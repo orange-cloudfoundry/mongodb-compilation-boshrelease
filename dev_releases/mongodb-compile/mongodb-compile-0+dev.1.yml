@@ -1,0 +1,90 @@
+name: mongodb-compile
+version: 0+dev.1
+commit_hash: 928ccba
+uncommitted_changes: true
+jobs:
+- name: make-tar
+  version: 749ae335915652a87089965f32c0b9c5b292e980
+  fingerprint: 749ae335915652a87089965f32c0b9c5b292e980
+  sha1: 3af0d722c36d66b6314abd92dea1ed8887ee8ca3
+packages:
+- name: binutils
+  version: 51742a5e1da14accab296b784d85fcaacf6fa2c0
+  fingerprint: 51742a5e1da14accab296b784d85fcaacf6fa2c0
+  sha1: 3bbd121398944cb7d50f9b93c46350b32fc47d36
+  dependencies:
+  - gcc
+  - compressors
+  - coreutils
+- name: cmake
+  version: 1d045df86fcb4b4eafc3e0c8a70428ac3830deb7
+  fingerprint: 1d045df86fcb4b4eafc3e0c8a70428ac3830deb7
+  sha1: 484fad299b8b59535420d69e1043b77e341cf0d3
+  dependencies:
+  - gcc
+- name: compressors
+  version: 0587333588e0186e611ff0cc215a4b86dbd5f490
+  fingerprint: 0587333588e0186e611ff0cc215a4b86dbd5f490
+  sha1: 125a8b81fa170ec9bd5a779a536c33e1211ca279
+  dependencies:
+  - gcc
+  - cmake
+- name: coreutils
+  version: f9b92b2c3d30502874ca936b99c4b58a8d3a6aad
+  fingerprint: f9b92b2c3d30502874ca936b99c4b58a8d3a6aad
+  sha1: 7698e7563870b13c46c2a2cba3bc6f43e2c6c483
+  dependencies:
+  - gcc
+- name: gcc
+  version: d923984b221276f05551e0c20df5d11415f6ddd9
+  fingerprint: d923984b221276f05551e0c20df5d11415f6ddd9
+  sha1: 4699afd68bfbbb3cd7e59fe9a6c75a7771eebd10
+  dependencies: []
+- name: golang-1.8-linux
+  version: 1509998fbf5c66cb8fc361a479beafb41ef8cc14
+  fingerprint: 1509998fbf5c66cb8fc361a479beafb41ef8cc14
+  sha1: 3d8d63ef92977b3e4ec1ac71a555e7374078fb80
+  dependencies: []
+- name: java-common
+  version: 018744938b5a691527c626963211f4ba4b5772bf
+  fingerprint: 018744938b5a691527c626963211f4ba4b5772bf
+  sha1: afbfb63acfeca837a12873c3c75941ba3c556588
+  dependencies: []
+- name: mongodb
+  version: dba769d102964f77239437acde4ad4cf81882090
+  fingerprint: dba769d102964f77239437acde4ad4cf81882090
+  sha1: bcb3e833c22e7e0e7bbd37015c709c8f7a0ff35c
+  dependencies:
+  - python
+  - scons
+  - golang-1.8-linux
+  - gcc
+  - compressors
+  - openssl
+  - binutils
+  - coreutils
+  - cmake
+- name: openssl
+  version: 0bc2fdede863330b9b37cbe7b35bb903791fa193
+  fingerprint: 0bc2fdede863330b9b37cbe7b35bb903791fa193
+  sha1: d8b9415dffa9877526703ae1f1935e8022b3a478
+  dependencies:
+  - gcc
+  - binutils
+- name: python
+  version: 3e47bd2a11ec35578c0d55dd76f907249ee8aabf
+  fingerprint: 3e47bd2a11ec35578c0d55dd76f907249ee8aabf
+  sha1: 093edb1665ec8ae40dbffe5f16fd7ae01f5bfd45
+  dependencies:
+  - gcc
+- name: scons
+  version: bafafe302325c7ba2c923dc4335a52df166fb8fc
+  fingerprint: bafafe302325c7ba2c923dc4335a52df166fb8fc
+  sha1: e5da4f89d977256aee161ff9eb85304429e97311
+  dependencies:
+  - python
+  - gcc
+license:
+  version: 0fbc9511a7e7f3a4d2f1af47f5ed327237b5f06c
+  fingerprint: 0fbc9511a7e7f3a4d2f1af47f5ed327237b5f06c
+  sha1: ceb762d748115b68744a9ff9424903a5bdfb910a

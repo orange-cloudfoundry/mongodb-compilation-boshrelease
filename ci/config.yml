@@ -1,0 +1,6 @@
+---
+bosh-server:
+  ip: 10.165.0.7
+  alias: bosh-concourse
+  user: concourse
+  password: concourse
