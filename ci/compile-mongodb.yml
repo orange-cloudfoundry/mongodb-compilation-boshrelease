@@ -5,6 +5,7 @@ jobs:
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
+      - get: go-1.8-vendor-package 
       - task: create-bosh-config
         config:
           platform: linux
@@ -23,25 +24,7 @@ jobs:
                 mkdir -p bosh-director-config
                 cd bosh-director-config || exit 115
                 cat > ./bosh_ca.crt <<EOF
-                -----BEGIN CERTIFICATE-----
-                MIIDEzCCAfugAwIBAgIQQjCfQi7CxoQv26iV1bvWCTANBgkqhkiG9w0BAQsFADAz
-                MQwwCgYDVQQGEwNVU0ExFjAUBgNVBAoTDUNsb3VkIEZvdW5kcnkxCzAJBgNVBAMT
-                AmNhMB4XDTE3MTEwMzEwNTIyNVoXDTE4MTEwMzEwNTIyNVowMzEMMAoGA1UEBhMD
-                VVNBMRYwFAYDVQQKEw1DbG91ZCBGb3VuZHJ5MQswCQYDVQQDEwJjYTCCASIwDQYJ
-                KoZIhvcNAQEBBQADggEPADCCAQoCggEBANz6S8KG714kjTtFq44REnqTMshYtSN/
-                rHXvSkDXu46aLcgWoGT+Ak2RO9QOUTVNv54pk7ogx4KTwsjeOi0hSgsvPWYytY4Q
-                MWTnQzKa9fsHRnybsLDZ+RK+qUKBpNGwj9+k64WSAVEPZdTGTNywlF6ArJmXg9v3
-                /I99tvUk49QgQxahyIxRHpoF+sc5iKgwChjLS/hZ1+hWOYDE+SepvTSQQigIbmxo
-                V7g7n1OXVygf2WbX7FksRV82ajyt4lUYj32r9m8nfp7gAICxDvdBAwMzDigcd0H0
-                wsGWV2+y6AywyXU/UfPx2h/MUOcvkJvEsUCjKFfyNzPfbTkcZAPuJPkCAwEAAaMj
-                MCEwDgYDVR0PAQH/BAQDAgEGMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQEL
-                BQADggEBAD7FJAA627Z3YdrfnPxzaIpr9Is9QvIbTRIsg3ukzEOZfsKRV7s/Oarp
-                T6AsuaUIgCmFB+uDzy6K2+wHq6ZlMoIHJ9loIpfTqJ1zOHW9tBeLCdX7u3omZB1n
-                jMATCYEyYHCnS+1V8mvFddC9JUqzO+JOQHTK6HXW5p77MTo17UiFY3kzI/Gq+Hb/
-                9v8lHqau/3O0y8W1PJlz+T+V6SbZpbrHiwgz0Ws1phTpV6rov2a4lIvXxOUKHV3s
-                yZrN8ij1sQLXboU/KQvgbWkNZxMkkt+kGVsBnB1NZbcgzQJZxhrV1I4I14uo7a9j
-                wAwY/0VT2nBvGJY+EceSsddWraST+OI=
-                -----END CERTIFICATE-----
+                ((bosh-server.ca))
                 EOF
                 export BOSH_CONFIG=$PWD/bosh_config.yml
                 bosh -e ((bosh-server.ip)) alias-env ((bosh-server.alias)) --ca-cert=./bosh_ca.crt
@@ -59,6 +42,7 @@ jobs:
         inputs:
           - name: bosh-director-config
           - name: mongodb-compilation-bosh-release
+          - name: go-1.8-vendor-package
         run:
           path: /bin/bash
           args:
@@ -68,7 +52,7 @@ jobs:
               cd mongodb-compilation-bosh-release|| exit 115
               bosh -e bosh-concourse create-release # --force
               bosh -e bosh-concourse upload-release
-              bosh -e bosh-concourse -d mongodb-compilation -n deploy manifest.yml
+              bosh -e bosh-concourse -d mongodb-compilation -n deploy manifest.yml -o ci/concourse-network.yml
 
     - task: run-errand
       config:
@@ -95,4 +79,8 @@ resources:
     type: git
     source:
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: master
+      branch: Initial-commit
+  - name: go-1.8-vendor-package
+    type: git
+    source:
+      uri: https://github.com/bosh-packages/golang-release.git
