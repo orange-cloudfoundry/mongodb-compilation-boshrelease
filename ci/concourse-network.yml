@@ -1,0 +1,4 @@
+- type: replace
+  path: /instance_groups/name=make_archive/networks?
+  value:
+    name:  concourse-deployment-net
