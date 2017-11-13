@@ -5,7 +5,7 @@ jobs:
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
-      - get: go-1.8-vendor-package 
+      - get: go-1.8-vendor-package
       - task: create-bosh-config
         config:
           platform: linux
@@ -71,8 +71,14 @@ jobs:
             - -exc
             - |
               export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
-              cd mongodb-bosh-release || exit 115
-              bosh -e bosh-concourse -d mongodb-compilation -n run-errand make-tar --keep-alive           
+              cd mongodb-compilation-bosh-release || exit 115
+              bosh -e bosh-concourse -d mongodb-compilation -n run-errand make-tar --keep-alive
+              bosh -e bosh-concourse -d mongodb-compilation scp /var/vcap/store/$JOB_NAME/archive/mongodb-linux-x86_64-*.tar.gz .
+              file=`ls mongodb-linux-x86_64-*.tar.gz`
+              bosh -e bosh-concourse add-blob $file mongodb/$file
+              bosh -e bosh-concourse upload-blobs
+              bosh -e bosh-concourse -n delete-vm $(bosh -e bosh-concourse -d mongodb-compilation vms --column="vm cid")
+              bosh -e bosh-concourse -n delete-disk $(bosh -e bosh-concourse -d mongodb-compilation disks --orphaned --column="disk cid")
 
 resources:
   - name: mongodb-compilation-bosh-release
