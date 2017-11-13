@@ -30,9 +30,6 @@ instance_groups:
   stemcell: trusty
   networks:
   - name: mongo1
-  persistent_disk_type: small
-  env:
-    persistent_disk_fs: xfs
   jobs:
   - name: make-tar
     release: mongodb-compile
