@@ -52,7 +52,9 @@ jobs:
               cd mongodb-compilation-bosh-release|| exit 115
               bosh -e bosh-concourse create-release # --force
               bosh -e bosh-concourse upload-release
-              bosh -e bosh-concourse -d mongodb-compilation -n deploy manifest.yml -o ci/concourse-network.yml
+
+              bosh -e bosh-concourse -d mongodb-compilation -n deploy \
+              manifest.yml -o ci/concourse-network.yml
 
     - task: run-errand
       config:
@@ -73,12 +75,22 @@ jobs:
               export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
               cd mongodb-compilation-bosh-release || exit 115
               bosh -e bosh-concourse -d mongodb-compilation -n run-errand make-tar --keep-alive
-              bosh -e bosh-concourse -d mongodb-compilation scp /var/vcap/store/$JOB_NAME/archive/mongodb-linux-x86_64-*.tar.gz .
+
+              src_vm=$(bosh -e bosh-concourse -d mongodb-compilation vms --column="instance")
+
+              bosh -e bosh-concourse -d mongodb-compilation scp \
+              ${src_vm}:/vcap/data/((job_name))/archive/mongodb-linux-x86_64-*.tar.gz .
+
               file=`ls mongodb-linux-x86_64-*.tar.gz`
-              bosh -e bosh-concourse add-blob $file mongodb/$file
+              echo file: $file
+              bosh -e bosh-concourse add-blob $file mongodb/$file \
               bosh -e bosh-concourse upload-blobs
-              bosh -e bosh-concourse -n delete-vm $(bosh -e bosh-concourse -d mongodb-compilation vms --column="vm cid")
-              bosh -e bosh-concourse -n delete-disk $(bosh -e bosh-concourse -d mongodb-compilation disks --orphaned --column="disk cid")
+
+              bosh -e bosh-concourse -n delete-vm $(bosh -e bosh-concourse -d \
+              mongodb-compilation vms --column="vm cid")
+
+              bosh -e bosh-concourse -n delete-disk $(bosh -e bosh-concourse \
+              -d mongodb-compilation disks --orphaned --column="disk cid")
 
 resources:
   - name: mongodb-compilation-bosh-release
