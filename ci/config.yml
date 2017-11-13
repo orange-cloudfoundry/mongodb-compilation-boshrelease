@@ -24,4 +24,8 @@ bosh-server:
     hJ5UL9ooWdOOb/knOkfsxRCrxSA4rfHPOsx6ZTasUjOKfCwJ2r4nI1jtnqrzxcfv
     RkS35WssdbIVW2vGHki8KLXM+NN5Nr3n
     -----END CERTIFICATE-----
-job_name: make-tar
+bosh-deployment:
+  name: mongodb-compilation
+  instance-group: make_archive
+  release: mongodb-compile
+  job: make-tar
