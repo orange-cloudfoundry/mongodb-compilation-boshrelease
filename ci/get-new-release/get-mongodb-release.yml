@@ -41,10 +41,11 @@ jobs:
           inputs:
             - name: bosh-director-config
           run:
-            path:  path: /bin/bash
+            path: /bin/bash
             args:
               - -exc
               - |
+                export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
                 cd mongodb-compilation-bosh-release/ci/get-new-release/bin/
                 ./get_last_mongo_version.pl
                 
@@ -53,4 +54,4 @@ resources:
     type: git
     source:
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: Initial-commit
+      branch: Checking-new-release
