@@ -1,0 +1,31 @@
+---
+bosh-server:
+  ip: 10.165.0.4
+  alias: bosh-concourse
+  user: concourse
+  password: concourse
+  ca: |
+    -----BEGIN CERTIFICATE-----
+    MIIDFDCCAfygAwIBAgIRAIZ0WR+HTT005ldEnHHVTOYwDQYJKoZIhvcNAQELBQAw
+    MzEMMAoGA1UEBhMDVVNBMRYwFAYDVQQKEw1DbG91ZCBGb3VuZHJ5MQswCQYDVQQD
+    EwJjYTAeFw0xNzExMTIwMTI4NTJaFw0xODExMTIwMTI4NTJaMDMxDDAKBgNVBAYT
+    A1VTQTEWMBQGA1UEChMNQ2xvdWQgRm91bmRyeTELMAkGA1UEAxMCY2EwggEiMA0G
+    CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC6r9WA3QpXsQawpdwG4qyLjxYLVf8F
+    W1fiZNBSnvGthlX5ispdnFSp28xhzCuu7fWxn4kDNlgTVJDbcP7wAA3OGweqyy2M
+    waSieAthjo5xwBBagRAgpaUwWULqlQKKGtLEPZoEZ8Os2ZziMIg+429dBS/VGKLF
+    QGDDKzphQ4hbRclAgComwS2jvH2Myo+qtMLVG4yPUjEeG7L4aDb34fxIn1gL4Wxt
+    YArxgu9rQluzVVVS6bW8Qc0E5oTz+PSj/fwSWl0MwKuShT+2bBrAlszfWkiIjqBO
+    kQ2i6VTFnAHUj60dVNyfqRrl4ZCb9lsGULpBChUnKhhUJnC4KgBdxsDdAgMBAAGj
+    IzAhMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEB
+    CwUAA4IBAQCGvyyaP1gxlGF+3+ifyPv9mCCxSVjYXf2Kz4kXNHYMoWXkuw1XC/L5
+    Yud6sQavKd7m6euRcJwIZHKQTIKtNr9iPjs+OcErSNz2ojv8RahB/6RKztWBjfgI
+    YFuz0AHOK5RZRIQHDx/NpPE8cdr0A/epnwtYTQOq8qetcmKJ+TVaNPnG+fjxBOQs
+    GBhZjVtb+mMGmhB8TRR3S9E1A1aMd68sKzA1v9j/i5L4wnlgGWKRSzGdMBbWDYPI
+    hJ5UL9ooWdOOb/knOkfsxRCrxSA4rfHPOsx6ZTasUjOKfCwJ2r4nI1jtnqrzxcfv
+    RkS35WssdbIVW2vGHki8KLXM+NN5Nr3n
+    -----END CERTIFICATE-----
+bosh-deployment:
+  name: mongodb-compilation
+  instance-group: make_archive
+  release: mongodb-compile
+  job: make-tar
