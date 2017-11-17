@@ -8,7 +8,7 @@ my $valid_tar=0;
 my $http_status="ko";
 
 # getting all info from community page and putting them in an array
-my @rel=`curl -s -L  https://www.mongodb.com/download-center#community`;
+my @rel=`curl -s -L  https://www.mongodb.com/download-center`;
 
 foreach my $i (@rel){
 	# searching for version in array

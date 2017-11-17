@@ -1,10 +1,29 @@
 ---
+resources:
+  - name: mongodb-compilation-bosh-release
+    type: git
+    source:
+      uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
+      branch: ((git.branch))
+  - name: last-compiled-version
+    type: semver
+    source: 
+      initial_version: 1.0.0
+      driver: git
+      uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
+      branch: ((git.branch))
+      file: compiled_version
+      username: ((git.username))
+      password: ((git.password))
+      git_user: "((git.git_user)) <((git.email))>"
+
 jobs:
-- name: get-mongodb-release
+- name: get-last-compiled-version
   serial: true
   plan:
     - aggregate:
-      - get: mongodb-compilation-bosh-release
+      - get: last-compiled-version
+      - get: mongodb-compilation-bosh-release 
       - task: create-bosh-config
         config:
           platform: linux
@@ -30,7 +49,60 @@ jobs:
                 ( echo ((bosh-server.user)) ; echo ((bosh-server.password)) ) \
                     | bosh -e ((bosh-server.alias)) log-in
 
-      - task: check-current-stable-release
+    - task: check-last-uploaded-src
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: concourse/bosh-cli
+            tag: latest
+        inputs:
+          - name: bosh-director-config
+          - name: mongodb-compilation-bosh-release
+        outputs:
+          - name: last-compiled-version  
+        run:
+          path: /bin/bash
+          args:
+            - -exc
+            - |
+              pushd mongodb-compilation-bosh-release
+              bosh -e ((bosh-server.ip)) blobs
+              popd
+              echo last compiled: $last-compiled-version
+              echo 6.6.6 > last-compiled-version/version
+    - put: last-compiled-version
+      params: {file: last-compiled-version/version}                
+
+- name: get-mongodb-release
+  serial: true
+  plan:
+    - aggregate:
+      - do:
+        - get: mongodb-compilation-bosh-release
+        - task: check-current-stable-release
+          config:
+            platform: linux
+            image_resource:
+              type: docker-image
+              source:
+                repository: concourse/bosh-cli
+                tag: latest
+            inputs:
+              - name: mongodb-compilation-bosh-release
+            outputs:
+              - name: mongo-versions  
+            run:
+              path: /bin/bash
+              args:
+                - -exc
+                - |
+                  apt install -y curl
+                  mkdir -p mongo-versions
+                  cd mongo-versions || exit 115
+                  last_stable_version=../mongodb-compilation-bosh-release/ci/get-new-release/bin/get_last_mongo_version.pl
+      - task: create-bosh-config
         config:
           platform: linux
           image_resource:
@@ -38,20 +110,23 @@ jobs:
             source:
               repository: concourse/bosh-cli
               tag: latest
-          inputs:
+          outputs:
             - name: bosh-director-config
           run:
             path: /bin/bash
             args:
               - -exc
               - |
-                export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
-                cd mongodb-compilation-bosh-release/ci/get-new-release/bin/
-                ./get_last_mongo_version.pl
-                
-resources:
-  - name: mongodb-compilation-bosh-release
-    type: git
-    source:
-      uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: Checking-new-release
+                mkdir -p bosh-director-config
+                cd bosh-director-config || exit 115
+                cat > ./bosh_ca.crt <<EOF
+                ((bosh-server.ca))
+                EOF
+                export BOSH_CONFIG=$PWD/bosh_config.yml
+                bosh -e ((bosh-server.ip)) alias-env ((bosh-server.alias)) --ca-cert=./bosh_ca.crt
+                ( echo ((bosh-server.user)) ; echo ((bosh-server.password)) ) \
+                    | bosh -e ((bosh-server.alias)) log-in
+  
+    
+
+   
