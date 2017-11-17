@@ -98,13 +98,15 @@ jobs:
         inputs:
           - name: bosh-director-config
           - name: mongodb-compilation-bosh-release
+        outputs:
+          - name: to-upload
         run:
           path: /bin/bash
           args:
             - -exc
             - |
               export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
-              cd ((bosh-deployment.name))-bosh-release || exit 115
+              pushd mongodb-compilation-bosh-release || exit 115
               bosh -e ((bosh-server.alias)) -d ((bosh-deployment.name)) -n run-errand make-tar --keep-alive
 
               src_vm=$(bosh -e ((bosh-server.alias)) -d ((bosh-deployment.name)) vms --column="instance"|tr -d [:space:])
@@ -116,16 +118,49 @@ jobs:
               echo file: $file
               bosh -e ((bosh-server.alias)) add-blob $file mongodb/$file
               bosh -e ((bosh-server.alias)) upload-blobs
-
               bosh -e ((bosh-server.alias)) -d ((bosh-deployment.name)) -n delete-vm $(bosh -e ((bosh-server.alias)) -d \
               ((bosh-deployment.name)) vms --column="vm cid")
+              popd
+              rsync -ra mongodb-compilation-bosh-release/ to-upload/
+
+    - task: update-github
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: concourse/bosh-cli
+            tag: latest
+        inputs:
+          - name: to-upload
+        run:
+          path: /bin/bash
+          args:
+            - -exc
+            - |
+              cd to-upload || exit 115
+              git config --global user.email ((repo.email))
+              git config --global user.name "((repo.name))"
+              git branch "Upload-test"
+              git checkout Upload-test
+              git commit -m "Adding Last compiled blob to blob list" config/blobs.yml
+    - put: mongodb-compilation-bosh-release-out
+      params:
+        repository: to-upload
 
 resources:
   - name: mongodb-compilation-bosh-release
     type: git
     source:
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: Initial-commit
+      branch: Checking-new-release
+  - name: mongodb-compilation-bosh-release-out
+    type: git
+    source:
+      uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
+      branch: Upload-test
+      username: ((repo.username))
+      password: ((repo.password))
   - name: go-1.8-vendor-package
     type: git
     source:
