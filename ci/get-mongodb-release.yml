@@ -58,10 +58,10 @@ jobs:
 - name: upload-src
   serial: true
   plan:
-    - aggregate:
-      - get: mongodb-compilation-bosh-release
-      - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/tasks/create-bosh-config.yml
+    
+    - get: mongodb-compilation-bosh-release
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/tasks/create-bosh-config.yml
 
     - get: dl-versions
       trigger: true

@@ -10,6 +10,13 @@ image_resource:
 outputs:
   - name: bosh-director-config
 
+params:
+  CA-CERT: ((bosh-server.ca))
+  IP: ((bosh-server.ip))
+  ALIAS: ((bosh-server.alias)) 
+  USER: ((bosh-server.user))
+  PASSWORD: ((bosh-server.password))
+
 run:
   path: /bin/bash
   args:
@@ -18,9 +25,9 @@ run:
       mkdir -p bosh-director-config
       cd bosh-director-config || exit 115
       cat > ./bosh_ca.crt <<EOF
-      ((bosh-server.ca))
+      $CA-CERT
       EOF
       export BOSH_CONFIG=$PWD/bosh_config.yml
-      bosh -e ((bosh-server.ip)) alias-env ((bosh-server.alias)) --ca-cert=./bosh_ca.crt
-      ( echo ((bosh-server.user)) ; echo ((bosh-server.password)) ) \
-          | bosh -e ((bosh-server.alias)) log-in
+      bosh -e $IP alias-env $ALIAS --ca-cert=./bosh_ca.crt
+      ( echo $USER ; echo $PASSWORD ) \
+          | bosh -e $ALIAS log-in
