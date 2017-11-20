@@ -13,10 +13,10 @@ unpause:
 	fly -t $(TARGET) unpause-pipeline -p $(PIPELINE)
 
 trigger:
-	fly -t $(TARGET) trigger-job -j $(PIPELINE)/get-last-compiled-version
+	fly -t $(TARGET) trigger-job -j $(PIPELINE)/check-versions
 
 delete:
 	fly -t $(TARGET) dp -p $(PIPELINE) --non-interactive
 
 check:
-	fly -t $(TARGET) check-resource --resource $(PIPELINE)/last-compiled-version
+	fly -t $(TARGET) check-resource --resource $(PIPELINE)/check-versions

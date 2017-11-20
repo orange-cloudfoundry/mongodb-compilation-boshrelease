@@ -1,0 +1,38 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: concourse/bosh-cli
+    tag: latest
+
+inputs:
+  - name: mongodb-compilation-bosh-release
+  - name: mongodb-version
+  - name: rocksdb-version
+
+outputs:
+  - name: dl-versions
+  
+run:
+  path: /bin/bash
+  args:
+    - -exc
+    - |
+      apt install -y curl jq
+      last_mongodb_version=$(cat mongodb-version/version)
+      last_rocksdb_version=$(cat rocksdb-version/version)
+      mongodb_last_stable=$(mongodb-compilation-bosh-release/ci/get-new-release/bin/get_last_mongo_version.pl)
+      mongodb_last_stable=3.4.7 
+      [ "$mongodb_last_stable" == "" ] && mongodb_last_stable=$last_mongodb_version
+      rocksdb_last_stable=$(mongodb-compilation-bosh-release/ci/get-new-release/bin/get_last_rocksdb_version.pl)
+      [ "rocksdb_last_stable" == "" ] && rocksdb_last_stable=$last_rocksdb_version
+      mkdir -p dl-versions
+      pushd dl-versions || exit 666
+      > dl-versions.properties
+      [ "$last_mongodb_version" != "$mongodb_last_stable" ] && \
+          echo "mongodb=${mongodb_last_stable}" >> dl-versions.properties
+      [ "$last_rocksdb_version" != "$rocksdb_last_stable" ] && \
+          echo "rocksdb=${rocksdb_last_stable}" >> dl-versions.properties
+      popd

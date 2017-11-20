@@ -1,0 +1,26 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: concourse/bosh-cli
+    tag: latest
+
+outputs:
+  - name: bosh-director-config
+
+run:
+  path: /bin/bash
+  args:
+    - -exc
+    - |
+      mkdir -p bosh-director-config
+      cd bosh-director-config || exit 115
+      cat > ./bosh_ca.crt <<EOF
+      ((bosh-server.ca))
+      EOF
+      export BOSH_CONFIG=$PWD/bosh_config.yml
+      bosh -e ((bosh-server.ip)) alias-env ((bosh-server.alias)) --ca-cert=./bosh_ca.crt
+      ( echo ((bosh-server.user)) ; echo ((bosh-server.password)) ) \
+          | bosh -e ((bosh-server.alias)) log-in

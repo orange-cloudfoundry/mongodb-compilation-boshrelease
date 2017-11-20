@@ -1,0 +1,34 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: concourse/bosh-cli
+    tag: latest
+
+inputs:
+  - name: dl-versions
+  - name: downloaded-src
+  - name: bosh-director-config
+  - name: mongodb-compilation-bosh-release
+
+outputs:
+  - name: to-upload  
+
+run:
+  path: /bin/bash
+  args:
+    - -exc
+    - |
+      ROOT_FOLDER=${PWD}
+      pushd mongodb-compilation-bosh-release
+      for i in $(find ${ROOT_FOLDER}/downloaded-src -type f -name '*.tar.gz' -print)
+      do
+        product=$(basename $(dirname $i))
+        archive=$(basename $i)
+        bosh add-blob $i $product/$archive
+        bosh -e ((bosh-server.alias)) upload-blobs
+      done
+      popd
+      rsync -ra mongodb-compilation-bosh-release/ to-upload/

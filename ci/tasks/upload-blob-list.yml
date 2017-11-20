@@ -1,0 +1,26 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: garland/aws-cli-docker
+    tag: latest
+
+inputs:
+  - name: to-upload
+
+run:
+  path: /bin/sh
+  args:
+    - -exc
+    - |
+      mkdir -p ~/.aws 
+      cat > ~/.aws/credentials <<EOF 
+      [default]
+      aws_access_key_id=((S3.access_key_id))
+      aws_secret_access_key=((S3.secret_access_key))
+      EOF
+
+      cd to-upload || exit 666
+      aws --endpoint-url ((S3.endpoint-url)) --no-verify-ssl s3 cp config/blobs.yml s3://((S3.bucket))/ci/blobs.yml
