@@ -61,7 +61,7 @@ jobs:
     - aggregate:
       - get: mongodb-compilation-bosh-release
       - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/create-bosh-config.yml
+        file: mongodb-compilation-bosh-release/ci/tasks/create-bosh-config.yml
 
     - get: dl-versions
       trigger: true
