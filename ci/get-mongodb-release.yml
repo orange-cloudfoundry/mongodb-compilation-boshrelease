@@ -62,7 +62,13 @@ jobs:
     - get: mongodb-compilation-bosh-release
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/tasks/create-bosh-config.yml
-
+      params:
+        CA-CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+  
     - get: dl-versions
       trigger: true
       passed: [check-versions]

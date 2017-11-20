@@ -10,13 +10,6 @@ image_resource:
 outputs:
   - name: bosh-director-config
 
-params:
-  CA-CERT: ((bosh-server.ca))
-  IP: ((bosh-server.ip))
-  ALIAS: ((bosh-server.alias)) 
-  USER: ((bosh-server.user))
-  PASSWORD: ((bosh-server.password))
-
 run:
   path: /bin/bash
   args:
