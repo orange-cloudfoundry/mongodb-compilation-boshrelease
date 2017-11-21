@@ -16,8 +16,9 @@ do
   # removing old blobs
   for j in $(bosh -e $ALIAS blobs| grep "^${product}/${prefix}" | grep -v $version | cut -d" " -f1)
   do
-  	bosh -e $ALIAS -n remove-blobs $j
+  	bosh -e $ALIAS -n remove-blob $j
   done
+
 done
 
 popd
