@@ -1,4 +1,6 @@
-#!/usr/bin/env bash -exc
+#!/usr/bin/env bash 
+
+set -exc
 
 # Installing needed packages
 apt install -y curl jq

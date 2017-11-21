@@ -1,4 +1,6 @@
-#!/usr/bin/env bash -exc
+#!/usr/bin/env bash 
+
+set -exc
 
 ROOT_FOLDER=${PWD}
 

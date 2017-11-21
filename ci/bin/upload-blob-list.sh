@@ -1,4 +1,6 @@
-#!/usr/bin/env sh -exc
+#!/usr/bin/env sh 
+
+set -exc
 
 mkdir -p ~/.aws
 

@@ -1,4 +1,6 @@
-#!/usr/bin/env bash -exc
+#!/usr/bin/env bash 
+
+set -exc
 
 mkdir -p bosh-director-config
 cd bosh-director-config || exit 115
