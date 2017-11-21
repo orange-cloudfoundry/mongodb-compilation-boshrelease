@@ -9,6 +9,7 @@ image_resource:
 
 inputs:
   - name: to-upload
+  - name: mongodb-compilation-bosh-release
 
 run:
   path: mongodb-compilation-bosh-release/ci/bin/upload-blob-list.sh
