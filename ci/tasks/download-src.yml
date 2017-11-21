@@ -8,7 +8,8 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: dl-versions    
+  - name: dl-versions
+  - name: mongodb-compilation-bosh-release
 
 outputs:
   - name: downloaded-src
