@@ -14,7 +14,7 @@ inputs:
   - name: mongodb-compilation-bosh-release
 
 outputs:
-  - name: to-upload  
+  - name: to-upload
 
 run:
   path: /bin/bash
