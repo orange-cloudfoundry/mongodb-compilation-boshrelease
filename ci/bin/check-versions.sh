@@ -27,7 +27,7 @@ mkdir -p dl-versions
 
 pushd dl-versions || exit 666
 
-> dl-versions.properties
+echo "last_check=$(date '+%Y-%d-%m %H:%M')"> dl-versions.properties
 [ "$last_mongodb_version" != "$mongodb_last_stable" ] && \
     echo "mongodb=${mongodb_last_stable}" >> dl-versions.properties
 [ "$last_rocksdb_version" != "$rocksdb_last_stable" ] && \
