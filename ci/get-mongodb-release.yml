@@ -40,6 +40,11 @@ resources:
   - name: dl-versions
     type: keyval
 
+  - name: go-1.8-vendor-package
+    type: git
+    source:
+      uri: https://github.com/bosh-packages/golang-release.git  
+
 jobs:
 - name: check-versions
   serial: true
@@ -93,3 +98,86 @@ jobs:
         SECRET_ACCESS_KEY: ((S3.secret_access_key))
         ENDPOINT_URL: ((S3.endpoint-url))
         BUCKET: ((S3.bucket))
+
+- name: compilation
+  serial: true
+  plan:
+    - aggregate:
+      - get: mongodb-compilation-bosh-release
+      - get: go-1.8-vendor-package
+    
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/tasks/create-bosh-config.yml
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+
+    - task: create-release
+      file: mongodb-compilation-bosh-release/ci/tasks/create-release.yml
+      params:
+        ALIAS: ((bosh-server.alias)) 
+        BOSH_RELEASE: ((bosh-deployment.release))
+        
+    - task: run-errand
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: concourse/bosh-cli
+            tag: latest
+        inputs:
+          - name: bosh-director-config
+          - name: mongodb-compilation-bosh-release
+        outputs:
+          - name: to-upload
+        run:
+          path: /bin/bash
+          args:
+            - -exc
+            - |
+              export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
+              pushd mongodb-compilation-bosh-release || exit 115
+              bosh -e ((bosh-server.alias)) -d ((bosh-deployment.name)) -n run-errand make-tar --keep-alive
+
+              src_vm=$(bosh -e ((bosh-server.alias)) -d ((bosh-deployment.name)) vms --column="instance"|tr -d [:space:])
+
+              bosh -e ((bosh-server.alias)) -d ((bosh-deployment.name)) scp \
+              ${src_vm}:/var/vcap/store/((bosh-deployment.job))/archive/mongodb-linux-x86_64-*.tar.gz .
+
+              file=`ls mongodb-linux-x86_64-*.tar.gz`
+              echo file: $file
+              bosh -e ((bosh-server.alias)) add-blob $file mongodb/$file
+              bosh -e ((bosh-server.alias)) upload-blobs
+              bosh -e ((bosh-server.alias)) -d ((bosh-deployment.name)) -n delete-vm $(bosh -e ((bosh-server.alias)) -d \
+              ((bosh-deployment.name)) vms --column="vm cid")
+              popd
+              rsync -ra mongodb-compilation-bosh-release/ to-upload/
+
+    - task: update-github
+      config:
+        platform: linux
+        image_resource:
+          type: docker-image
+          source:
+            repository: concourse/bosh-cli
+            tag: latest
+        inputs:
+          - name: to-upload
+        run:
+          path: /bin/bash
+          args:
+            - -exc
+            - |
+              cd to-upload || exit 115
+              git config --global user.email ((repo.email))
+              git config --global user.name "((repo.name))"
+              git branch "Upload-test"
+              git checkout Upload-test
+              git commit -m "Adding Last compiled blob to blob list" config/blobs.yml
+    - put: mongodb-compilation-bosh-release-out
+      params:
+        repository: to-upload
