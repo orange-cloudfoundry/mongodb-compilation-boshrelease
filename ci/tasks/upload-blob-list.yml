@@ -11,16 +11,5 @@ inputs:
   - name: to-upload
 
 run:
-  path: /bin/sh
-  args:
-    - -exc
-    - |
-      mkdir -p ~/.aws 
-      cat > ~/.aws/credentials <<EOF 
-      [default]
-      aws_access_key_id=$ACCESS_KEY_ID
-      aws_secret_access_key=$SECRET_ACCESS_KEY
-      EOF
+  path: mongodb-compilation-bosh-release/ci/bin/upload-blob-list.sh
 
-      cd to-upload || exit 666
-      aws --endpoint-url $ENDPOINT_URL --no-verify-ssl s3 cp config/blobs.yml s3://$BUCKET/ci/blobs.yml
