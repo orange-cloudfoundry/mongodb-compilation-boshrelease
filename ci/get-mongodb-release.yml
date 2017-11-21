@@ -63,7 +63,7 @@ jobs:
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/tasks/create-bosh-config.yml
       params:
-        CA-CERT: ((bosh-server.ca))
+        CA_CERT: ((bosh-server.ca))
         IP: ((bosh-server.ip))
         ALIAS: ((bosh-server.alias)) 
         USER: ((bosh-server.user))
