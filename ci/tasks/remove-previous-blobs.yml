@@ -9,8 +9,7 @@ image_resource:
 
 inputs:
   - name: bosh-director-config
-  - name: to-upload
-  - name: dl-versions  
+  - name: downloaded-src 
 
 outputs:
   - name: to-upload
