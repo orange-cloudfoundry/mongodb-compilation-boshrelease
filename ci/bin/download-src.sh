@@ -34,7 +34,7 @@ if [ "$rocksdb_version" != "" ]
 then
 	mkdir -p rocksdb
 	cd rocksdb || exit 666
-	curl -o rocks-rocks-${rocksdb_version}.tar.gz \
+	curl -o rocksdb-${rocksdb_version}.tar.gz \
 	  -L https://codeload.github.com/facebook/rocksdb/tar.gz/v${rocksdb_version}
 fi
 popd
