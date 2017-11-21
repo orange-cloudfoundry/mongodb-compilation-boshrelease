@@ -7,23 +7,23 @@ export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 pushd mongodb-compilation-bosh-release|| exit 666
 
 # Creating fake files for already deployed releases
-if [ ! -d dev_releases/$BOSH_RELEASE ]
+if [ ! -d dev_releases/${BOSH_RELEASE} ]
 then
-    mkdir -p dev_releases/$BOSH_RELEASE
+    mkdir -p dev_releases/${BOSH_RELEASE}
 fi
 
-for release in $(bosh -e $ALIAS releases -d mongodb-compilation --column="Version")
+for release in $(bosh -e ${ALIAS} releases -d ${DEPLOYMENT_NAME} --column="Version")
 do
     release=$(echo $release|sed -e "s/\*$//")
-    commit_hash=$(bosh -e $ALIAS releases -d mongodb-compilation --column="commit hash")
-    if [ ! -f dev_releases/$BOSH_RELEASE/index.yml ]
+    commit_hash=$(bosh -e ${ALIAS} releases -d ${DEPLOYMENT_NAME} --column="commit hash")
+    if [ ! -f dev_releases/${BOSH_RELEASE}/index.yml ]
     then
-        echo "builds:" > dev_releases/$BOSH_RELEASE/index.yml
+        echo "builds:" > dev_releases/${BOSH_RELEASE}/index.yml
     fi
-    if [ ! -f dev_releases/$BOSH_RELEASE/$BOSH_RELEASE-${release}.yml ]
+    if [ ! -f dev_releases/${BOSH_RELEASE}/${BOSH_RELEASE}-${release}.yml ]
     then
-        cat > dev_releases/$BOSH_RELEASE/$BOSH_RELEASE-${release}.yml <<EOF
-        name: mongodb-compilation
+        cat > dev_releases/${BOSH_RELEASE}/${BOSH_RELEASE}-${release}.yml <<EOF
+        name: ${DEPLOYMENT_NAME}
         version: ${release}
         commit_hash: ${commit_hash}
         uncommitted_changes: false
@@ -35,11 +35,11 @@ EOF
     fi
 done
 
-bosh -e $ALIAS create-release --force
+bosh -e ${ALIAS} create-release --force
 
-bosh -e $ALIAS  upload-release
+bosh -e ${ALIAS} upload-release
 
-bosh -e $ALIAS -d mongodb-compilation -n deploy \
+bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n deploy \
 manifest.yml -o ci/concourse-network.yml
 
 popd
