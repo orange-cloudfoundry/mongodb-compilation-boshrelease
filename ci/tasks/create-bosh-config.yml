@@ -7,6 +7,9 @@ image_resource:
     repository: concourse/bosh-cli
     tag: latest
 
+inputs:
+  - name: mongodb-compilation-bosh-release    
+
 outputs:
   - name: bosh-director-config
 
