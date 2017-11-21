@@ -14,3 +14,6 @@ EOF
 cd to-upload || exit 666
 #upload blob list
 aws --endpoint-url $ENDPOINT_URL --no-verify-ssl s3 cp config/blobs.yml s3://$BUCKET/ci/blobs.yml
+
+# create keyval file to indicate the end of sources upload job
+echo "date=$(date +%Y-%d-%m %H24:M%)" > update-ok.properties
