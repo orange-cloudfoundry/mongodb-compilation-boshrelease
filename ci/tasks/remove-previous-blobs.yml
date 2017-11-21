@@ -9,7 +9,8 @@ image_resource:
 
 inputs:
   - name: bosh-director-config
-  - name: downloaded-src 
+  - name: downloaded-src
+  - name: mongodb-compilation-bosh-release
 
 outputs:
   - name: to-upload
