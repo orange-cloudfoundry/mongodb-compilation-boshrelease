@@ -1,0 +1,19 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: concourse/bosh-cli
+    tag: latest
+
+inputs:
+  - name: bosh-director-config
+  - name: to-upload
+  - name: dl-versions  
+
+outputs:
+  - name: to-upload
+
+run:
+  path: mongodb-compilation-bosh-release/ci/bin/remove-previous-blobs.sh

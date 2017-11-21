@@ -81,6 +81,11 @@ jobs:
       params:
         ALIAS: ((bosh-server.alias))
 
+    - task: remove-previous-blobs
+      file: mongodb-compilation-bosh-release/ci/tasks/remove-previous-blobs.yml
+      params:
+        ALIAS: ((bosh-server.alias))
+
     - task: upload-blob-list
       file: mongodb-compilation-bosh-release/ci/tasks/upload-blob-list.yml
       params:
