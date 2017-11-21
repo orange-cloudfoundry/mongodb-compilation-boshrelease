@@ -16,4 +16,4 @@ done
 
 popd
 
-rsync -ra mongodb-compilation-bosh-release/ to-upload/
+rsync -ra mongodb-compilation-bosh-release/ to-upload-pre/

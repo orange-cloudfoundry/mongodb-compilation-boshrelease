@@ -11,7 +11,8 @@ inputs:
   - name: bosh-director-config
   - name: downloaded-src
   - name: mongodb-compilation-bosh-release
-
+  - name: to-upload-pre
+  
 outputs:
   - name: to-upload
 
