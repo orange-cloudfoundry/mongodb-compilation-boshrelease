@@ -79,7 +79,7 @@ jobs:
     - task: upload-bosh
       file: mongodb-compilation-bosh-release/ci/tasks/upload-bosh.yml
       params:
-        ALIAS: ((bosh-server.alias)) 
+        ALIAS: ((bosh-server.alias))
 
     - task: upload-blob-list
       file: mongodb-compilation-bosh-release/ci/tasks/upload-blob-list.yml
