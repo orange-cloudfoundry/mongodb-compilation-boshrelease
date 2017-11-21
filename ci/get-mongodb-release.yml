@@ -78,6 +78,13 @@ jobs:
 
     - task: upload-bosh
       file: mongodb-compilation-bosh-release/ci/tasks/upload-bosh.yml
+      params:
+        ALIAS: ((bosh-server.alias)) 
 
     - task: upload-blob-list
       file: mongodb-compilation-bosh-release/ci/tasks/upload-blob-list.yml
+      params:
+        ACCESS_KEY_ID: ((S3.access_key_id))
+        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+        ENDPOINT_URL: ((S3.endpoint-url))
+        BUCKET: ((S3.bucket))

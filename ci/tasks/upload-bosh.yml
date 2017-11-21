@@ -28,7 +28,7 @@ run:
         product=$(basename $(dirname $i))
         archive=$(basename $i)
         bosh add-blob $i $product/$archive
-        bosh -e ((bosh-server.alias)) upload-blobs
+        bosh -e $ALIAS upload-blobs
       done
       popd
       rsync -ra mongodb-compilation-bosh-release/ to-upload/

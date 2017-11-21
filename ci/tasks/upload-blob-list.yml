@@ -18,9 +18,9 @@ run:
       mkdir -p ~/.aws 
       cat > ~/.aws/credentials <<EOF 
       [default]
-      aws_access_key_id=((S3.access_key_id))
-      aws_secret_access_key=((S3.secret_access_key))
+      aws_access_key_id=$ACCESS_KEY_ID
+      aws_secret_access_key=$SECRET_ACCESS_KEY
       EOF
 
       cd to-upload || exit 666
-      aws --endpoint-url ((S3.endpoint-url)) --no-verify-ssl s3 cp config/blobs.yml s3://((S3.bucket))/ci/blobs.yml
+      aws --endpoint-url $ENDPOINT_URL --no-verify-ssl s3 cp config/blobs.yml s3://$BUCKET/ci/blobs.yml
