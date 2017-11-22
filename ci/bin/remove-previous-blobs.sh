@@ -4,7 +4,9 @@ set -ex
 
 ROOT_FOLDER=${PWD}
 
-pushd to-upload-pre
+cp -rp to-upload-pre/. to-upload
+
+pushd to-upload
 
 for i in $(find ${ROOT_FOLDER}/downloaded-src -type f -name '*.tar.gz' -print)
 do
@@ -22,5 +24,3 @@ do
 done
 
 popd
-
-rsync -ra to-upload-pre/ to-upload/
