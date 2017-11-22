@@ -1,0 +1,25 @@
+#!/usr/bin/env bash 
+
+export JOB_NAME='make-tar'
+
+# Setup archive folders
+
+export ARC_DIR=/var/vcap/store/$JOB_NAME/archive
+export SRC_DIR=/var/vcap/store/$JOB_NAME/src
+
+export ARCHIVE=${ARC_DIR}/mongodb-linux-x86_64-<%= p("mongodb-version") -%>.tar.gz 
+
+[ ! -d ${ARC_DIR} ] && mkdir -p ${ARC_DIR} 
+[ ! -d ${SRC_DIR} ] && mkdir -p ${SRC_DIR}
+
+rm -rf ${SRC_DIR}/*
+
+[ -f ${ARCHIVE} ] && rm -f ${ARCHIVE}
+
+cp -rp /var/vcap/packages/mongodb/* ${SRC_DIR}
+[ ! -d ${SRC_DIR}/lib ] && mkdir -p ${SRC_DIR}/lib
+cp -rp /var/vcap/packages/compressors/lib/*  ${SRC_DIR}/lib
+[ ! -d ${SRC_DIR}/lib64 ] && mkdir -p ${SRC_DIR}/lib64
+cp -rp /var/vcap/packages/gcc/lib64/libstdc++.so.6* ${SRC_DIR}/lib64
+
+tar cvzf ${ARCHIVE} -C ${SRC_DIR} .

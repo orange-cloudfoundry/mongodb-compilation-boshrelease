@@ -1,0 +1,100 @@
+binutils/bc-1.07.1.tar.gz:
+  size: 419850
+  object_id: ce390e0b-61b6-426f-6a33-dd6e455ce9df
+  sha: b4475c6d66590a5911d30f9747361db47231640a
+binutils/binutils-2.28.tar.gz:
+  size: 36228252
+  object_id: b90aab93-0a87-4c20-50d4-1c6e79c41193
+  sha: 4a70c4b8da5e908ee0b0f31efbfe9c746104d355
+binutils/ed-1.14.2.tar.lz:
+  size: 67493
+  object_id: 8c976129-f7e4-4812-7cb9-18dfd8f2ebd7
+  sha: 3e8aa331ffbc929884107ff3f8fbd76d01252277
+binutils/lzip-1.19.tar.gz:
+  size: 100277
+  object_id: 292e8c1a-1e2b-49f4-70f7-24aff116cc6b
+  sha: c6042a786b69e3209112fa991806e2e7e0ba5f07
+binutils/texinfo-6.4.tar.gz:
+  size: 9300533
+  object_id: 9c2d5c96-9d19-4584-7280-29eb3a486e0c
+  sha: 809a9f0f88c43bc8a75088a972342799ea030c2a
+cmake/cmake-3.8.2.tar.gz:
+  size: 7504706
+  object_id: 8b17215c-534c-4605-587e-9668cd6df1b4
+  sha: c38aad7406d6cbd99a6c71922c6c3406f745c583
+compressors/bzip2-1.0.6.tar.gz:
+  size: 782025
+  object_id: 92736406-b333-4d55-626f-81104ff8ca61
+  sha: 3f89f861209ce81a6bab1fd1998c0ef311712002
+compressors/lz4-1.7.5.tar.gz:
+  size: 208019
+  object_id: f6aa8c72-7efd-45ea-59f0-b24eb57d6dad
+  sha: a710a7d45beb0951806d2b98f0c1739107e97c14
+compressors/snappy-1.1.4.tar.gz:
+  size: 1128197
+  object_id: 18b4b0c6-e8f0-4e64-7bde-b4f79e90cd2b
+  sha: cd9726d0f277b4f89fc250a5da2be186c9397c6b
+compressors/zlib-1.2.11.tar.gz:
+  size: 607698
+  object_id: 466ae523-2033-42ba-6b0d-e6b24166e1c0
+  sha: e6d119755acdf9104d7ba236b1242696940ed6dd
+compressors/zstd-1.3.0.tar.gz:
+  size: 1469911
+  object_id: 1788a358-1c86-4a57-6fd7-f6eb3f489a3a
+  sha: 1b254a1a7092886c7e17957b5f672b8c1b972b08
+coreutils/coreutils-8.27.tar.xz:
+  size: 5285648
+  object_id: e9f14df8-5d59-46c5-407b-2978a4c3ee18
+  sha: ee054c8a4c0c924de49e4f03266733f27f986fbb
+gcc/gcc-5.4.0.tar.gz:
+  size: 123208571
+  object_id: 5b9060cf-e882-4faf-7d9b-e0a024b03351
+  sha: ca189feb8b93108a6313e34e745d45a03547dbc1
+gcc/gmp-6.1.2.tar.bz2:
+  size: 2386766
+  object_id: ca58afd1-9016-437f-5941-0e7d4f1d9594
+  sha: 366ded6a44cd108ba6b3f5b9a252eab3f3a95cdf
+gcc/libpcap-1.8.1.tar.gz:
+  size: 739163
+  object_id: 5c40e18c-a2b4-482c-591c-4ee1ae9adee6
+  sha: 32d7526dde8f8a2f75baf40c01670602aeef7e39
+gcc/m4-1.4.18.tar.bz2:
+  size: 1516964
+  object_id: a48a63c8-9c4a-492c-7127-9dc2401fc29f
+  sha: 63224a10becb5f527542b2e7baf2a1572666dbed
+gcc/mpc-1.0.3.tar.gz:
+  size: 669925
+  object_id: 1a7a996e-bbce-49b1-4d05-b1c8e76277a4
+  sha: b8be66396c726fdc36ebb0f692ed8a8cca3bcc66
+gcc/mpfr-3.1.5.tar.bz2:
+  size: 1279489
+  object_id: 853c5e85-441c-47d2-558d-8b005a5e93bd
+  sha: 874e84bb5959fd5a19c032cfb5d673dded4b5cff
+mongodb/mongo-rocks-3.4.6.tar.gz:
+  size: 58872
+  object_id: 4cdc1aab-eada-4dd5-6c33-7294b1ba1a4a
+  sha: 84efa4aefcf88b243124f31fb604c7cbca402846
+mongodb/mongo-tools-3.4.6.tar.gz:
+  size: 4715206
+  object_id: 3a3158d4-1afb-4f2e-622f-8e0d121da0b3
+  sha: 4d7950d37f57d4fe156873e3c786a4270442f746
+mongodb/mongodb-src-r3.4.6.tar.gz:
+  size: 39922209
+  object_id: cd7eebe2-bf3e-4fe7-6f8c-6e6d4cc2f464
+  sha: 5ea6b2323ec1ef0ce057548ad37859b379140b5e
+mongodb/rocksdb-5.5.5.tar.gz:
+  size: 3282156
+  object_id: ccc5196e-f203-42ec-5f9b-b5dcb571dca7
+  sha: 8df3c5f2356ac4e7d9cb31c5df7270735ef5c8a8
+openssl/openssl-1.0.2l.tar.gz:
+  size: 5365054
+  object_id: fa76bd1a-5d2e-4f09-5d10-d3bfca2759bd
+  sha: b58d5d0e9cea20e571d903aafa853e2ccd914138
+python/Python-2.7.13.tgz:
+  size: 17076672
+  object_id: 0a245792-4294-412f-7d1d-156f2fac1408
+  sha: dce2b862a30099ee48c19a7c34e2d7c2eeff5670
+scons/scons-2.5.1.tar.gz:
+  size: 620909
+  object_id: 99db22bb-8872-4580-5326-bf4cd4df7c6b
+  sha: f742350251734df75355e51c70f291e119ef927a
