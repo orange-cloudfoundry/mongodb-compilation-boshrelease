@@ -3,3 +3,5 @@ blobs/
 src/*tar*
 src/*tgz
 dev_releases/**
+ci/get-new-release/settings.yml
+ci/compile-mongo/settings.yml
