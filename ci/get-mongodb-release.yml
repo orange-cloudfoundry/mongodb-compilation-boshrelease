@@ -45,7 +45,7 @@ resources:
     source:
       uri: https://github.com/bosh-packages/golang-release.git
 
-  - name: upload-src-ok
+  - name: uploaded
     type: keyval
 
 jobs:
@@ -101,15 +101,15 @@ jobs:
         SECRET_ACCESS_KEY: ((S3.secret_access_key))
         ENDPOINT_URL: ((S3.endpoint-url))
         BUCKET: ((S3.bucket))
-    - put: upload-src-ok
-      params: { file: to-upload/upload-ok.properties }
+    - put: uploaded
+      params: { file: uploaded/keyval.properties }
 
 - name: compilation
   serial: true
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
-      - get: upload-src-ok
+      - get: uploaded
         passed: [upload-src]
       - get: go-1.8-vendor-package
     
