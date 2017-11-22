@@ -15,7 +15,7 @@ EOF
 
 mkdir -p ${ROOT_FOLDER}/mongodb-compilation-bosh-release-patched
 
-rsync -ra ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ ${ROOT_FOLDER}/mongodb-compilation-bosh-release-patched/
+cp -rp ${ROOT_FOLDER}/mongodb-compilation-bosh-release/. ${ROOT_FOLDER}/mongodb-compilation-bosh-release-patched
 
 cd mongodb-compilation-bosh-release-patched || exit 666
 #upload blob list
