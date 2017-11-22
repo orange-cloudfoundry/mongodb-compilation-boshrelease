@@ -2,7 +2,7 @@ name: mongodb-compilation
 director_uuid: 8dd35958-abc4-46fc-9c96-f91c791bfeae
 
 releases:
-  - name: mongodb-compile
+  - name: mongodb-compiler
     version: latest
  
 update:
@@ -19,10 +19,10 @@ stemcells:
 
 instance_groups:
 - name: make_archive
-  release: mongodb-compile
+  release: mongodb-compiler
   lifecycle: errand
   azs: [z1]
-  instances: 1 # 
+  instances: 1
   vm_type: small
   env:
     bosh:
@@ -32,6 +32,6 @@ instance_groups:
   - name: mongo1
   jobs:
   - name: make-tar
-    release: mongodb-compile
+    release: mongodb-compiler
     properties: 
       mongodb-version: 3.4.6

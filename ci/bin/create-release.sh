@@ -13,12 +13,12 @@ create_fake_files()
         mkdir -p dev_releases/${BOSH_RELEASE}
     fi
 
-    for release in $(bosh -e ${ALIAS} releases -d ${DEPLOYMENT_NAME} --column="Version"|tr -d"*")
+    for release in $(bosh -e ${ALIAS} releases -d ${DEPLOYMENT_NAME} --column="Version"|tr -d "*")
     do
 
         # get the hash of the release
         commit_hash=$(bosh -e ${ALIAS} releases -d ${DEPLOYMENT_NAME} --column="Version" --column="commit hash" \
-                    |tr -d "*" |grep -w "^${release}"|tr -s [:space:]|cut -d" " -f2|tr -d [:space:])
+                    |tr -d "*" |grep -w "^${release}"|tr -s "\t" " "|cut -d" " -f2|tr -d [:space:])
 
         if [ ! -f dev_releases/${BOSH_RELEASE}/index.yml ]
         then
