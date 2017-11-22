@@ -40,7 +40,7 @@ EOF
 
 export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 
-pushd mongodb-compilation-bosh-release|| exit 666
+pushd mongodb-compilation-bosh-release-patched|| exit 666
 
 create_fake_files
 

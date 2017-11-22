@@ -10,6 +10,7 @@ image_resource:
 inputs:
   - name: bosh-director-config
   - name: mongodb-compilation-bosh-release
+  - name: mongodb-compilation-bosh-release-patched  
   - name: go-1.8-vendor-package
 
 run:
