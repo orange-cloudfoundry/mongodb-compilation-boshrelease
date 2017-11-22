@@ -8,6 +8,7 @@ image_resource:
     tag: latest
 
 inputs:
+  - name: uploaded
   - name: bosh-director-config
   - name: mongodb-compilation-bosh-release
   - name: go-1.8-vendor-package
