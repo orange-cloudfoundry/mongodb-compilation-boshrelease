@@ -113,6 +113,14 @@ jobs:
         trigger: true
         passed: [upload-src]
       - get: go-1.8-vendor-package
+
+    - task: get-blob-list
+      file: mongodb-compilation-bosh-release/ci/tasks/get-blob-list.yml
+      params:
+        ACCESS_KEY_ID: ((S3.access_key_id))
+        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+        ENDPOINT_URL: ((S3.endpoint-url))
+        BUCKET: ((S3.bucket))  
     
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/tasks/create-bosh-config.yml
