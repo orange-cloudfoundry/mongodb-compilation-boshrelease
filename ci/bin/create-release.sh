@@ -14,8 +14,12 @@ fi
 
 for release in $(bosh -e ${ALIAS} releases -d ${DEPLOYMENT_NAME} --column="Version")
 do
+    # remove the * at the end of deployed releases
     release=$(echo $release|sed -e "s/\*$//")
-    commit_hash=$(bosh -e ${ALIAS} releases -d ${DEPLOYMENT_NAME} --column="commit hash")
+
+    # get the hash of the release
+    commit_hash=$(bosh -e ${ALIAS} releases -d ${DEPLOYMENT_NAME} --column="Version" --column="commit hash" \
+                |grep  "^${release}"|tr -s [:space:]|cut -d" " -f2)
     if [ ! -f dev_releases/${BOSH_RELEASE}/index.yml ]
     then
         echo "builds:" > dev_releases/${BOSH_RELEASE}/index.yml
