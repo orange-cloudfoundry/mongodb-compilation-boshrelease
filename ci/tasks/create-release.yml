@@ -11,7 +11,7 @@ inputs:
   - name: bosh-director-config
   - name: mongodb-compilation-bosh-release
   - name: mongodb-compilation-bosh-release-patched  
-  - name: go-1.8-vendor-package
+  - name: golang-release
 
 run:
   path: mongodb-compilation-bosh-release/ci/bin/create-release.sh

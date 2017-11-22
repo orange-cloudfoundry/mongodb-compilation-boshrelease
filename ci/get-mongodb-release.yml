@@ -40,7 +40,7 @@ resources:
   - name: dl-versions
     type: keyval
 
-  - name: go-1.8-vendor-package
+  - name: golang-release
     type: git
     source:
       uri: https://github.com/bosh-packages/golang-release.git
@@ -112,7 +112,7 @@ jobs:
       - get: uploaded
         trigger: true
         passed: [upload-src]
-      - get: go-1.8-vendor-package
+      - get: golang-release
 
     - task: get-blob-list
       file: mongodb-compilation-bosh-release/ci/tasks/get-blob-list.yml
@@ -137,6 +137,7 @@ jobs:
         ALIAS: ((bosh-server.alias)) 
         BOSH_RELEASE: ((bosh-deployment.release))
         DEPLOYMENT_NAME: ((bosh-deployment.name))
+        GO_PACKAGE: ((go_package))
         
     - task: make-archive
       file: mongodb-compilation-bosh-release/ci/tasks/make-archive.yml

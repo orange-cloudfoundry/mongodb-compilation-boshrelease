@@ -2,6 +2,8 @@
 
 set -ex
 
+ROOT_FOLDER=${PWD}
+
 create_fake_files()
 {
     # Creating fake files for already deployed releases
@@ -43,6 +45,8 @@ export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 pushd mongodb-compilation-bosh-release-patched|| exit 666
 
 create_fake_files
+
+bosh -e ${ALIAS} vendor-package ${GO_PACKAGE} ${ROOT_FOLDER}/golang-release
 
 bosh -e ${ALIAS} create-release --force
 
