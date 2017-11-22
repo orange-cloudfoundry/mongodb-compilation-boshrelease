@@ -28,7 +28,7 @@ do
         commit_hash: ${commit_hash}
         uncommitted_changes: false
 EOF
-        cat >> dev_releases/((bosh-deployment.release))/index.yml <<EOF
+        cat >> dev_releases/${BOSH_RELEASE}/index.yml <<EOF
         $(cat /proc/sys/kernel/random/uuid):
         version: ${release}
 EOF
