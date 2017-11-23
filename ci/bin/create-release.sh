@@ -27,14 +27,14 @@ create_fake_files()
         if [ ! -f dev_releases/${BOSH_RELEASE}/${BOSH_RELEASE}-${release}.yml ]
         then
             cat > dev_releases/${BOSH_RELEASE}/${BOSH_RELEASE}-${release}.yml <<EOF
-            name: ${DEPLOYMENT_NAME}
-            version: ${release}
-            commit_hash: ${commit_hash}
-            uncommitted_changes: false
+name: ${DEPLOYMENT_NAME}
+version: ${release}
+commit_hash: ${commit_hash}
+uncommitted_changes: false
 EOF
             cat >> dev_releases/${BOSH_RELEASE}/index.yml <<EOF
-            $(cat /proc/sys/kernel/random/uuid):
-            version: ${release}
+$(cat /proc/sys/kernel/random/uuid):
+version: ${release}
 EOF
         fi
     done    
