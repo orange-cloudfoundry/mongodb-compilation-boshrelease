@@ -138,6 +138,8 @@ jobs:
         BOSH_RELEASE: ((bosh-deployment.release))
         DEPLOYMENT_NAME: ((bosh-deployment.name))
         GO_PACKAGE: ((go_package))
+        INSTANCE_GROUP: ((bosh-deployment.instance-group))
+        NETWORK: ((bosh-deployment.network))
         
     - task: make-archive
       file: mongodb-compilation-bosh-release/ci/tasks/make-archive.yml

@@ -33,8 +33,8 @@ commit_hash: ${commit_hash}
 uncommitted_changes: false
 EOF
             cat >> dev_releases/${BOSH_RELEASE}/index.yml <<EOF
-$(cat /proc/sys/kernel/random/uuid):
-version: ${release}
+  $(cat /proc/sys/kernel/random/uuid):
+    version: ${release}
 EOF
         fi
     done    
@@ -53,6 +53,6 @@ bosh -e ${ALIAS} create-release --force
 bosh -e ${ALIAS} upload-release
 
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n deploy \
-manifest.yml -o ci/concourse-network.yml
-
+    manifest.yml -v deployment=DEPLOYMENT_NAME -v release=BOSH_RELEASE -v instance_group=INSTANCE_GROUP \
+    -v network=NETWORK -v version=$(grep "^mongodb" $ROOT_FOLDER/uploaded/keyval.properties|cut -d"=" -f2)
 popd
