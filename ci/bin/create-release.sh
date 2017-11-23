@@ -18,7 +18,7 @@ create_fake_files()
 
         # get the hash of the release
         commit_hash=$(bosh -e ${ALIAS} releases -d ${DEPLOYMENT_NAME} --column="Version" --column="commit hash" \
-                    |tr -d "*" |grep -w "^${release}"|tr -s "\t" " "|cut -d" " -f2|tr -d [:space:])
+                    |tr -d "*" |grep -w "^${release}"|tr -s "\t" " "|cut -d" " -f2|tr -d [:space:]|tr -d "+")
 
         if [ ! -f dev_releases/${BOSH_RELEASE}/index.yml ]
         then
