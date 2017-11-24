@@ -14,5 +14,5 @@ outputs:
   - name: mongodb-compilation-bosh-release-patched
 
 run:
-  path: mongodb-compilation-bosh-release/ci/bin/get-blob-list.sh
+  path: mongodb-compilation-bosh-release/ci/bin/get-config-files.sh
 

@@ -115,8 +115,8 @@ jobs:
         passed: [upload-src]
       - get: golang-release
 
-    - task: get-blob-list
-      file: mongodb-compilation-bosh-release/ci/tasks/get-blob-list.yml
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/tasks/get-config-files.yml
       params:
         ACCESS_KEY_ID: ((S3.access_key_id))
         SECRET_ACCESS_KEY: ((S3.secret_access_key))
