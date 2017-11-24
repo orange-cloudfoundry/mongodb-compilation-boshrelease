@@ -15,7 +15,9 @@ EOF
 
 cd to-upload || exit 666
 #upload blob list
-aws --endpoint-url $ENDPOINT_URL --no-verify-ssl s3 cp config/blobs.yml s3://$BUCKET/ci/blobs.yml
+aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 cp config/blobs.yml s3://${BUCKET}/ci/blobs.yml
+#upload final.yml
+aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 cp config/final.yml s3://${BUCKET}/ci/final.yml
 
 mkdir -p ${ROOT_FOLDER}/uploaded
 cd ${ROOT_FOLDER}/uploaded || exit 666
