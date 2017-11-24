@@ -53,6 +53,7 @@ bosh -e ${ALIAS} create-release --force
 bosh -e ${ALIAS} upload-release
 
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n deploy \
-    manifest.yml -v deployment=DEPLOYMENT_NAME -v release=BOSH_RELEASE -v instance_group=INSTANCE_GROUP \
-    -v network=NETWORK -v version=$(grep "^mongodb" $ROOT_FOLDER/uploaded/keyval.properties|cut -d"=" -f2)
+    manifest.yml -v deployment=${DEPLOYMENT_NAME} -v release=${BOSH_RELEASE} \
+    -v instance_group=${INSTANCE_GROUP} -v network=${NETWORK} \
+    -v version=$(grep "^mongodb" ${ROOT_FOLDER}/uploaded/keyval.properties|cut -d"=" -f2)
 popd

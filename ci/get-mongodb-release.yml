@@ -131,6 +131,11 @@ jobs:
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
 
+    - task: update-final-yml
+      file: mongodb-compilation-bosh-release/ci/tasks/update-final-yml
+      params:
+        BOSH_RELEASE: ((bosh-deployment.release))   
+
     - task: create-release
       file: mongodb-compilation-bosh-release/ci/tasks/create-release.yml
       params:

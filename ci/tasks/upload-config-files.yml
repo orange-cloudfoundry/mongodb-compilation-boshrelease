@@ -16,5 +16,4 @@ outputs:
   - name: uploaded  
 
 run:
-  path: mongodb-compilation-bosh-release/ci/bin/upload-blob-list.sh
-
+  path: mongodb-compilation-bosh-release/ci/bin/upload-config-files.sh
