@@ -84,6 +84,14 @@ jobs:
     - task: download-src
       file: mongodb-compilation-bosh-release/ci/tasks/download-src.yml
 
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((S3.access_key_id))
+        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+        ENDPOINT_URL: ((S3.endpoint-url))
+        BUCKET: ((S3.bucket))   
+
     - task: upload-bosh
       file: mongodb-compilation-bosh-release/ci/tasks/upload-bosh.yml
       params:

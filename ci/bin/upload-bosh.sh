@@ -5,7 +5,7 @@ set -ex
 ROOT_FOLDER=${PWD}
 export BOSH_CONFIG=${ROOT_FOLDER}/bosh-director-config/bosh_config.yml
 
-rsync -ra mongodb-compilation-bosh-release/ to-upload-pre/
+rsync -ra mongodb-compilation-bosh-release-patched/ to-upload-pre/
 
 pushd to-upload-pre || exit 666
 
