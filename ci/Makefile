@@ -1,6 +1,6 @@
 
 TARGET?=dw
-PIPELINE?=get-mongodb-release
+PIPELINE?=mongodb-compilation
 SETTINGS?=settings.yml
 
 login:
