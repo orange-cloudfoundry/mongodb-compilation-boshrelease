@@ -6,7 +6,7 @@ ROOT_FOLDER=${PWD}
 
 cp -rp to-upload-pre/. to-upload
 
-pushd to-upload
+pushd to-upload || exit 666
 
 # Updating final.yml with release name specified in settings
 sed -i -e "s/^\(final_name:\).*/\1 ${BOSH_RELEASE}/" config/final.yml

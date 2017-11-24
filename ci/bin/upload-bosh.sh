@@ -3,8 +3,11 @@
 set -ex
 
 ROOT_FOLDER=${PWD}
+export BOSH_CONFIG=${ROOT_FOLDER}/bosh-director-config/bosh_config.yml
 
-pushd mongodb-compilation-bosh-release
+rsync -ra mongodb-compilation-bosh-release/ to-upload-pre/
+
+pushd to-upload-pre || exit 666
 
 for i in $(find ${ROOT_FOLDER}/downloaded-src -type f -name '*.tar.gz' -print)
 do
@@ -16,4 +19,3 @@ done
 
 popd
 
-rsync -ra mongodb-compilation-bosh-release/ to-upload-pre/
