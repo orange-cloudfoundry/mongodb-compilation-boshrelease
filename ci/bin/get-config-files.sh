@@ -18,5 +18,9 @@ mkdir -p ${ROOT_FOLDER}/mongodb-compilation-bosh-release-patched
 cp -rp ${ROOT_FOLDER}/mongodb-compilation-bosh-release/. ${ROOT_FOLDER}/mongodb-compilation-bosh-release-patched
 
 cd mongodb-compilation-bosh-release-patched || exit 666
-#upload blob list
-aws --endpoint-url $ENDPOINT_URL --no-verify-ssl s3 cp s3://$BUCKET/ci/blobs.yml config/blobs.yml
+
+#retriev blob list
+aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 cp s3://${BUCKET}/ci/blobs.yml config/blobs.yml
+
+#retrieve final.yml
+aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 cp s3://${BUCKET}/ci/final.yml config/final.yml
