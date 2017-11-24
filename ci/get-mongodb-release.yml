@@ -89,13 +89,14 @@ jobs:
       params:
         ALIAS: ((bosh-server.alias))
 
-    - task: remove-previous-blobs
-      file: mongodb-compilation-bosh-release/ci/tasks/remove-previous-blobs.yml
+    - task: update-config-files
+      file: mongodb-compilation-bosh-release/ci/tasks/update-config-files.yml
       params:
         ALIAS: ((bosh-server.alias))
-
-    - task: upload-blob-list
-      file: mongodb-compilation-bosh-release/ci/tasks/upload-blob-list.yml
+        BOSH_RELEASE: ((bosh-deployment.release))
+        
+    - task: upload-config-files
+      file: mongodb-compilation-bosh-release/ci/tasks/upload-config-files.yml
       params:
         ACCESS_KEY_ID: ((S3.access_key_id))
         SECRET_ACCESS_KEY: ((S3.secret_access_key))
@@ -130,11 +131,6 @@ jobs:
         ALIAS: ((bosh-server.alias)) 
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
-
-    - task: update-final-yml
-      file: mongodb-compilation-bosh-release/ci/tasks/update-final-yml
-      params:
-        BOSH_RELEASE: ((bosh-deployment.release))   
 
     - task: create-release
       file: mongodb-compilation-bosh-release/ci/tasks/create-release.yml
