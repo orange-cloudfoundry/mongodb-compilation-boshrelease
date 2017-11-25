@@ -46,8 +46,6 @@ pushd mongodb-compilation-bosh-release-patched|| exit 666
 
 create_fake_files
 
-bosh -e ${ALIAS} vendor-package ${GO_PACKAGE} ${ROOT_FOLDER}/golang-release
-
 bosh -e ${ALIAS} create-release --force
 
 bosh -e ${ALIAS} upload-release
