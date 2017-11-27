@@ -17,7 +17,7 @@ do
   # do not upload again already available blob - prevent blobstore to have the same blob twice
   blobstore_id=$(bosh blobs --column="path" --column="blobstore id" \
                 |grep "^${product}/${archive}" |tr -s "\t" " "|tr -s [:space:]|cut -d" " -f2)
-  [ "${blostore_id}" != "" ] && available=$(grep ${blostore_id} blobstore_ids.list|wc -l) || available=0
+  [ "${blobstore_id}" != "" ] && available=$(grep ${blobstore_id} blobstore_ids.list|wc -l) || available=0
 
   if [ ${available} -eq 0 ]
   then
