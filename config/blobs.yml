@@ -70,22 +70,6 @@ gcc/mpfr-3.1.5.tar.bz2:
   size: 1279489
   object_id: 6359e6a6-74a9-46d0-7246-7911d70e7894
   sha: 874e84bb5959fd5a19c032cfb5d673dded4b5cff
-mongodb/mongo-rocks-3.4.6.tar.gz:
-  size: 58872
-  object_id: f2937f13-8498-4379-777e-850c89abab26
-  sha: 84efa4aefcf88b243124f31fb604c7cbca402846
-mongodb/mongo-tools-3.4.6.tar.gz:
-  size: 4715206
-  object_id: ee3e4252-a2ce-4f27-4b7f-e62499d1a343
-  sha: 4d7950d37f57d4fe156873e3c786a4270442f746
-mongodb/mongodb-src-r3.4.6.tar.gz:
-  size: 39922209
-  object_id: f87fafda-66aa-4a8e-5f13-cd3bd9ec6929
-  sha: 5ea6b2323ec1ef0ce057548ad37859b379140b5e
-mongodb/rocksdb-5.5.5.tar.gz:
-  size: 3282156
-  object_id: ec956088-3952-4157-4bd2-0adde26ecb92
-  sha: 8df3c5f2356ac4e7d9cb31c5df7270735ef5c8a8
 openssl/openssl-1.0.2l.tar.gz:
   size: 5365054
   object_id: f610711c-d406-4050-5d37-db8ee8b52e06

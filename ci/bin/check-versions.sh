@@ -15,7 +15,8 @@ rocksdb_last_stable=$(mongodb-compilation-bosh-release/ci/bin/get_last_rocksdb_v
 
 # force mongodb version for tests
 # DONT FORGET TO REMOVE IT
-mongodb_last_stable=3.4.7
+mongodb_last_stable=3.4.6
+rocksdb_last_stable=5.5.5
 
 [ "$mongodb_last_stable" == "" ] && \
   mongodb_last_stable=$last_mongodb_version
@@ -27,7 +28,7 @@ mkdir -p dl-versions
 
 pushd dl-versions || exit 666
 
-> dl-versions.properties
+echo "last_check=\"$(date '+%Y-%d-%m %H:%M')\""> dl-versions.properties
 [ "$last_mongodb_version" != "$mongodb_last_stable" ] && \
     echo "mongodb=${mongodb_last_stable}" >> dl-versions.properties
 [ "$last_rocksdb_version" != "$rocksdb_last_stable" ] && \

@@ -1,0 +1,205 @@
+---
+resource_types:
+  - name: keyval
+    type: docker-image
+    source:
+      repository: swce/keyval-resource
+      
+resources:
+
+  - name: mongodb-compilation-bosh-release
+    type: git
+    source:
+      uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
+      branch: ((git.branch))
+
+  - name: mongodb-version
+    type: semver
+    source: 
+      initial_version: 1.0.0
+      driver: git
+      uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
+      branch: ((git.branch))
+      file: compiled_version
+      username: ((git.username))
+      password: ((git.password))
+      git_user: "((git.git_user)) <((git.email))>"
+
+  - name: rocksdb-version
+    type: semver
+    source: 
+      initial_version: 1.0.0
+      driver: git
+      uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
+      branch: ((git.branch))
+      file: compiled_version
+      username: ((git.username))
+      password: ((git.password))
+      git_user: "((git.git_user)) <((git.email))>"
+
+  - name: dl-versions
+    type: keyval
+
+  - name: golang-release
+    type: git
+    source:
+      uri: https://github.com/bosh-packages/golang-release.git
+
+  - name: uploaded
+    type: keyval
+
+jobs:
+- name: check-versions
+  serial: true
+  plan:
+    - aggregate:
+      - get: mongodb-compilation-bosh-release       
+      - get: mongodb-version
+      - get: rocksdb-version
+
+    - task: check-versions
+      file: mongodb-compilation-bosh-release/ci/tasks/check-versions.yml
+
+    - put: dl-versions
+      params: {file: dl-versions/dl-versions.properties}
+           
+- name: upload-src
+  serial: true
+  plan:
+    
+    - get: mongodb-compilation-bosh-release
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/tasks/create-bosh-config.yml
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+  
+    - get: dl-versions
+      trigger: true
+      passed: [check-versions]
+
+    - task: download-src
+      file: mongodb-compilation-bosh-release/ci/tasks/download-src.yml
+
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((S3.access_key_id))
+        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+        ENDPOINT_URL: ((S3.endpoint-url))
+        BUCKET: ((S3.bucket))   
+
+    - task: upload-bosh
+      file: mongodb-compilation-bosh-release/ci/tasks/upload-bosh.yml
+      params:
+        ALIAS: ((bosh-server.alias))
+
+    - task: update-config-files
+      file: mongodb-compilation-bosh-release/ci/tasks/update-config-files.yml
+      params:
+        ALIAS: ((bosh-server.alias))
+        BOSH_RELEASE: ((bosh-deployment.release))
+        
+    - task: upload-config-files
+      file: mongodb-compilation-bosh-release/ci/tasks/upload-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((S3.access_key_id))
+        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+        ENDPOINT_URL: ((S3.endpoint-url))
+        BUCKET: ((S3.bucket))
+    - put: uploaded
+      params: { file: uploaded/keyval.properties }
+
+- name: compilation
+  serial: true
+  plan:
+    - aggregate:
+      - get: mongodb-compilation-bosh-release
+      - get: uploaded
+        trigger: true
+        passed: [upload-src]
+      - get: golang-release
+
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((S3.access_key_id))
+        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+        ENDPOINT_URL: ((S3.endpoint-url))
+        BUCKET: ((S3.bucket))  
+    
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/tasks/create-bosh-config.yml
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+
+    - task: create-release
+      file: mongodb-compilation-bosh-release/ci/tasks/create-release.yml
+      params:
+        ALIAS: ((bosh-server.alias)) 
+        BOSH_RELEASE: ((bosh-deployment.release))
+        DEPLOYMENT_NAME: ((bosh-deployment.name))
+        INSTANCE_GROUP: ((bosh-deployment.instance-group))
+        NETWORK: ((bosh-deployment.network))
+        
+    - task: make-archive
+      file: mongodb-compilation-bosh-release/ci/tasks/make-archive.yml
+      params:
+        ALIAS: ((bosh-server.alias))
+        DEPLOYMENT_NAME: ((bosh-deployment.name))
+#
+#    - task: upload-ci-s3
+#      file: mongodb-compilation-bosh-release/ci/tasks/upload-ci-s3.yml
+#      params:
+#        ACCESS_KEY_ID: ((S3.access_key_id))
+#        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+#        ENDPOINT_URL: ((S3.endpoint-url))
+#        BUCKET: ((S3.bucket))
+#
+#    - put: archive
+#      params: { file: uploaded/keyval.properties }
+#
+#- name: deployment-test
+#  serial: true
+#  plan:
+#    - aggregate:
+#      - get: mongodb-compilation-bosh-release
+#      - get: archive
+#        trigger: true
+#        passed: [compilation]
+#      - get: golang-release
+
+#
+#
+#    - task: update-github
+#      config:
+#        platform: linux
+#        image_resource:
+#          type: docker-image
+#          source:
+#            repository: concourse/bosh-cli
+#            tag: latest
+#        inputs:
+#          - name: to-upload
+#        run:
+#          path: /bin/bash
+#          args:
+#            - -exc
+#            - |
+#              cd to-upload || exit 115
+#              git config --global user.email ((repo.email))
+#              git config --global user.name "((repo.name))"
+#              git branch "Upload-test"
+#              git checkout Upload-test
+#              git commit -m "Adding Last compiled blob to blob list" config/blobs.yml
+#    - put: mongodb-compilation-bosh-release-out
+#      params:
+#        repository: to-upload
+#

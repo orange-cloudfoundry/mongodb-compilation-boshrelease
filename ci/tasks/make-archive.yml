@@ -9,12 +9,11 @@ image_resource:
 
 inputs:
   - name: bosh-director-config
-  - name: downloaded-src
   - name: mongodb-compilation-bosh-release
-  - name: to-upload-pre
+  - name: mongodb-compilation-bosh-release-patched
   
 outputs:
   - name: to-upload
 
 run:
-  path: mongodb-compilation-bosh-release/ci/bin/remove-previous-blobs.sh
+  path: mongodb-compilation-bosh-release/ci/bin/make-archive.sh
