@@ -16,4 +16,4 @@ outputs:
   - name: uploaded  
 
 run:
-  path: mongodb-compilation-bosh-release/ci/bin/upload-config-files.sh
+  path: mongodb-compilation-bosh-release/ci/jobs/upload-src/scripts/upload-config-files.sh
