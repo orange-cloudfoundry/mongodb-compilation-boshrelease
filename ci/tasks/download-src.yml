@@ -8,10 +8,11 @@ image_resource:
     tag: latest
 
 inputs:
+  - name: dl-versions
   - name: mongodb-compilation-bosh-release
 
 outputs:
-  - name: bosh-director-config
+  - name: downloaded-src
 
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/common/scripts/create-bosh-config.sh
+  path: mongodb-compilation-bosh-release/ci/bin/download-src.sh

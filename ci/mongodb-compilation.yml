@@ -58,7 +58,7 @@ jobs:
       - get: rocksdb-version
 
     - task: check-versions
-      file: mongodb-compilation-bosh-release/ci/jobs/check-versions/tasks/check-versions.yml
+      file: mongodb-compilation-bosh-release/ci/tasks/check-versions.yml
 
     - put: dl-versions
       params: {file: dl-versions/dl-versions.properties}
@@ -69,7 +69,7 @@ jobs:
     
     - get: mongodb-compilation-bosh-release
     - task: create-bosh-config
-      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+      file: mongodb-compilation-bosh-release/ci/tasks/create-bosh-config.yml
       params:
         CA_CERT: ((bosh-server.ca))
         IP: ((bosh-server.ip))
@@ -82,10 +82,10 @@ jobs:
       passed: [check-versions]
 
     - task: download-src
-      file: mongodb-compilation-bosh-release/ci/jobs/upload-src/tasks/download-src.yml
+      file: mongodb-compilation-bosh-release/ci/tasks/download-src.yml
 
     - task: get-config-files
-      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
+      file: mongodb-compilation-bosh-release/ci/tasks/get-config-files.yml
       params:
         ACCESS_KEY_ID: ((S3.access_key_id))
         SECRET_ACCESS_KEY: ((S3.secret_access_key))
@@ -93,18 +93,18 @@ jobs:
         BUCKET: ((S3.bucket))   
 
     - task: upload-bosh
-      file: mongodb-compilation-bosh-release/ci/jobs/upload-src/tasks/upload-bosh.yml
+      file: mongodb-compilation-bosh-release/ci/tasks/upload-bosh.yml
       params:
         ALIAS: ((bosh-server.alias))
 
     - task: update-config-files
-      file: mongodb-compilation-bosh-release/ci/jobs/upload-src/tasks/update-config-files.yml
+      file: mongodb-compilation-bosh-release/ci/tasks/update-config-files.yml
       params:
         ALIAS: ((bosh-server.alias))
         BOSH_RELEASE: ((bosh-deployment.release))
         
     - task: upload-config-files
-      file: mongodb-compilation-bosh-release/ci/jobs/upload-src/tasks/upload-config-files.yml
+      file: mongodb-compilation-bosh-release/ci/tasks/upload-config-files.yml
       params:
         ACCESS_KEY_ID: ((S3.access_key_id))
         SECRET_ACCESS_KEY: ((S3.secret_access_key))
@@ -123,8 +123,16 @@ jobs:
         passed: [upload-src]
       - get: golang-release
 
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((S3.access_key_id))
+        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+        ENDPOINT_URL: ((S3.endpoint-url))
+        BUCKET: ((S3.bucket))  
+    
     - task: create-bosh-config
-      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+      file: mongodb-compilation-bosh-release/ci/tasks/create-bosh-config.yml
       params:
         CA_CERT: ((bosh-server.ca))
         IP: ((bosh-server.ip))
@@ -132,16 +140,8 @@ jobs:
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
 
-    - task: get-config-files
-      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
-      params:
-        ACCESS_KEY_ID: ((S3.access_key_id))
-        SECRET_ACCESS_KEY: ((S3.secret_access_key))
-        ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))  
-    
     - task: create-release
-      file: mongodb-compilation-bosh-release/ci/jobs/compilation/tasks/create-release.yml
+      file: mongodb-compilation-bosh-release/ci/tasks/create-release.yml
       params:
         ALIAS: ((bosh-server.alias)) 
         BOSH_RELEASE: ((bosh-deployment.release))
@@ -150,11 +150,22 @@ jobs:
         NETWORK: ((bosh-deployment.network))
         
     - task: make-archive
-      file: mongodb-compilation-bosh-release/ci/jobs/compilation/tasks/make-archive.yml
+      file: mongodb-compilation-bosh-release/ci/tasks/make-archive.yml
       params:
         ALIAS: ((bosh-server.alias))
         DEPLOYMENT_NAME: ((bosh-deployment.name))
-        
+#
+#    - task: upload-ci-s3
+#      file: mongodb-compilation-bosh-release/ci/tasks/upload-ci-s3.yml
+#      params:
+#        ACCESS_KEY_ID: ((S3.access_key_id))
+#        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+#        ENDPOINT_URL: ((S3.endpoint-url))
+#        BUCKET: ((S3.bucket))
+#
+#    - put: archive
+#      params: { file: uploaded/keyval.properties }
+#
 #- name: deployment-test
 #  serial: true
 #  plan:
