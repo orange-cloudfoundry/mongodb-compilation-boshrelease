@@ -9,9 +9,12 @@ image_resource:
 
 inputs:
   - name: bosh-director-config
+  - name: downloaded-src
   - name: mongodb-compilation-bosh-release
-  - name: mongodb-compilation-bosh-release-patched  
-  - name: uploaded
+  - name: to-upload-pre
+  
+outputs:
+  - name: to-upload
 
 run:
-  path: mongodb-compilation-bosh-release/ci/bin/create-release.sh
+  path: mongodb-compilation-bosh-release/ci/jobs/upload-src/scripts/update-config-files.sh

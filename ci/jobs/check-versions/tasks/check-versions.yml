@@ -16,4 +16,4 @@ outputs:
   - name: dl-versions
   
 run:
-  path: mongodb-compilation-bosh-release/ci/bin/check-versions.sh
+  path: mongodb-compilation-bosh-release/ci/jobs/check-versions/scripts/check-versions.sh
