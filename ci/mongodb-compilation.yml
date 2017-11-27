@@ -146,7 +146,6 @@ jobs:
         ALIAS: ((bosh-server.alias)) 
         BOSH_RELEASE: ((bosh-deployment.release))
         DEPLOYMENT_NAME: ((bosh-deployment.name))
-        GO_PACKAGE: ((go_package))
         INSTANCE_GROUP: ((bosh-deployment.instance-group))
         NETWORK: ((bosh-deployment.network))
         
@@ -155,6 +154,28 @@ jobs:
       params:
         ALIAS: ((bosh-server.alias))
         DEPLOYMENT_NAME: ((bosh-deployment.name))
+#
+#    - task: upload-ci-s3
+#      file: mongodb-compilation-bosh-release/ci/tasks/upload-ci-s3.yml
+#      params:
+#        ACCESS_KEY_ID: ((S3.access_key_id))
+#        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+#        ENDPOINT_URL: ((S3.endpoint-url))
+#        BUCKET: ((S3.bucket))
+#
+#    - put: archive
+#      params: { file: uploaded/keyval.properties }
+#
+#- name: deployment-test
+#  serial: true
+#  plan:
+#    - aggregate:
+#      - get: mongodb-compilation-bosh-release
+#      - get: archive
+#        trigger: true
+#        passed: [compilation]
+#      - get: golang-release
+
 #
 #
 #    - task: update-github
