@@ -11,7 +11,7 @@ resources:
     type: git
     source:
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: ((git.branch))
+      branch: ((mongodb-compilation-boshrelease-repo.branch))
 
   - name: mongodb-version
     type: semver
@@ -19,11 +19,11 @@ resources:
       initial_version: 1.0.0
       driver: git
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: ((git.branch))
+      branch: ((mongodb-compilation-boshrelease-repo.branch))
       file: compiled_version
-      username: ((git.username))
-      password: ((git.password))
-      git_user: "((git.git_user)) <((git.email))>"
+      username: ((mongodb-compilation-boshrelease-repo.username))
+      password: ((mongodb-compilation-boshrelease-repo.password))
+      git_user: "((mongodb-compilation-boshrelease-repo.git_user)) <((mongodb-compilation-boshrelease-repo.email))>"
 
   - name: rocksdb-version
     type: semver
@@ -31,29 +31,27 @@ resources:
       initial_version: 1.0.0
       driver: git
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: ((git.branch))
+      branch: ((mongodb-compilation-boshrelease-repo.branch))
       file: compiled_version
-      username: ((git.username))
-      password: ((git.password))
-      git_user: "((git.git_user)) <((git.email))>"
+      username: ((mongodb-compilation-boshrelease-repo.username))
+      password: ((mongodb-compilation-boshrelease-repo.password))
+      git_user: "((mongodb-compilation-boshrelease-repo.git_user)) <((mongodb-compilation-boshrelease-repo.email))>"
 
   - name: dl-versions
     type: keyval
 
-  - name: golang-release
-    type: git
-    source:
-      uri: https://github.com/bosh-packages/golang-release.git
-
   - name: uploaded
     type: keyval
+
+  - name: compiled
+    type: keyval  
 
 jobs:
 - name: check-versions
   serial: true
   plan:
     - aggregate:
-      - get: mongodb-compilation-bosh-release       
+      - get: mongodb-compilation-bosh-release
       - get: mongodb-version
       - get: rocksdb-version
 
@@ -104,7 +102,7 @@ jobs:
         BOSH_RELEASE: ((bosh-deployment.release))
         
     - task: upload-config-files
-      file: mongodb-compilation-bosh-release/ci/jobs/upload-src/tasks/upload-config-files.yml
+      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/upload-config-files.yml
       params:
         ACCESS_KEY_ID: ((S3.access_key_id))
         SECRET_ACCESS_KEY: ((S3.secret_access_key))
@@ -121,7 +119,6 @@ jobs:
       - get: uploaded
         trigger: true
         passed: [upload-src]
-      - get: golang-release
 
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
@@ -138,7 +135,7 @@ jobs:
         ACCESS_KEY_ID: ((S3.access_key_id))
         SECRET_ACCESS_KEY: ((S3.secret_access_key))
         ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))  
+        BUCKET: ((S3.bucket))
     
     - task: create-release
       file: mongodb-compilation-bosh-release/ci/jobs/compilation/tasks/create-release.yml
@@ -155,6 +152,16 @@ jobs:
       params:
         ALIAS: ((bosh-server.alias))
         DEPLOYMENT_NAME: ((bosh-deployment.name))
+
+    - task: upload-config-files
+      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/upload-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((S3.access_key_id))
+        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+        ENDPOINT_URL: ((S3.endpoint-url))
+        BUCKET: ((S3.bucket))
+    - put: compiled
+      params: { file: uploaded/keyval.properties }
         
 #- name: deployment-test
 #  serial: true
