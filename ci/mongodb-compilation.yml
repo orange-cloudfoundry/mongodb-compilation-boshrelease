@@ -147,8 +147,37 @@ jobs:
         INSTANCE_GROUP: ((bosh-deployment.instance-group))
         NETWORK: ((bosh-deployment.network))
 
+    - put: compiled
+      params: { file: compiled/keyval.properties }        
+
+- name: create-archive
+  serial: true
+  plan:
+    - aggregate:
+      - get: mongodb-compilation-bosh-release
+      - get: compiled
+        trigger: true
+        passed: [compilation]
+
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((S3.access_key_id))
+        SECRET_ACCESS_KEY: ((S3.secret_access_key))
+        ENDPOINT_URL: ((S3.endpoint-url))
+        BUCKET: ((S3.bucket))
+    
     - task: make-archive
-      file: mongodb-compilation-bosh-release/ci/jobs/compilation/tasks/make-archive.yml
+      file: mongodb-compilation-bosh-release/ci/jobs/create-archive/tasks/make-archive.yml
       params:
         ALIAS: ((bosh-server.alias))
         DEPLOYMENT_NAME: ((bosh-deployment.name))
@@ -160,8 +189,6 @@ jobs:
         SECRET_ACCESS_KEY: ((S3.secret_access_key))
         ENDPOINT_URL: ((S3.endpoint-url))
         BUCKET: ((S3.bucket))
-    - put: compiled
-      params: { file: uploaded/keyval.properties }
         
 #- name: deployment-test
 #  serial: true

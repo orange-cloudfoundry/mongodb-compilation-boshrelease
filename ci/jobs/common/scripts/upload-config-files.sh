@@ -22,6 +22,6 @@ aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 cp config/final.yml s3://$
 mkdir -p ${ROOT_FOLDER}/uploaded
 cd ${ROOT_FOLDER}/uploaded || exit 666
 # create keyval file to indicate the end of sources upload job
-echo "upload_date=\"$(date '+%Y-%d-%m %H:%M')\"" > keyval.properties
+echo "Upload_date=$(date '+%Y-%d-%m %H:%M')" > keyval.properties
 # propagate mongodb version
 grep "^mongodb" ${ROOT_FOLDER}/versions/keyval.properties >> keyval.properties

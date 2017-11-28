@@ -23,3 +23,8 @@ bosh -e ${ALIAS} add-blob $file mongodb/$file
 bosh -e ${ALIAS} upload-blobs
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n delete-vm $(bosh -e ${ALIAS} -d \
   ${DEPLOYMENT_NAME} vms --column="vm cid")
+
+# needed to reuse upload-config-files
+mkdir ${ROOT_FOLDER}/versions
+cp -rp ${ROOT_FOLDER}/compiled/. ${ROOT_FOLDER}/versions
+

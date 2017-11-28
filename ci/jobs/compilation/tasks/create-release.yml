@@ -14,7 +14,7 @@ inputs:
   - name: uploaded
 
 outputs:
-  - name: versions  
+  - name: compiled  
 
 run:
   path: mongodb-compilation-bosh-release/ci/jobs/compilation/scripts/create-release.sh

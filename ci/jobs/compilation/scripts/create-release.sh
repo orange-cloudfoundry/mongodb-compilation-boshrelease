@@ -60,8 +60,9 @@ popd
 
 # copy uploaded to versions to be abble to reuse the upload config files task
 
-mkdir -p versions
+mkdir -p compiled
 
-pushd versions || exit 666
-cp -p  ${ROOT_FOLDER}/uploaded/keyval.properties .
+pushd compiled || exit 666
+echo "Compilation_date=$(date '+%Y-%d-%m %H:%M')"> keyval.properties
+grep "^mongodb" ${ROOT_FOLDER}/uploaded/keyval.properties >> keyval.properties
 popd
