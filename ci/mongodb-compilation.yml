@@ -37,7 +37,7 @@ resources:
       password: ((mongodb-compilation-boshrelease-repo.password))
       git_user: "((mongodb-compilation-boshrelease-repo.git_user)) <((mongodb-compilation-boshrelease-repo.email))>"
 
-  - name: dl-versions
+  - name: versions
     type: keyval
 
   - name: uploaded
@@ -58,8 +58,8 @@ jobs:
     - task: check-versions
       file: mongodb-compilation-bosh-release/ci/jobs/check-versions/tasks/check-versions.yml
 
-    - put: dl-versions
-      params: {file: dl-versions/dl-versions.properties}
+    - put: versions
+      params: {file: versions/keyval.properties}
            
 - name: upload-src
   serial: true
@@ -75,7 +75,7 @@ jobs:
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
   
-    - get: dl-versions
+    - get: versions
       trigger: true
       passed: [check-versions]
 

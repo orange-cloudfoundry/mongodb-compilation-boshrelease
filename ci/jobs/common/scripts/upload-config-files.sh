@@ -24,4 +24,4 @@ cd ${ROOT_FOLDER}/uploaded || exit 666
 # create keyval file to indicate the end of sources upload job
 echo "upload_date=\"$(date '+%Y-%d-%m %H:%M')\"" > keyval.properties
 # propagate mongodb version
-grep "^mongodb" ${ROOT_FOLDER}/dl-versions/keyval.properties >> keyval.properties
+grep "^mongodb" ${ROOT_FOLDER}/versions/keyval.properties >> keyval.properties

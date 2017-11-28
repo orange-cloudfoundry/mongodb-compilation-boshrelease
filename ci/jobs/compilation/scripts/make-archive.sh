@@ -23,3 +23,4 @@ bosh -e ${ALIAS} add-blob $file mongodb/$file
 bosh -e ${ALIAS} upload-blobs
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n delete-vm $(bosh -e ${ALIAS} -d \
   ${DEPLOYMENT_NAME} vms --column="vm cid")
+  

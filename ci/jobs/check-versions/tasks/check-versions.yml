@@ -13,7 +13,7 @@ inputs:
   - name: rocksdb-version
 
 outputs:
-  - name: dl-versions
+  - name: versions
   
 run:
   path: mongodb-compilation-bosh-release/ci/jobs/check-versions/scripts/check-versions.sh
