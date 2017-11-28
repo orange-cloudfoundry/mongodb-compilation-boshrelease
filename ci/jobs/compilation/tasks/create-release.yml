@@ -13,5 +13,8 @@ inputs:
   - name: mongodb-compilation-bosh-release-patched  
   - name: uploaded
 
+outputs:
+  - name: versions  
+
 run:
   path: mongodb-compilation-bosh-release/ci/jobs/compilation/scripts/create-release.sh

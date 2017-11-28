@@ -14,7 +14,6 @@ inputs:
   
 outputs:
   - name: to-upload
-  - name: versions
 
 run:
   path: mongodb-compilation-bosh-release/ci/jobs/compilation/scripts/make-archive.sh

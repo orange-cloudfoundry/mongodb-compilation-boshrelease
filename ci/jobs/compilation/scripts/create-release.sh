@@ -57,3 +57,11 @@ bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n deploy \
     -v instance_group=${INSTANCE_GROUP} -v network=${NETWORK} -v director_uuid=${UUID} \
     -v version=$(grep "^mongodb" ${ROOT_FOLDER}/uploaded/keyval.properties|cut -d"=" -f2)
 popd
+
+# copy uploaded to versions to be abble to reuse the upload config files task
+
+mkdir -p versions
+
+pushd versions || exit 666
+cp -p  ${ROOT_FOLDER}/uploaded/keyval.properties .
+popd
