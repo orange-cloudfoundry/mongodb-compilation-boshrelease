@@ -25,6 +25,5 @@ bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n delete-vm $(bosh -e ${ALIAS} -d \
   ${DEPLOYMENT_NAME} vms --column="vm cid")
 
 # needed to reuse upload-config-files
-mkdir ${ROOT_FOLDER}/versions
+mkdir -p ${ROOT_FOLDER}/versions
 cp -rp ${ROOT_FOLDER}/compiled/. ${ROOT_FOLDER}/versions
-
