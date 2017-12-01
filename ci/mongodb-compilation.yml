@@ -189,7 +189,26 @@ jobs:
         SECRET_ACCESS_KEY: ((S3.secret_access_key))
         ENDPOINT_URL: ((S3.endpoint-url))
         BUCKET: ((S3.bucket))
-        
+
+    - put: uploaded
+      params: { file: uploaded/keyval.properties }    
+
+- name: bump-versions
+  serial: true
+  plan:
+    - aggregate:
+      - get: versions
+      - get: uploaded
+        trigger: true
+        passed: [create-archive]
+      - get: mongodb-compilation-bosh-release  
+    - task: propagate-versions
+      file: mongodb-compilation-bosh-release/ci/jobs/bump-versions/tasks/propagate-versions.yml
+    - put: mongodb-version
+      params: { file: new_versions/mongodb }
+    - put: rocksdb-version   
+      params: { file: new_versions/rocksdb }
+
 #- name: deployment-test
 #  serial: true
 #  plan:
