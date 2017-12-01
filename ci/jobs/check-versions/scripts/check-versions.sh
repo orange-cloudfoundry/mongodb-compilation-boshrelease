@@ -3,6 +3,7 @@
 set -ex
 
 # Installing needed packages
+apt update
 apt install -y curl jq
 
 # last compiled and validated releases

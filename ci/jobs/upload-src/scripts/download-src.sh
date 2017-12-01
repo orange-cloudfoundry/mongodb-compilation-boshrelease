@@ -6,6 +6,7 @@ set -ex
 ROOT_FOLDER=${PWD}
 
 # installing needed packages
+apt update
 apt install -y curl
 
 mkdir -p downloaded-src
