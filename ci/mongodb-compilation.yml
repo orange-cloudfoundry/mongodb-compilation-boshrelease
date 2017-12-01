@@ -20,7 +20,7 @@ resources:
       driver: git
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
       branch: ((mongodb-compilation-boshrelease-repo.branch))
-      file: compiled_version
+      file: mongodb_compiled_version
       username: ((mongodb-compilation-boshrelease-repo.username))
       password: ((mongodb-compilation-boshrelease-repo.password))
       git_user: "((mongodb-compilation-boshrelease-repo.git_user)) <((mongodb-compilation-boshrelease-repo.email))>"
@@ -32,7 +32,7 @@ resources:
       driver: git
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
       branch: ((mongodb-compilation-boshrelease-repo.branch))
-      file: compiled_version
+      file: rocksdb_compiled_version
       username: ((mongodb-compilation-boshrelease-repo.username))
       password: ((mongodb-compilation-boshrelease-repo.password))
       git_user: "((mongodb-compilation-boshrelease-repo.git_user)) <((mongodb-compilation-boshrelease-repo.email))>"
