@@ -85,10 +85,10 @@ jobs:
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
       params:
-        ACCESS_KEY_ID: ((S3.access_key_id))
-        SECRET_ACCESS_KEY: ((S3.secret_access_key))
-        ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))   
+        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        BUCKET: ((compilation-blobstore.bucket))
 
     - task: upload-bosh
       file: mongodb-compilation-bosh-release/ci/jobs/upload-src/tasks/upload-bosh.yml
@@ -100,14 +100,14 @@ jobs:
       params:
         ALIAS: ((bosh-server.alias))
         BOSH_RELEASE: ((bosh-deployment.release))
-        
+
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/upload-config-files.yml
       params:
-        ACCESS_KEY_ID: ((S3.access_key_id))
-        SECRET_ACCESS_KEY: ((S3.secret_access_key))
-        ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))
+        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        BUCKET: ((compilation-blobstore.bucket))
     - put: uploaded
       params: { file: uploaded/keyval.properties }
 
@@ -132,10 +132,10 @@ jobs:
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
       params:
-        ACCESS_KEY_ID: ((S3.access_key_id))
-        SECRET_ACCESS_KEY: ((S3.secret_access_key))
-        ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))
+        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        BUCKET: ((compilation-blobstore.bucket))
     
     - task: create-release
       file: mongodb-compilation-bosh-release/ci/jobs/compilation/tasks/create-release.yml
@@ -171,10 +171,10 @@ jobs:
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
       params:
-        ACCESS_KEY_ID: ((S3.access_key_id))
-        SECRET_ACCESS_KEY: ((S3.secret_access_key))
-        ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))
+        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        BUCKET: ((compilation-blobstore.bucket))
     
     - task: make-archive
       file: mongodb-compilation-bosh-release/ci/jobs/create-archive/tasks/make-archive.yml
@@ -185,10 +185,10 @@ jobs:
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/upload-config-files.yml
       params:
-        ACCESS_KEY_ID: ((S3.access_key_id))
-        SECRET_ACCESS_KEY: ((S3.secret_access_key))
-        ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))
+        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        BUCKET: ((compilation-blobstore.bucket))
 
     - put: uploaded
       params: { file: uploaded/keyval.properties }    
@@ -208,41 +208,3 @@ jobs:
       params: { file: new_versions/mongodb }
     - put: rocksdb-version   
       params: { file: new_versions/rocksdb }
-
-#- name: deployment-test
-#  serial: true
-#  plan:
-#    - aggregate:
-#      - get: mongodb-compilation-bosh-release
-#      - get: archive
-#        trigger: true
-#        passed: [compilation]
-#      - get: golang-release
-
-#
-#
-#    - task: update-github
-#      config:
-#        platform: linux
-#        image_resource:
-#          type: docker-image
-#          source:
-#            repository: concourse/bosh-cli
-#            tag: latest
-#        inputs:
-#          - name: to-upload
-#        run:
-#          path: /bin/bash
-#          args:
-#            - -exc
-#            - |
-#              cd to-upload || exit 115
-#              git config --global user.email ((repo.email))
-#              git config --global user.name "((repo.name))"
-#              git branch "Upload-test"
-#              git checkout Upload-test
-#              git commit -m "Adding Last compiled blob to blob list" config/blobs.yml
-#    - put: mongodb-compilation-bosh-release-out
-#      params:
-#        repository: to-upload
-#
