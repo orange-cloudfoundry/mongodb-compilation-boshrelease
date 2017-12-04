@@ -47,13 +47,21 @@ jobs:
 - name: deploy-346
   serial: true
   plan:
+    - get: mongodb-bosh-release
+    - get: mongodb-compilation-bosh-release  
     - aggregate:
-      - get: mongodb-bosh-release
-      - get: mongodb-compilation-bosh-release
       - get: mongodb-version
         trigger: true
       - get: rocksdb-version
         trigger: true
+      - task: create-bosh-config
+        file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+        params:
+          CA_CERT: ((bosh-server.ca))
+          IP: ((bosh-server.ip))
+          ALIAS: ((bosh-server.alias)) 
+          USER: ((bosh-server.user))
+          PASSWORD: ((bosh-server.password))  
     
     - task: get-config-files-mainrelease
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files-mainrelease.yml
@@ -61,4 +69,13 @@ jobs:
         ACCESS_KEY_ID: ((S3.access_key_id))
         SECRET_ACCESS_KEY: ((S3.secret_access_key))
         ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))   
+        BUCKET: ((S3.bucket))
+
+    - task: deploy-rs
+      file: mongodb-compilation-bosh-release/ci/jobs/deploy-346/tasks/deploy-rs.yml      
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
