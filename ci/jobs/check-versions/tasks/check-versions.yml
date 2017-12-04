@@ -9,8 +9,6 @@ image_resource:
 
 inputs:
   - name: mongodb-compilation-bosh-release
-  - name: mongodb-version
-  - name: rocksdb-version
 
 outputs:
   - name: versions
