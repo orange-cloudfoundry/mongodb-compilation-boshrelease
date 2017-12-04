@@ -17,10 +17,12 @@ unpause:
 	done	
 
 trigger:
-	fly -t $(TARGET) trigger-job -j $(PIPELINE)/check-versions
+	fly -t $(TARGET) trigger-job -j mongodb-compilation/check-versions
 
 delete:
-	fly -t $(TARGET) dp -p $(PIPELINE) --non-interactive
+	for PIPELINE in $(PIPELINES_LIST) ; do \
+		fly -t $(TARGET) dp -p $$PIPELINE --non-interactive ; \
+	done
 
 check:
 	fly -t $(TARGET) check-resource --resource $(PIPELINE)/check-versions

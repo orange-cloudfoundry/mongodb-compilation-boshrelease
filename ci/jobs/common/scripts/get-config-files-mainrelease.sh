@@ -27,5 +27,9 @@ aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 cp s3://${BUCKET}/ci/blobs
 aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 cp s3://${BUCKET}/ci/final.yml config/final.yml 2>/dev/null \
 ||echo "no archived final.yml, use release default one"
 
+#retrieve private.yml
+aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 cp s3://${BUCKET}/ci/private.yml config/private.yml 2>/dev/null \
+||echo "no archived private.yml, use release default one"
+
 #get the list of availables blobs ids on blobsore
 aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 ls s3://${BUCKET}/ 2>/dev/null > blobstore_ids.list

@@ -52,7 +52,9 @@ jobs:
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
-    
+      - get: mongodb-version
+      - get: rocksdb-version
+
     - task: check-versions
       file: mongodb-compilation-bosh-release/ci/jobs/check-versions/tasks/check-versions.yml
 
