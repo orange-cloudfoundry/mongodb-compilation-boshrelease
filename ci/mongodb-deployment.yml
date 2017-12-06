@@ -61,15 +61,27 @@ jobs:
           IP: ((bosh-server.ip))
           ALIAS: ((bosh-server.alias)) 
           USER: ((bosh-server.user))
-          PASSWORD: ((bosh-server.password))  
-    
+          PASSWORD: ((bosh-server.password)) 
+
     - task: get-config-files
-      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files-mainrelease.yml
+      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        BUCKET: ((compilation-blobstore.bucket))       
+    
+    - task: get-config-files-mainrelease
+      file: mongodb-compilation-bosh-release/ci/jobs/deploy-346/tasks/get-config-files-mainrelease.yml
       params:
         ACCESS_KEY_ID: ((mongodb-release-blobstore.access_key_id))
         SECRET_ACCESS_KEY: ((mongodb-release-blobstore.secret_access_key))
         ENDPOINT_URL: ((mongodb-release-blobstore.endpoint-url))
         BUCKET: ((mongodb-release-blobstore.bucket))
+        COMPIL_ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        COMPIL_SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        COMPIL_ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        COMPIL_BUCKET: ((compilation-blobstore.bucket))
 
     - task: deploy-rs
       file: mongodb-compilation-bosh-release/ci/jobs/deploy-346/tasks/deploy-rs.yml      
@@ -79,3 +91,10 @@ jobs:
         ALIAS: ((bosh-server.alias)) 
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
+        RELEASE_NAME: mongodb-ci-rs
+        DEPLOYMENTS_NETWORK: ((deployments.network))
+        SHIELD_URL: ((deployments.shield-url))
+        MONGO_PORT: ((deployments.mongod.port))
+        PERSISTENT_DISK_TYPE: ((deployments.mongod.persistent-disk-type))
+        VM_TYPE: ((deployments.mongod.vm-type))
+        ROOT_USERNAME: ((deployments.mongod.root-username))

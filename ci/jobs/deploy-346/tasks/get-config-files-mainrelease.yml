@@ -10,10 +10,11 @@ image_resource:
 inputs:
   - name: mongodb-bosh-release
   - name: mongodb-compilation-bosh-release
+  - name: mongodb-compilation-bosh-release-patched
 
 outputs:
   - name: mongodb-bosh-release-patched
 
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/common/scripts/get-config-files-mainrelease.sh
+  path: mongodb-compilation-bosh-release/ci/jobs/deploy-346/scripts/get-config-files-mainrelease.sh
 

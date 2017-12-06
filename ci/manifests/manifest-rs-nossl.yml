@@ -2,7 +2,7 @@ name: ((appli))
 director_uuid: 8dd35958-abc4-46fc-9c96-f91c791bfeae
 
 releases:
-  - name: mongodb-services
+  - name: ((mongodb-release))
     version: latest
   - name: prometheus
     version: latest
@@ -23,28 +23,29 @@ stemcells:
 
 instance_groups:
 - name: mongod
-  release: mongodb-services
+  release: ((mongodb-release))
   azs: [z1]
   instances: 3 # 
-  vm_type: small
+  vm_type: ((vm-type))
   env:
     bosh:
       swap_size: 0
   stemcell: trusty
   networks:
-  - name: mongo1
-  persistent_disk_type: small
+  - name: ((deployments-network))
+  persistent_disk_type: ((persistent-disk-type))
   env:
     persistent_disk_fs: xfs
   jobs:
   - name: mongod
-    release: mongodb-services
+    release: ((mongodb-release))
     properties: 
       node_role: rs
       require_ssl: 0
       replication:
         enable: 1
         key: ((mongo_keyfile_content))
+      root_username: ((root-username))
       root_password: ((mongo_root_password))
       admin_password: ((mongo_admin_password))
       server_certificate: 
@@ -54,14 +55,14 @@ instance_groups:
   - release: shield
     name: shield-agent
     properties:
-      autoprovision: true # https://10.165.0.21
+    autoprovision: true # https://10.165.0.21
       targets:
         mongodb:
           plugin: mongo
           config:
-            mongo_user: MongoRoot
+            mongo_user: ((root-username))
             mongo_password: ((mongo_root_password))
-            mongo_port: "27017"
+            mongo_port: ((mongo-port))
             mongo_bindir: "/var/vcap/packages/mongodb/bin"
     consumes:
       shield-daemon: { from: shield-daemon, deployment: shield }
@@ -70,7 +71,7 @@ instance_groups:
     properties:
       mongodb_exporter:
         mongodb:
-          uri: mongodb://MongoRoot:((mongo_root_password))@localhost:27017?authSource=admin
+          uri: mongodb://((root-username)):((mongo_root_password))@localhost:((mongo-port))?authSource=admin
         web:
           port: 9001  
         collect_oplog: true

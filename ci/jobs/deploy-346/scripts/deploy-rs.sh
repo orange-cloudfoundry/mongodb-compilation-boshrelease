@@ -10,7 +10,7 @@ pushd mongodb-bosh-release-patched || exit 666
 
 # renaming final_name in final.yml
 
-sed -i -e "s/\(^final_name: \).*$/\1 mongodb-ci-rs/" config/final.yml
+sed -i -e "s/\(^final_name: \).*$/\1 ${RELEASE_NAME}/" config/final.yml
 
 # avoid checking jobs fingerprints
 rm -rf .final_*
@@ -19,6 +19,15 @@ bosh -e ${ALIAS} cr --force
 
 bosh -e ${ALIAS} ur 
 
-bosh -e ${ALIAS} -d mongodb-ci-rs -v appli=mongodb-ci-rs ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/manifest-rs-nossl.yml
+bosh -e ${ALIAS} deploy -n -d mongodb-ci-rs \
+        -v appli=mongodb-ci-rs \
+        -v mongodb-release=${RELEASE_NAME} \
+        -v deployments-network=${DEPLOYMENTS_NETWORK} \
+        -v shield-url=${SHIELD_URL} \
+        -v mongo-port=${MONGO_PORT} \
+        -v persistent-disk-type=${PERSISTENT_DISK_TYPE} \
+        -v vm-type=${VM_TYPE} \
+        -v root-username=${ROOT_USERNAME} \
+        ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/manifest-rs-nossl.yml
 
 popd
