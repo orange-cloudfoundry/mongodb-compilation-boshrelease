@@ -30,8 +30,6 @@ mkdir -p versions
 pushd versions || exit 666
 
 echo "last_check=$(date '+%Y-%d-%m %H:%M')"> keyval.properties
-[ "$last_mongodb_version" != "$mongodb_last_stable" ] && \
-    echo "mongodb=${mongodb_last_stable}" >> keyval.properties
-[ "$last_rocksdb_version" != "$rocksdb_last_stable" ] && \
-    echo "rocksdb=${rocksdb_last_stable}" >> keyval.properties
+echo "mongodb=${mongodb_last_stable}" >> keyval.properties
+echo "rocksdb=${rocksdb_last_stable}" >> keyval.properties
 popd
