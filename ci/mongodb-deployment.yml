@@ -63,13 +63,13 @@ jobs:
           USER: ((bosh-server.user))
           PASSWORD: ((bosh-server.password))  
     
-    - task: get-config-files-mainrelease
+    - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files-mainrelease.yml
       params:
-        ACCESS_KEY_ID: ((S3.access_key_id))
-        SECRET_ACCESS_KEY: ((S3.secret_access_key))
-        ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))
+        ACCESS_KEY_ID: ((mongodb-release-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((mongodb-release-blobstore.secret_access_key))
+        ENDPOINT_URL: ((mongodb-release-blobstore.endpoint-url))
+        BUCKET: ((mongodb-release-blobstore.bucket))
 
     - task: deploy-rs
       file: mongodb-compilation-bosh-release/ci/jobs/deploy-346/tasks/deploy-rs.yml      
