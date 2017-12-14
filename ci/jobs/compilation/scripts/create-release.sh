@@ -54,6 +54,6 @@ bosh -e ${ALIAS} upload-release
 
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n deploy \
     ci/manifests/compilation.yml -v deployment=${DEPLOYMENT_NAME} -v release=${BOSH_RELEASE} \
-    -v instance_group=${INSTANCE_GROUP} -v network=${NETWORK} \
+    -v instance_group=${INSTANCE_GROUP} -v network=${NETWORK} -v director_uuid=${UUID} \
     -v version=$(grep "^mongodb" ${ROOT_FOLDER}/uploaded/keyval.properties|cut -d"=" -f2)
 popd
