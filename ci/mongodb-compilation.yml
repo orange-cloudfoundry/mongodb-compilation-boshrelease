@@ -143,12 +143,13 @@ jobs:
     - task: create-release
       file: mongodb-compilation-bosh-release/ci/jobs/compilation/tasks/create-release.yml
       params:
-        ALIAS: ((bosh-server.alias)) 
+        ALIAS: ((bosh-server.alias))
+        UUID: ((bosh-server.uuid))
         BOSH_RELEASE: ((bosh-deployment.release))
         DEPLOYMENT_NAME: ((bosh-deployment.name))
         INSTANCE_GROUP: ((bosh-deployment.instance-group))
         NETWORK: ((bosh-deployment.network))
-        
+
     - task: make-archive
       file: mongodb-compilation-bosh-release/ci/jobs/compilation/tasks/make-archive.yml
       params:

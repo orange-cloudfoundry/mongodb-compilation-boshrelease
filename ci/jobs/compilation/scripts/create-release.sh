@@ -13,12 +13,14 @@ create_fake_files()
         mkdir -p dev_releases/${BOSH_RELEASE}
     fi
 
-    for release in $(bosh -e ${ALIAS} releases -d ${DEPLOYMENT_NAME} --column="Version"|tr -d "*")
+    for release in $(bosh -e ${ALIAS} releases | grep ${BOSH_RELEASE} \
+                    | sed -e 's/[^[:space:]]*[[:space:]]*\([^[:space:]]*\).*/\1/' | tr -d "*")
     do
 
         # get the hash of the release
-        commit_hash=$(bosh -e ${ALIAS} releases -d ${DEPLOYMENT_NAME} --column="Version" --column="commit hash" \
-                    |tr -d "*" |grep -w "^${release}"|tr -s "\t" " "|cut -d" " -f2|tr -d [:space:]|tr -d "+")
+        commit_hash=$(bosh -e ${ALIAS} releases --column="Version" --column="commit hash" \
+                    | tr -d "*" | grep -w "^${release}" | tr -s "\t" " "|cut -d" " -f2 \
+                    | tr -d [:space:] | tr -d "+")
 
         if [ ! -f dev_releases/${BOSH_RELEASE}/index.yml ]
         then
@@ -51,7 +53,7 @@ bosh -e ${ALIAS} create-release --force
 bosh -e ${ALIAS} upload-release
 
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n deploy \
-    manifest.yml -v deployment=${DEPLOYMENT_NAME} -v release=${BOSH_RELEASE} \
-    -v instance_group=${INSTANCE_GROUP} -v network=${NETWORK} \
+    ci/manifests/compilation.yml -v deployment=${DEPLOYMENT_NAME} -v release=${BOSH_RELEASE} \
+    -v instance_group=${INSTANCE_GROUP} -v network=${NETWORK} -v director_uuid=${UUID} \
     -v version=$(grep "^mongodb" ${ROOT_FOLDER}/uploaded/keyval.properties|cut -d"=" -f2)
 popd
