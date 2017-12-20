@@ -60,14 +60,6 @@ instance_groups:
       require-shield-core: false
       core:
         ca: ((/bosh-jra/shield/shield-ca.certificate))
-      targets:
-        mongodb:
-          plugin: mongo
-          config:
-            mongo_user: ((root-username))
-            mongo_password: ((mongo_root_password))
-            mongo_port: ((mongo-port))
-            mongo_bindir: "/var/vcap/packages/mongodb/bin"
     consumes:
       shield: { from: shield, deployment: shield }
   - name: mongodb_exporter
