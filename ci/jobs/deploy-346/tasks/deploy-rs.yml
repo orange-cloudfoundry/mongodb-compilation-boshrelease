@@ -12,5 +12,8 @@ inputs:
   - name: mongodb-compilation-bosh-release
   - name: bosh-director-config
 
+outputs:
+  - name: deployed   
+
 run:
   path: mongodb-compilation-bosh-release/ci/jobs/deploy-346/scripts/deploy-rs.sh

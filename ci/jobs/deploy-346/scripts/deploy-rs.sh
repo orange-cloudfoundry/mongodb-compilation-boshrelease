@@ -31,3 +31,9 @@ bosh -e ${ALIAS} deploy -n -d mongodb-ci-rs \
         ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/manifest-rs-nossl.yml
 
 popd
+
+mkdir -p deployed
+
+pushd deployed || exit 666
+echo "Deployment_date=$(date '+%Y-%d-%m %H:%M')"> keyval.properties
+popd
