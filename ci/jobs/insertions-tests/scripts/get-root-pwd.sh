@@ -10,7 +10,7 @@ credhub api ${IP}:${PORT} --skip-tls-validation
     | credhub login
 set -x
 
-mkdir -p mongo-passwd
-cd mongo-passwd || exit 666
+mkdir -p output
+cd output || exit 666
 
-credhub g -n /${BOSH_ALIAS}/mongodb-ci-rs/${VAR} -j |jq -r '.value' >rootpwd.txt
+credhub g -n /${BOSH_ALIAS}/mongodb-ci-rs/${VAR} -j |jq -r '.value' |sed -e "s/^/password=/">keyval.properties

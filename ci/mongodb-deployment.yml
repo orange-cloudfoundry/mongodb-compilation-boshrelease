@@ -46,8 +46,14 @@ resources:
   - name: deployed
     type: keyval
 
- # - name: removed
- #   type: keyval
+  - name: deployment-specs
+    type: keyval  
+  
+  - name: filled
+    type: keyval
+
+  - name: removed
+    type: keyval
 
 jobs:
 - name: deploy-346
@@ -112,6 +118,10 @@ jobs:
 - name: insertion-tests
   serial: true
   plan:
+    - get: deployed
+      trigger: true
+      passed: [deploy-346]
+
     - get: mongodb-compilation-bosh-release
     - aggregate:
       - task: create-bosh-config
@@ -123,22 +133,21 @@ jobs:
           USER: ((bosh-server.user))
           PASSWORD: ((bosh-server.password))
 
-      - task: get-mongo-pwd
-        file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/get-root-pwd.yml
-        params:
-          BOSH_ALIAS: ((bosh-server.alias))
-          IP: ((credhub.ip))
-          PORT: ((credhub.port))
-          USER: ((credhub.username))
-          PASSWORD: ((credhub.password))
-          VAR: mongo_root_password
+    - task: get-mongo-pwd
+      file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/get-root-pwd.yml
+      params:
+        BOSH_ALIAS: ((bosh-server.alias))
+        IP: ((credhub.ip))
+        PORT: ((credhub.port))
+        USER: ((credhub.username))
+        PASSWORD: ((credhub.password))
+        VAR: mongo_root_password
 
-    - get: deployed
-      trigger: true
-      passed: [deploy-346]
+    - put: deployment-specs
+      params: { file: output/keyval.properties}
 
-    - task: insert-collection
-      file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/insert-collection.yml
+    - task: get-deployment-ips
+      file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/get-deployment-ips.yml
       params:
         CA_CERT: ((bosh-server.ca))
         IP: ((bosh-server.ip))
@@ -146,43 +155,56 @@ jobs:
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
 
+    - put: deployment-specs
+      params: { file: output/keyval.properties}    
+
+    - task: insert-collection
+      file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/insert-collection.yml
+      params:
+        USER: ((deployments.mongod.root-username))
+        PORT: ((deployments.mongod.port))
+
+    - put: filled
+      params: { file: filled/keyval.properties }
 
 
-#- name: delete-deployment
-#  serial: true
-#  plan:
-#
-#    - get: mongodb-compilation-bosh-release
-#    - task: create-bosh-config
-#      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
-#      params:
-#        CA_CERT: ((bosh-server.ca))
-#        IP: ((bosh-server.ip))
-#        ALIAS: ((bosh-server.alias)) 
-#        USER: ((bosh-server.user))
-#        PASSWORD: ((bosh-server.password))
-#
-#    - get: deployed
-#      trigger: true
-#      passed: [deploy-346]
-#
-#    - task: remove-deployment
-#      file: mongodb-compilation-bosh-release/ci/jobs/remove-deployment/tasks/remove-deployment.yml      
-#      params:
-#        CA_CERT: ((bosh-server.ca))
-#        IP: ((bosh-server.ip))
-#        ALIAS: ((bosh-server.alias)) 
-#        USER: ((bosh-server.user))
-#        PASSWORD: ((bosh-server.password))
-#        RELEASE_NAME: mongodb-ci-rs
-#        DEPLOYMENTS_NETWORK: ((deployments.network))
-#        SHIELD_URL: ((deployments.shield-url))
-#        MONGO_PORT: ((deployments.mongod.port))
-#        PERSISTENT_DISK_TYPE: ((deployments.mongod.persistent-disk-type))
-#        VM_TYPE: ((deployments.mongod.vm-type))
-#        ROOT_USERNAME: ((deployments.mongod.root-username))  
-#
-#    - put: removed
-#      params: { file: removed/keyval.properties }
-#
-#
+- name: delete-deployment
+  serial: false
+  plan:
+
+    - get: mongodb-compilation-bosh-release
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+
+    - get: deployed
+      trigger: false
+      passed: [deploy-346]
+
+    - task: remove-deployment
+      file: mongodb-compilation-bosh-release/ci/jobs/remove-deployment/tasks/remove-deployment.yml      
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+        RELEASE_NAME: mongodb-ci-rs
+        DEPLOYMENTS_NETWORK: ((deployments.network))
+        SHIELD_URL: ((deployments.shield-url))
+        MONGO_PORT: ((deployments.mongod.port))
+        PERSISTENT_DISK_TYPE: ((deployments.mongod.persistent-disk-type))
+        VM_TYPE: ((deployments.mongod.vm-type))
+        ROOT_USERNAME: ((deployments.mongod.root-username))  
+
+    - put: removed
+      params: { file: removed/keyval.properties }
+    
+    - put: deployed
+      params: { file: removed/keyval.empty } 
+

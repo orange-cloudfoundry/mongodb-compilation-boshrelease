@@ -4,17 +4,17 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: jraverdyorange/mongodb-client-3.4.6
+    repository: jraverdyorange/mongodb-cli
     tag: latest
 
 inputs:
   - name: deployed
   - name: bosh-director-config
   - name: mongodb-compilation-bosh-release
-  - name: mongo-passwd
+  - name: deployment-specs
   
 outputs:
-  - name: inserted
+  - name: filled
 
 run:
   path: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/scripts/insert-collection.sh

@@ -11,7 +11,7 @@ inputs:
   - name: mongodb-compilation-bosh-release
 
 outputs:
-  - name: mongo-passwd
+  - name: output
 
 run:
   path: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/scripts/get-root-pwd.sh

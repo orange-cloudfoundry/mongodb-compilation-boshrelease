@@ -52,16 +52,46 @@ instance_groups:
         ca: ((mongo_ca.ca))
         private_key: ((mongo_ca.private_key))
         certificate: ((mongo_ca.certificate))
-  - release: shield
-    name: shield-agent
+  
+  - name: import
+    release: shield
+    consumes:
+      shield: {from: shield, deployment: shield-test}
+        
+    properties:
+      import:
+        core: https://10.165.0.22
+        token: 00d8da5d-7334-4e85-9acd-5d838a21a2c0
+        ca: ((/bosh-jra/shield-test/shield-ca.certificate))
+        tenants:
+        - name: mongodb-tenant
+          systems:
+            - name: ((appli))
+              agent:  (ip):5444
+              plugin: mongo
+              config: 
+                mongo_bindir: /var/vcap/packages/mongodb/bin
+                mongo_user: MongoRoot
+                mongo_password: ((mongo_root_password))
+              summary: "test shield"  
+              jobs:
+                - name: Daily
+                  when: "every 8 hours from 0:15"
+                  policy: Short-Term
+                  storage: mysql-scality-backups
+                  paused:  false
+    
+  - name: shield-agent
+    release: shield
     properties:
       name: ((appli))
-      shield-url: https://10.165.0.21
+      shield-url: https://10.165.0.22
       require-shield-core: false
       core:
-        ca: ((/bosh-jra/shield/shield-ca.certificate))
+        ca: ((/bosh-jra/shield-test/shield-ca.certificate))
     consumes:
-      shield: { from: shield, deployment: shield }
+      shield: { from: shield, deployment: shield-test }
+      
   - name: mongodb_exporter
     release: prometheus
     properties:
