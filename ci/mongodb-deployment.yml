@@ -46,8 +46,8 @@ resources:
   - name: deployed
     type: keyval
 
-  - name: removed
-    type: keyval
+ # - name: removed
+ #   type: keyval
 
 jobs:
 - name: deploy-346
@@ -108,60 +108,81 @@ jobs:
     - put: deployed
       params: { file: deployed/keyval.properties }    
 
-- name: delete-deployment
+
+- name: insertion-tests
   serial: true
   plan:
-
     - get: mongodb-compilation-bosh-release
-    - task: create-bosh-config
-      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
-      params:
-        CA_CERT: ((bosh-server.ca))
-        IP: ((bosh-server.ip))
-        ALIAS: ((bosh-server.alias)) 
-        USER: ((bosh-server.user))
-        PASSWORD: ((bosh-server.password))
+    - aggregate:
+      - task: create-bosh-config
+        file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+        params:
+          CA_CERT: ((bosh-server.ca))
+          IP: ((bosh-server.ip))
+          ALIAS: ((bosh-server.alias)) 
+          USER: ((bosh-server.user))
+          PASSWORD: ((bosh-server.password))
+
+      - task: get-mongo-pwd
+        file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/get-root-pwd.yml
+        params:
+          BOSH_ALIAS: ((bosh-server.alias))
+          IP: ((credhub.ip))
+          PORT: ((credhub.port))
+          USER: ((credhub.username))
+          PASSWORD: ((credhub.password))
+          VAR: mongo_root_password
 
     - get: deployed
       trigger: true
       passed: [deploy-346]
 
-    - task: remove-deployment
-      file: mongodb-compilation-bosh-release/ci/jobs/remove-deployment/tasks/remove-deployment.yml      
+    - task: insert-collection
+      file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/insert-collection.yml
       params:
         CA_CERT: ((bosh-server.ca))
         IP: ((bosh-server.ip))
         ALIAS: ((bosh-server.alias)) 
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
-        RELEASE_NAME: mongodb-ci-rs
-        DEPLOYMENTS_NETWORK: ((deployments.network))
-        SHIELD_URL: ((deployments.shield-url))
-        MONGO_PORT: ((deployments.mongod.port))
-        PERSISTENT_DISK_TYPE: ((deployments.mongod.persistent-disk-type))
-        VM_TYPE: ((deployments.mongod.vm-type))
-        ROOT_USERNAME: ((deployments.mongod.root-username))  
 
-    - put: removed
-      params: { file: removed/keyval.properties }
 
-#
-#- name: insertion-tests
+
+#- name: delete-deployment
 #  serial: true
 #  plan:
-#    - get: mongodb-bosh-release
-#    - get: mongodb-compilation-bosh-release  
-#    - aggregate:
-#      - get: mongodb-version
-#        trigger: true
-#      - get: rocksdb-version
-#        trigger: true
-#      - task: create-bosh-config
-#        file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
-#        params:
-#          CA_CERT: ((bosh-server.ca))
-#          IP: ((bosh-server.ip))
-#          ALIAS: ((bosh-server.alias)) 
-#          USER: ((bosh-server.user))
-#          PASSWORD: ((bosh-server.password))
+#
+#    - get: mongodb-compilation-bosh-release
+#    - task: create-bosh-config
+#      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+#      params:
+#        CA_CERT: ((bosh-server.ca))
+#        IP: ((bosh-server.ip))
+#        ALIAS: ((bosh-server.alias)) 
+#        USER: ((bosh-server.user))
+#        PASSWORD: ((bosh-server.password))
+#
+#    - get: deployed
+#      trigger: true
+#      passed: [deploy-346]
+#
+#    - task: remove-deployment
+#      file: mongodb-compilation-bosh-release/ci/jobs/remove-deployment/tasks/remove-deployment.yml      
+#      params:
+#        CA_CERT: ((bosh-server.ca))
+#        IP: ((bosh-server.ip))
+#        ALIAS: ((bosh-server.alias)) 
+#        USER: ((bosh-server.user))
+#        PASSWORD: ((bosh-server.password))
+#        RELEASE_NAME: mongodb-ci-rs
+#        DEPLOYMENTS_NETWORK: ((deployments.network))
+#        SHIELD_URL: ((deployments.shield-url))
+#        MONGO_PORT: ((deployments.mongod.port))
+#        PERSISTENT_DISK_TYPE: ((deployments.mongod.persistent-disk-type))
+#        VM_TYPE: ((deployments.mongod.vm-type))
+#        ROOT_USERNAME: ((deployments.mongod.root-username))  
+#
+#    - put: removed
+#      params: { file: removed/keyval.properties }
+#
 #
