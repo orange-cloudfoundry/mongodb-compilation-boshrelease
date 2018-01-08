@@ -1,0 +1,18 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: jraverdyorange/shield-cli
+    tag: latest
+
+inputs:
+  - name: filled
+  - name: mongodb-compilation-bosh-release
+  
+outputs:
+  - name: backuped
+
+run:
+  path: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/scripts/backup.sh
