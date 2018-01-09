@@ -60,11 +60,11 @@ instance_groups:
         
     properties:
       import:
-        core: https://10.165.0.22
-        token: 00d8da5d-7334-4e85-9acd-5d838a21a2c0
+        core: ((shield-url))
+        token: ((shield-token))
         ca: ((/bosh-jra/shield-test/shield-ca.certificate))
         tenants:
-        - name: mongodb-tenant
+        - name: ((shield-tenant))
           systems:
             - name: ((appli))
               agent:  (ip):5444
@@ -75,17 +75,17 @@ instance_groups:
                 mongo_password: ((mongo_root_password))
               summary: "test shield"  
               jobs:
-                - name: Daily
+                - name: ((appli))-backup-test
                   when: "every 8 hours from 0:15"
                   policy: Short-Term
-                  storage: mysql-scality-backups
+                  storage: ((shield-storage))
                   paused:  false
     
   - name: shield-agent
     release: shield
     properties:
       name: ((appli))
-      shield-url: https://10.165.0.22
+      shield-url: ((shield-url))
       require-shield-core: false
       core:
         ca: ((/bosh-jra/shield-test/shield-ca.certificate))

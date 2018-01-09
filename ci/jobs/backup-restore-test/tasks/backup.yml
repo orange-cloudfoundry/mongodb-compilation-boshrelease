@@ -8,11 +8,7 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: filled
   - name: mongodb-compilation-bosh-release
   
-outputs:
-  - name: backuped
-
 run:
   path: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/scripts/backup.sh
