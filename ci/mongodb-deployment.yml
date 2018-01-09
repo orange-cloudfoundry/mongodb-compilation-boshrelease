@@ -103,13 +103,14 @@ jobs:
         ALIAS: ((bosh-server.alias)) 
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
-        RELEASE_NAME: mongodb-ci-rs
-        DEPLOYMENTS_NETWORK: ((deployments.network))
-        SHIELD_URL: ((deployments.shield-url))
-        MONGO_PORT: ((deployments.mongod.port))
-        PERSISTENT_DISK_TYPE: ((deployments.mongod.persistent-disk-type))
-        VM_TYPE: ((deployments.mongod.vm-type))
-        ROOT_USERNAME: ((deployments.mongod.root-username))
+        RELEASE_NAME: ((deployment.tests.name))
+        DEPLOYMENT_NAME: ((deployment.tests.name))
+        DEPLOYMENTS_NETWORK: ((deployment.tests.network))
+        SHIELD_URL: ((deployment.tests.shield.core))
+        MONGO_PORT: ((deployment.tests.mongod.port))
+        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
+        VM_TYPE: ((deployment.tests.mongod.vm-type))
+        ROOT_USERNAME: ((deployment.tests.mongod.root-username))
 
     - put: deployed
       params: { file: deployed/keyval.properties }    
@@ -137,10 +138,10 @@ jobs:
       file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/get-root-pwd.yml
       params:
         BOSH_ALIAS: ((bosh-server.alias))
-        IP: ((credhub.ip))
-        PORT: ((credhub.port))
-        USER: ((credhub.username))
-        PASSWORD: ((credhub.password))
+        IP: ((deployment.tests.credhub.ip))
+        PORT: ((deployment.tests.credhub.port))
+        USER: ((deployment.tests.credhub.username))
+        PASSWORD: ((deployment.tests.credhub.password))
         VAR: mongo_root_password
 
     - put: deployment-specs
@@ -161,8 +162,8 @@ jobs:
     - task: insert-collection
       file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/insert-collection.yml
       params:
-        USER: ((deployments.mongod.root-username))
-        PORT: ((deployments.mongod.port))
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))
 
     - put: filled
       params: { file: filled/keyval.properties }
@@ -195,6 +196,12 @@ jobs:
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
 
+    - task: run-shield-errand
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/run-shield-errand.yml
+      params:
+        ALIAS: ((bosh-server.alias))
+        DEPLOYMENT: ((deployment.tests.name))
+
 - name: delete-deployment
   serial: false
   plan:
@@ -221,17 +228,17 @@ jobs:
         ALIAS: ((bosh-server.alias)) 
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
-        RELEASE_NAME: mongodb-ci-rs
-        DEPLOYMENTS_NETWORK: ((deployments.network))
-        SHIELD_URL: ((deployments.shield-url))
-        MONGO_PORT: ((deployments.mongod.port))
-        PERSISTENT_DISK_TYPE: ((deployments.mongod.persistent-disk-type))
-        VM_TYPE: ((deployments.mongod.vm-type))
-        ROOT_USERNAME: ((deployments.mongod.root-username))  
+        RELEASE_NAME: ((deployment.tests.name))
+        DEPLOYMENT_NAME: ((deployment.tests.name))
+        DEPLOYMENTS_NETWORK: ((deployment.tests.network))
+        SHIELD_URL: ((deployment.tests.shield.core))
+        MONGO_PORT: ((deployment.tests.mongod.port))
+        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
+        VM_TYPE: ((deployment.tests.mongod.vm-type))
+        ROOT_USERNAME: ((deployment.tests.mongod.root-username))
 
     - put: removed
       params: { file: removed/keyval.properties }
     
     - put: deployed
-      params: { file: removed/keyval.empty } 
-
+      params: { file: removed/keyval.empty }
