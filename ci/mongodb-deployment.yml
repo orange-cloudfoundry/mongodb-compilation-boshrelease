@@ -213,8 +213,7 @@ jobs:
         SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
-        JOB:                ((deployment.tests.name))-backup-test
-
+ 
 - name: delete-deployment
   serial: false
   plan:

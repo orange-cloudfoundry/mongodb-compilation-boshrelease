@@ -23,7 +23,6 @@ do
 	# removing all jobs linked to target
 	if [ "$target" != "" ]
 	then
-
 		for i in $(buckler jobs --target ${target} --json |jq -r '.[].uuid')
 		do
 			buckler delete-job $i --yes

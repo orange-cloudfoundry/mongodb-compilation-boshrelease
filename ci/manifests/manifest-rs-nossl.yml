@@ -73,9 +73,9 @@ instance_groups:
                 mongo_bindir: /var/vcap/packages/mongodb/bin
                 mongo_user: ((root-username))
                 mongo_password: ((mongo_root_password))
-              summary: "test shield"  
+              summary: "test shield"
               jobs:
-                - name: ((appli))-backup-test
+                - name: (ip)-backup-test
                   when: "every 8 hours from 0:15"
                   policy: Short-Term
                   storage: ((shield-storage))
