@@ -167,6 +167,33 @@ jobs:
     - put: filled
       params: { file: filled/keyval.properties }
 
+- name: backup-restore-test
+  serial: true
+  plan:
+    - get: filled
+      trigger: true
+      passed: [insertion-tests]
+
+    - get: deployment-specs
+
+    - get: mongodb-compilation-bosh-release
+    - aggregate:
+      - task: create-bosh-config
+        file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+        params:
+          CA_CERT:  ((bosh-server.ca))
+          IP:       ((bosh-server.ip))
+          ALIAS:    ((bosh-server.alias)) 
+          USER:     ((bosh-server.user))
+          PASSWORD: ((bosh-server.password))
+
+    - task: shield-clean-up
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/shield-clean-up.yml
+      params:
+        SHIELD_CA:          ((deployment.tests.shield.ca))
+        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
+        SHIELD_CORE:        ((deployment.tests.shield.core))
+        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
 
 - name: delete-deployment
   serial: false
