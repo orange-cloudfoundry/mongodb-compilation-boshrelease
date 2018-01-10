@@ -206,8 +206,17 @@ jobs:
         ALIAS:      ((bosh-server.alias))
         DEPLOYMENT: ((deployment.tests.name))
 
-    - task: backup
-      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/backup.yml
+    - task: update-targets-hosts
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/update-targets-hosts.yml
+      params:
+        SHIELD_CA:          ((deployment.tests.shield.ca))
+        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
+        SHIELD_CORE:        ((deployment.tests.shield.core))
+        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+        MONGO_PORT:         ((deployment.tests.mongod.port))  
+
+    - task: run-backup
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/run-backup.yml
       params:
         SHIELD_CA:          ((deployment.tests.shield.ca))
         SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
