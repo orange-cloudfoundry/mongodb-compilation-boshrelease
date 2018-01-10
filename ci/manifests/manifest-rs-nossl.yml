@@ -71,7 +71,7 @@ instance_groups:
               plugin: mongo
               config: 
                 mongo_bindir: /var/vcap/packages/mongodb/bin
-                mongo_user: MongoRoot
+                mongo_user: ((root-username))
                 mongo_password: ((mongo_root_password))
               summary: "test shield"  
               jobs:
@@ -79,7 +79,7 @@ instance_groups:
                   when: "every 8 hours from 0:15"
                   policy: Short-Term
                   storage: ((shield-storage))
-                  paused:  false
+                  paused:  true
     
   - name: shield-agent
     release: shield

@@ -26,6 +26,7 @@ bosh -e ${ALIAS} deploy -n -d mongodb-ci-rs \
         -v shield-url=${SHIELD_URL} \
         -v shield-token=${SHIELD_TOKEN} \
         -v shield-tenant=${SHIELD_TENANT} \
+        -v shield-storage=${SHIELD_STORAGE} \
         -v mongo-port=${MONGO_PORT} \
         -v persistent-disk-type=${PERSISTENT_DISK_TYPE} \
         -v vm-type=${VM_TYPE} \
