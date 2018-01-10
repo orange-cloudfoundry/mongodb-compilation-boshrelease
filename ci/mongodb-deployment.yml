@@ -198,6 +198,7 @@ jobs:
         SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+        SHIELD_TARGET:      ((deployment.tests.name))
 
     - task: run-shield-import-errand
       file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/run-shield-errand.yml
