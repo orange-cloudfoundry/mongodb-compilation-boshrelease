@@ -213,6 +213,7 @@ jobs:
         SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+        SHIELD_TARGET:      ((deployment.tests.name))
         MONGO_PORT:         ((deployment.tests.mongod.port))  
 
     - task: run-backup
@@ -222,6 +223,21 @@ jobs:
         SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+
+    - task: drop-collection
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/drop-collection.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))
+
+    - task: run-restore
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/run-restore.yml
+      params:
+        SHIELD_CA:          ((deployment.tests.shield.ca))
+        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
+        SHIELD_CORE:        ((deployment.tests.shield.core))
+        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+        SHIELD_TARGET:      ((deployment.tests.name))
  
 - name: delete-deployment
   serial: false

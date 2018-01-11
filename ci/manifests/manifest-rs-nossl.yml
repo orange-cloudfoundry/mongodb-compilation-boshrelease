@@ -102,6 +102,7 @@ instance_groups:
           port: 9001  
         collect_oplog: true
         collect_replset: true
+
 properties:
   aliases:
     bbs.service.cf.internal:
