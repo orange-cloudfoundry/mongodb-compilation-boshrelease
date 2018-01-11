@@ -238,6 +238,12 @@ jobs:
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
+
+    - task: test-restoration
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/test-restoration.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))    
  
 - name: delete-deployment
   serial: false
