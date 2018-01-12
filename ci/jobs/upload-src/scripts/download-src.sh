@@ -6,6 +6,7 @@ set -ex
 ROOT_FOLDER=${PWD}
 
 # installing needed packages
+apt update
 apt install -y curl
 
 mkdir -p downloaded-src
@@ -15,7 +16,7 @@ pushd downloaded-src || exit 666
 mkdir -p mongodb
 cd mongodb || exit 666
 
-mongodb_version=`cat ${ROOT_FOLDER}/dl-versions/keyval.properties|grep "^mongodb"|cut -d "=" -f2`
+mongodb_version=`cat ${ROOT_FOLDER}/versions/keyval.properties|grep "^mongodb"|cut -d "=" -f2`
 
 if [ "$mongodb_version" != "" ]
 then
@@ -27,7 +28,7 @@ then
 	  -L https://codeload.github.com/mongodb/mongo-tools/tar.gz/r${mongodb_version}
 fi
 
-rocksdb_version=`cat ${ROOT_FOLDER}/dl-versions/keyval.properties|grep "^rocksdb"|cut -d "=" -f2`
+rocksdb_version=`cat ${ROOT_FOLDER}/versions/keyval.properties|grep "^rocksdb"|cut -d "=" -f2`
 
 if [ "$rocksdb_version" != "" ]
 then

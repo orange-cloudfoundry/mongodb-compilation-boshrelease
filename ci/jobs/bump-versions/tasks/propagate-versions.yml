@@ -8,12 +8,11 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: mongodb-compilation-bosh-release
-  - name: mongodb-version
-  - name: rocksdb-version
-  
-outputs:
   - name: versions
-  
+  - name: mongodb-compilation-bosh-release
+
+outputs:
+  - name: new_versions
+
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/check-versions/scripts/check-versions.sh
+  path: mongodb-compilation-bosh-release/ci/jobs/bump-versions/scripts/propagate-versions.sh

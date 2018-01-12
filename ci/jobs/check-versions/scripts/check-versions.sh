@@ -3,6 +3,7 @@
 set -ex
 
 # Installing needed packages
+apt update
 apt install -y curl jq
 
 # last compiled and validated releases
@@ -24,13 +25,11 @@ rocksdb_last_stable=5.5.5
 [ "rocksdb_last_stable" == "" ] && \
   rocksdb_last_stable=$last_rocksdb_version
 
-mkdir -p dl-versions
+mkdir -p versions
 
-pushd dl-versions || exit 666
+pushd versions || exit 666
 
-echo "last_check=\"$(date '+%Y-%d-%m %H:%M')\""> dl-versions.properties
-[ "$last_mongodb_version" != "$mongodb_last_stable" ] && \
-    echo "mongodb=${mongodb_last_stable}" >> dl-versions.properties
-[ "$last_rocksdb_version" != "$rocksdb_last_stable" ] && \
-    echo "rocksdb=${rocksdb_last_stable}" >> dl-versions.properties
+echo "last_check=$(date '+%Y-%d-%m %H:%M')"> keyval.properties
+echo "mongodb=${mongodb_last_stable}" >> keyval.properties
+echo "rocksdb=${rocksdb_last_stable}" >> keyval.properties
 popd

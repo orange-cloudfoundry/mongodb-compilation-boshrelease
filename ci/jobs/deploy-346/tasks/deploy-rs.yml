@@ -8,12 +8,12 @@ image_resource:
     tag: latest
 
 inputs:
+  - name: mongodb-bosh-release-patched
   - name: mongodb-compilation-bosh-release
-  - name: mongodb-version
-  - name: rocksdb-version
-  
+  - name: bosh-director-config
+
 outputs:
-  - name: versions
-  
+  - name: deployed   
+
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/check-versions/scripts/check-versions.sh
+  path: mongodb-compilation-bosh-release/ci/jobs/deploy-346/scripts/deploy-rs.sh

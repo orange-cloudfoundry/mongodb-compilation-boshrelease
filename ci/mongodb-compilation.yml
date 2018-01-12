@@ -11,7 +11,7 @@ resources:
     type: git
     source:
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: ((git.branch))
+      branch: ((mongodb-compilation-boshrelease-repo.branch))
 
   - name: mongodb-version
     type: semver
@@ -19,11 +19,11 @@ resources:
       initial_version: 1.0.0
       driver: git
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: ((git.branch))
-      file: compiled_version
-      username: ((git.username))
-      password: ((git.password))
-      git_user: "((git.git_user)) <((git.email))>"
+      branch: ((mongodb-compilation-boshrelease-repo.branch))
+      file: mongodb_compiled_version
+      username: ((mongodb-compilation-boshrelease-repo.username))
+      password: ((mongodb-compilation-boshrelease-repo.password))
+      git_user: "((mongodb-compilation-boshrelease-repo.git_user)) <((mongodb-compilation-boshrelease-repo.email))>"
 
   - name: rocksdb-version
     type: semver
@@ -31,37 +31,35 @@ resources:
       initial_version: 1.0.0
       driver: git
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: ((git.branch))
-      file: compiled_version
-      username: ((git.username))
-      password: ((git.password))
-      git_user: "((git.git_user)) <((git.email))>"
+      branch: ((mongodb-compilation-boshrelease-repo.branch))
+      file: rocksdb_compiled_version
+      username: ((mongodb-compilation-boshrelease-repo.username))
+      password: ((mongodb-compilation-boshrelease-repo.password))
+      git_user: "((mongodb-compilation-boshrelease-repo.git_user)) <((mongodb-compilation-boshrelease-repo.email))>"
 
-  - name: dl-versions
+  - name: versions
     type: keyval
-
-  - name: golang-release
-    type: git
-    source:
-      uri: https://github.com/bosh-packages/golang-release.git
 
   - name: uploaded
     type: keyval
+
+  - name: compiled
+    type: keyval  
 
 jobs:
 - name: check-versions
   serial: true
   plan:
     - aggregate:
-      - get: mongodb-compilation-bosh-release       
+      - get: mongodb-compilation-bosh-release
       - get: mongodb-version
       - get: rocksdb-version
 
     - task: check-versions
       file: mongodb-compilation-bosh-release/ci/jobs/check-versions/tasks/check-versions.yml
 
-    - put: dl-versions
-      params: {file: dl-versions/dl-versions.properties}
+    - put: versions
+      params: {file: versions/keyval.properties}
            
 - name: upload-src
   serial: true
@@ -77,7 +75,7 @@ jobs:
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
   
-    - get: dl-versions
+    - get: versions
       trigger: true
       passed: [check-versions]
 
@@ -87,10 +85,10 @@ jobs:
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
       params:
-        ACCESS_KEY_ID: ((S3.access_key_id))
-        SECRET_ACCESS_KEY: ((S3.secret_access_key))
-        ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))   
+        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        BUCKET: ((compilation-blobstore.bucket))
 
     - task: upload-bosh
       file: mongodb-compilation-bosh-release/ci/jobs/upload-src/tasks/upload-bosh.yml
@@ -102,14 +100,14 @@ jobs:
       params:
         ALIAS: ((bosh-server.alias))
         BOSH_RELEASE: ((bosh-deployment.release))
-        
+
     - task: upload-config-files
-      file: mongodb-compilation-bosh-release/ci/jobs/upload-src/tasks/upload-config-files.yml
+      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/upload-config-files.yml
       params:
-        ACCESS_KEY_ID: ((S3.access_key_id))
-        SECRET_ACCESS_KEY: ((S3.secret_access_key))
-        ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))
+        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        BUCKET: ((compilation-blobstore.bucket))
     - put: uploaded
       params: { file: uploaded/keyval.properties }
 
@@ -121,7 +119,6 @@ jobs:
       - get: uploaded
         trigger: true
         passed: [upload-src]
-      - get: golang-release
 
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
@@ -135,10 +132,10 @@ jobs:
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
       params:
-        ACCESS_KEY_ID: ((S3.access_key_id))
-        SECRET_ACCESS_KEY: ((S3.secret_access_key))
-        ENDPOINT_URL: ((S3.endpoint-url))
-        BUCKET: ((S3.bucket))  
+        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        BUCKET: ((compilation-blobstore.bucket))
     
     - task: create-release
       file: mongodb-compilation-bosh-release/ci/jobs/compilation/tasks/create-release.yml
@@ -150,46 +147,64 @@ jobs:
         INSTANCE_GROUP: ((bosh-deployment.instance-group))
         NETWORK: ((bosh-deployment.network))
 
+    - put: compiled
+      params: { file: compiled/keyval.properties }        
+
+- name: create-archive
+  serial: true
+  plan:
+    - aggregate:
+      - get: mongodb-compilation-bosh-release
+      - get: compiled
+        trigger: true
+        passed: [compilation]
+
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        BUCKET: ((compilation-blobstore.bucket))
+    
     - task: make-archive
-      file: mongodb-compilation-bosh-release/ci/jobs/compilation/tasks/make-archive.yml
+      file: mongodb-compilation-bosh-release/ci/jobs/create-archive/tasks/make-archive.yml
       params:
         ALIAS: ((bosh-server.alias))
         DEPLOYMENT_NAME: ((bosh-deployment.name))
-        
-#- name: deployment-test
-#  serial: true
-#  plan:
-#    - aggregate:
-#      - get: mongodb-compilation-bosh-release
-#      - get: archive
-#        trigger: true
-#        passed: [compilation]
-#      - get: golang-release
 
-#
-#
-#    - task: update-github
-#      config:
-#        platform: linux
-#        image_resource:
-#          type: docker-image
-#          source:
-#            repository: concourse/bosh-cli
-#            tag: latest
-#        inputs:
-#          - name: to-upload
-#        run:
-#          path: /bin/bash
-#          args:
-#            - -exc
-#            - |
-#              cd to-upload || exit 115
-#              git config --global user.email ((repo.email))
-#              git config --global user.name "((repo.name))"
-#              git branch "Upload-test"
-#              git checkout Upload-test
-#              git commit -m "Adding Last compiled blob to blob list" config/blobs.yml
-#    - put: mongodb-compilation-bosh-release-out
-#      params:
-#        repository: to-upload
-#
+    - task: upload-config-files
+      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/upload-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
+        BUCKET: ((compilation-blobstore.bucket))
+
+    - put: uploaded
+      params: { file: uploaded/keyval.properties }    
+
+- name: bump-versions
+  serial: true
+  plan:
+    - aggregate:
+      - get: versions
+      - get: uploaded
+        trigger: true
+        passed: [create-archive]
+      - get: mongodb-compilation-bosh-release  
+    - task: propagate-versions
+      file: mongodb-compilation-bosh-release/ci/jobs/bump-versions/tasks/propagate-versions.yml
+    - put: mongodb-version
+      params: { file: new_versions/mongodb }
+    - put: rocksdb-version   
+      params: { file: new_versions/rocksdb }

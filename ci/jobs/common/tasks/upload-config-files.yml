@@ -8,7 +8,7 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: dl-versions
+  - name: versions
   - name: to-upload
   - name: mongodb-compilation-bosh-release
 
@@ -16,4 +16,4 @@ outputs:
   - name: uploaded  
 
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/upload-src/scripts/upload-config-files.sh
+  path: mongodb-compilation-bosh-release/ci/jobs/common/scripts/upload-config-files.sh

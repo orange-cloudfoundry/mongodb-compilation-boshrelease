@@ -9,11 +9,11 @@ image_resource:
 
 inputs:
   - name: mongodb-compilation-bosh-release
-  - name: mongodb-version
-  - name: rocksdb-version
-  
+  - name: bosh-director-config
+  - name: deployment-specs 
+
 outputs:
-  - name: versions
-  
+  - name: output
+
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/check-versions/scripts/check-versions.sh
+  path: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/scripts/get-deployment-ips.sh
