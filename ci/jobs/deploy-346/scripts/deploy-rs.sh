@@ -20,10 +20,13 @@ bosh -e ${ALIAS} cr --force
 bosh -e ${ALIAS} ur 
 
 bosh -e ${ALIAS} deploy -n -d mongodb-ci-rs \
-        -v appli=mongodb-ci-rs \
+        -v appli=${DEPLOYMENT_NAME} \
         -v mongodb-release=${RELEASE_NAME} \
-        -v deployments-network=${DEPLOYMENTS_NETWORK} \
+        -v deployments-network=${DEPLOYMENT_NETWORK} \
         -v shield-url=${SHIELD_URL} \
+        -v shield-token=${SHIELD_TOKEN} \
+        -v shield-tenant=${SHIELD_TENANT} \
+        -v shield-storage=${SHIELD_STORAGE} \
         -v mongo-port=${MONGO_PORT} \
         -v persistent-disk-type=${PERSISTENT_DISK_TYPE} \
         -v vm-type=${VM_TYPE} \

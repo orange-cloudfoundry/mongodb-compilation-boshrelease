@@ -69,47 +69,51 @@ jobs:
       - task: create-bosh-config
         file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
         params:
-          CA_CERT: ((bosh-server.ca))
-          IP: ((bosh-server.ip))
-          ALIAS: ((bosh-server.alias)) 
-          USER: ((bosh-server.user))
+          CA_CERT:  ((bosh-server.ca))
+          IP:       ((bosh-server.ip))
+          ALIAS:    ((bosh-server.alias)) 
+          USER:     ((bosh-server.user))
           PASSWORD: ((bosh-server.password)) 
 
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
       params:
-        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
-        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
-        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
-        BUCKET: ((compilation-blobstore.bucket))       
+        ACCESS_KEY_ID:      ((compilation-blobstore.access_key_id))
+        SECRET_ACCESS_KEY:  ((compilation-blobstore.secret_access_key))
+        ENDPOINT_URL:       ((compilation-blobstore.endpoint-url))
+        BUCKET:             ((compilation-blobstore.bucket))       
     
     - task: get-config-files-mainrelease
       file: mongodb-compilation-bosh-release/ci/jobs/deploy-346/tasks/get-config-files-mainrelease.yml
       params:
-        ACCESS_KEY_ID: ((mongodb-release-blobstore.access_key_id))
-        SECRET_ACCESS_KEY: ((mongodb-release-blobstore.secret_access_key))
-        ENDPOINT_URL: ((mongodb-release-blobstore.endpoint-url))
-        BUCKET: ((mongodb-release-blobstore.bucket))
-        COMPIL_ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
+        ACCESS_KEY_ID:            ((mongodb-release-blobstore.access_key_id))
+        SECRET_ACCESS_KEY:        ((mongodb-release-blobstore.secret_access_key))
+        ENDPOINT_URL:             ((mongodb-release-blobstore.endpoint-url))
+        BUCKET:                   ((mongodb-release-blobstore.bucket))
+        COMPIL_ACCESS_KEY_ID:     ((compilation-blobstore.access_key_id))
         COMPIL_SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
-        COMPIL_ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
-        COMPIL_BUCKET: ((compilation-blobstore.bucket))
+        COMPIL_ENDPOINT_URL:      ((compilation-blobstore.endpoint-url))
+        COMPIL_BUCKET:            ((compilation-blobstore.bucket))
 
     - task: deploy-rs
       file: mongodb-compilation-bosh-release/ci/jobs/deploy-346/tasks/deploy-rs.yml      
       params:
-        CA_CERT: ((bosh-server.ca))
-        IP: ((bosh-server.ip))
-        ALIAS: ((bosh-server.alias)) 
-        USER: ((bosh-server.user))
-        PASSWORD: ((bosh-server.password))
-        RELEASE_NAME: mongodb-ci-rs
-        DEPLOYMENTS_NETWORK: ((deployments.network))
-        SHIELD_URL: ((deployments.shield-url))
-        MONGO_PORT: ((deployments.mongod.port))
-        PERSISTENT_DISK_TYPE: ((deployments.mongod.persistent-disk-type))
-        VM_TYPE: ((deployments.mongod.vm-type))
-        ROOT_USERNAME: ((deployments.mongod.root-username))
+        CA_CERT:              ((bosh-server.ca))
+        IP:                   ((bosh-server.ip))
+        ALIAS:                ((bosh-server.alias)) 
+        USER:                 ((bosh-server.user))
+        PASSWORD:             ((bosh-server.password))
+        RELEASE_NAME:         ((deployment.tests.name))
+        DEPLOYMENT_NAME:      ((deployment.tests.name))
+        DEPLOYMENT_NETWORK:   ((deployment.tests.network))
+        SHIELD_URL:           ((deployment.tests.shield.core))
+        SHIELD_TOKEN:         ((deployment.tests.shield.token))
+        SHIELD_TENANT:        ((deployment.tests.shield.tenant))
+        SHIELD_STORAGE:       ((deployment.tests.shield.storage))
+        MONGO_PORT:           ((deployment.tests.mongod.port))
+        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
+        VM_TYPE:              ((deployment.tests.mongod.vm-type))
+        ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
 
     - put: deployed
       params: { file: deployed/keyval.properties }    
@@ -127,21 +131,21 @@ jobs:
       - task: create-bosh-config
         file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
         params:
-          CA_CERT: ((bosh-server.ca))
-          IP: ((bosh-server.ip))
-          ALIAS: ((bosh-server.alias)) 
-          USER: ((bosh-server.user))
+          CA_CERT:  ((bosh-server.ca))
+          IP:       ((bosh-server.ip))
+          ALIAS:    ((bosh-server.alias)) 
+          USER:     ((bosh-server.user))
           PASSWORD: ((bosh-server.password))
 
     - task: get-mongo-pwd
       file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/get-root-pwd.yml
       params:
         BOSH_ALIAS: ((bosh-server.alias))
-        IP: ((credhub.ip))
-        PORT: ((credhub.port))
-        USER: ((credhub.username))
-        PASSWORD: ((credhub.password))
-        VAR: mongo_root_password
+        IP:         ((deployment.tests.credhub.ip))
+        PORT:       ((deployment.tests.credhub.port))
+        USER:       ((deployment.tests.credhub.username))
+        PASSWORD:   ((deployment.tests.credhub.password))
+        VAR:        mongo_root_password
 
     - put: deployment-specs
       params: { file: output/keyval.properties}
@@ -149,10 +153,10 @@ jobs:
     - task: get-deployment-ips
       file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/get-deployment-ips.yml
       params:
-        CA_CERT: ((bosh-server.ca))
-        IP: ((bosh-server.ip))
-        ALIAS: ((bosh-server.alias)) 
-        USER: ((bosh-server.user))
+        CA_CERT:  ((bosh-server.ca))
+        IP:       ((bosh-server.ip))
+        ALIAS:    ((bosh-server.alias)) 
+        USER:     ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
 
     - put: deployment-specs
@@ -161,13 +165,86 @@ jobs:
     - task: insert-collection
       file: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/tasks/insert-collection.yml
       params:
-        USER: ((deployments.mongod.root-username))
-        PORT: ((deployments.mongod.port))
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))
 
     - put: filled
       params: { file: filled/keyval.properties }
 
+- name: backup-restore-test
+  serial: true
+  plan:
+    - get: filled
+      trigger: true
+      passed: [insertion-tests]
 
+    - get: deployment-specs
+
+    - get: mongodb-compilation-bosh-release
+    - aggregate:
+      - task: create-bosh-config
+        file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+        params:
+          CA_CERT:  ((bosh-server.ca))
+          IP:       ((bosh-server.ip))
+          ALIAS:    ((bosh-server.alias)) 
+          USER:     ((bosh-server.user))
+          PASSWORD: ((bosh-server.password))
+
+    - task: shield-clean-up
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/shield-clean-up.yml
+      params:
+        SHIELD_CA:          ((deployment.tests.shield.ca))
+        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
+        SHIELD_CORE:        ((deployment.tests.shield.core))
+        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+        SHIELD_TARGET:      ((deployment.tests.name))
+
+    - task: run-shield-import-errand
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/run-shield-errand.yml
+      params:
+        ALIAS:      ((bosh-server.alias))
+        DEPLOYMENT: ((deployment.tests.name))
+
+    - task: update-targets-hosts
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/update-targets-hosts.yml
+      params:
+        SHIELD_CA:          ((deployment.tests.shield.ca))
+        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
+        SHIELD_CORE:        ((deployment.tests.shield.core))
+        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+        SHIELD_TARGET:      ((deployment.tests.name))
+        MONGO_PORT:         ((deployment.tests.mongod.port))  
+
+    - task: run-backup
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/run-backup.yml
+      params:
+        SHIELD_CA:          ((deployment.tests.shield.ca))
+        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
+        SHIELD_CORE:        ((deployment.tests.shield.core))
+        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+
+    - task: drop-collection
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/drop-collection.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))
+
+    - task: run-restore
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/run-restore.yml
+      params:
+        SHIELD_CA:          ((deployment.tests.shield.ca))
+        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
+        SHIELD_CORE:        ((deployment.tests.shield.core))
+        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+        SHIELD_TARGET:      ((deployment.tests.name))
+
+    - task: test-restoration
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/test-restoration.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))    
+ 
 - name: delete-deployment
   serial: false
   plan:
@@ -176,10 +253,10 @@ jobs:
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
       params:
-        CA_CERT: ((bosh-server.ca))
-        IP: ((bosh-server.ip))
-        ALIAS: ((bosh-server.alias)) 
-        USER: ((bosh-server.user))
+        CA_CERT:  ((bosh-server.ca))
+        IP:       ((bosh-server.ip))
+        ALIAS:    ((bosh-server.alias)) 
+        USER:     ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
 
     - get: deployed
@@ -189,22 +266,20 @@ jobs:
     - task: remove-deployment
       file: mongodb-compilation-bosh-release/ci/jobs/remove-deployment/tasks/remove-deployment.yml      
       params:
-        CA_CERT: ((bosh-server.ca))
-        IP: ((bosh-server.ip))
-        ALIAS: ((bosh-server.alias)) 
-        USER: ((bosh-server.user))
-        PASSWORD: ((bosh-server.password))
-        RELEASE_NAME: mongodb-ci-rs
-        DEPLOYMENTS_NETWORK: ((deployments.network))
-        SHIELD_URL: ((deployments.shield-url))
-        MONGO_PORT: ((deployments.mongod.port))
-        PERSISTENT_DISK_TYPE: ((deployments.mongod.persistent-disk-type))
-        VM_TYPE: ((deployments.mongod.vm-type))
-        ROOT_USERNAME: ((deployments.mongod.root-username))  
+        CA_CERT:              ((bosh-server.ca))
+        IP:                   ((bosh-server.ip))
+        ALIAS:                ((bosh-server.alias)) 
+        USER:                 ((bosh-server.user))
+        PASSWORD:             ((bosh-server.password))
+        RELEASE_NAME:         ((deployment.tests.name))
+        DEPLOYMENT_NAME:      ((deployment.tests.name))
+        DEPLOYMENTS_NETWORK:  ((deployment.tests.network))
+        SHIELD_URL:           ((deployment.tests.shield.core))
+        MONGO_PORT:           ((deployment.tests.mongod.port))
+        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
+        VM_TYPE:              ((deployment.tests.mongod.vm-type))
+        ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
 
     - put: removed
       params: { file: removed/keyval.properties }
     
-    - put: deployed
-      params: { file: removed/keyval.empty } 
-
