@@ -99,7 +99,7 @@ jobs:
       file: mongodb-compilation-bosh-release/ci/jobs/upload-src/tasks/update-config-files.yml
       params:
         ALIAS: ((bosh-server.alias))
-        BOSH_RELEASE: ((bosh-deployment.release))
+        BOSH_RELEASE: ((deployment.compilation.release))
 
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/upload-config-files.yml
@@ -142,10 +142,10 @@ jobs:
       params:
         ALIAS: ((bosh-server.alias))
         UUID: ((bosh-server.uuid))
-        BOSH_RELEASE: ((bosh-deployment.release))
-        DEPLOYMENT_NAME: ((bosh-deployment.name))
-        INSTANCE_GROUP: ((bosh-deployment.instance-group))
-        NETWORK: ((bosh-deployment.network))
+        BOSH_RELEASE: ((deployment.compilation.release))
+        DEPLOYMENT_NAME: ((deployment.compilation.name))
+        INSTANCE_GROUP: ((deployment.compilation.instance-group))
+        NETWORK: ((deployment.compilation.network))
 
     - put: compiled
       params: { file: compiled/keyval.properties }        
@@ -180,7 +180,7 @@ jobs:
       file: mongodb-compilation-bosh-release/ci/jobs/create-archive/tasks/make-archive.yml
       params:
         ALIAS: ((bosh-server.alias))
-        DEPLOYMENT_NAME: ((bosh-deployment.name))
+        DEPLOYMENT_NAME: ((deployment.compilation.name))
 
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/upload-config-files.yml
