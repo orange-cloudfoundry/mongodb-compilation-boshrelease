@@ -1,6 +1,6 @@
 
 TARGET?=dw
-PIPELINES_LIST?=mongodb-compilation mongodb-deployment
+PIPELINES_LIST?=mongodb-compilation mongodb-deployment mongodb-check-blobstore
 SETTINGS?=settings.yml
 
 login:
