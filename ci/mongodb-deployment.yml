@@ -78,25 +78,25 @@ jobs:
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
       params:
-        ACCESS_KEY_ID:      ((compilation-blobstore.access_key_id))
-        SECRET_ACCESS_KEY:  ((compilation-blobstore.secret_access_key))
-        ENDPOINT_URL:       ((compilation-blobstore.endpoint-url))
-        BUCKET:             ((compilation-blobstore.bucket))       
+        ACCESS_KEY_ID:      ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
+        BUCKET:             ((blobstores.compilation.bucket))       
     
     - task: get-config-files-mainrelease
       file: mongodb-compilation-bosh-release/ci/jobs/deploy-346/tasks/get-config-files-mainrelease.yml
       params:
-        ACCESS_KEY_ID:            ((mongodb-release-blobstore.access_key_id))
-        SECRET_ACCESS_KEY:        ((mongodb-release-blobstore.secret_access_key))
-        ENDPOINT_URL:             ((mongodb-release-blobstore.endpoint-url))
-        BUCKET:                   ((mongodb-release-blobstore.bucket))
-        COMPIL_ACCESS_KEY_ID:     ((compilation-blobstore.access_key_id))
-        COMPIL_SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
-        COMPIL_ENDPOINT_URL:      ((compilation-blobstore.endpoint-url))
-        COMPIL_BUCKET:            ((compilation-blobstore.bucket))
-
+        ACCESS_KEY_ID:            ((blobstores.release.access_key_id))
+        SECRET_ACCESS_KEY:        ((blobstores.release.secret_access_key))
+        ENDPOINT_URL:             ((blobstores.release.endpoint-url))
+        BUCKET:                   ((blobstores.release.bucket))
+        COMPIL_ACCESS_KEY_ID:     ((blobstores.compilation.access_key_id))
+        COMPIL_SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        COMPIL_ENDPOINT_URL:      ((blobstores.compilation.endpoint-url))
+        COMPIL_BUCKET:            ((blobstores.compilation.bucket))
+   
     - task: deploy-rs
-      file: mongodb-compilation-bosh-release/ci/jobs/deploy-346/tasks/deploy-rs.yml      
+      file: mongodb-compilation-bosh-release/ci/jobs/deploy-346/tasks/deploy-rs.yml
       params:
         CA_CERT:              ((bosh-server.ca))
         IP:                   ((bosh-server.ip))
