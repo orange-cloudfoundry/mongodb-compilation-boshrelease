@@ -55,7 +55,6 @@ instance_groups:
   
   - name: import
     release: shield
-       
     properties:
       import:
         core: ((shield-url))
@@ -100,6 +99,30 @@ instance_groups:
           port: 9001  
         collect_oplog: true
         collect_replset: true
+
+- name: acceptance-tests
+    release: ((mongodb-release))
+    lifecycle: errand
+    azs: [ z1 ]
+    instances: 1
+    jobs:
+      - name: mongodb-acceptance-tests
+        release: ((mongodb-release))
+        properties:
+          acceptance_tests:
+            mongo_ports: [((mongod-port))]
+            mongo_root_username: ((root-username))
+            mongo_root_password: ((mongo_root_password))
+            mongo_replica_set_name: rs0
+    vm_type: ((vm-type))
+    stemcell: trusty
+    networks:
+      - name: ((deployments-network))
+    persistent_disk_type: ((persistent-disk-type))
+    env:
+      persistent_disk_fs: xfs
+      bosh:
+        swap_size: 0 
 
 properties:
   aliases:

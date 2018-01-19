@@ -12,17 +12,17 @@ cat ${ROOT_FOLDER}/deployment-specs/keyval.properties \
 
 source ${ROOT_FOLDER}/deployment-specs/sourced.properties 
 
-buckler api --ca-cert "${SHIELD_CA}" ${SHIELD_CORE} shield-tests
+shield api --ca-cert "${SHIELD_CA}" ${SHIELD_CORE} shield-tests
 
 export SHIELD_CORE=shield-tests
 
-buckler login
+shield login
 
 for ip in $(echo ${ips}|tr -s ',' ' ') # getting ips from deployment-specs
 do
 	
-	target=$(buckler target ${SHIELD_TARGET}-${ip} --json | jq -r '.uuid') 
+	target=$(shield target ${SHIELD_TARGET}-${ip} --json | jq -r '.uuid') 
 	
-    buckler update-target ${target} -d mongo_host="rs0/${ips}" -d mongo_port="${MONGO_PORT}"
+    shield update-target ${target} -d mongo_host="rs0/${ips}" -d mongo_port="${MONGO_PORT}"
 
 done

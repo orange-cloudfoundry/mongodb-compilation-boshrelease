@@ -12,18 +12,18 @@ cat ${ROOT_FOLDER}/deployment-specs/keyval.properties \
 
 source ${ROOT_FOLDER}/deployment-specs/sourced.properties 
 
-buckler api --ca-cert "${SHIELD_CA}" ${SHIELD_CORE} shield-tests
+shield api --ca-cert "${SHIELD_CA}" ${SHIELD_CORE} shield-tests
 
 export SHIELD_CORE=shield-tests
 
-buckler login
+shield login
 
 backup_ok=false
 
 for ip in $(echo ${ips}|tr -s ',' ' ') # getting ips from deployment-specs
 do
 	if ! ${backup_ok} ; then
-		buckler run-job "${ip}-backup-test" --yes
+		shield run-job "${ip}-backup-test" --yes
 		[ $? -eq 0 ] && backup_ok=true 
 	fi
 done
