@@ -6,7 +6,11 @@ export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 
 ROOT_FOLDER=${PWD}
 
-source ${ROOT_FOLDER}/deployment-specs/keyval.properties
+cat ${ROOT_FOLDER}/deployment-specs/keyval.properties \
+  | grep -v -E "^UPDATED|^UUID" \
+  > ${ROOT_FOLDER}/deployment-specs/sourced.properties
+
+source ${ROOT_FOLDER}/deployment-specs/sourced.properties 
 
 buckler api --ca-cert "${SHIELD_CA}" ${SHIELD_CORE} shield-tests
 
