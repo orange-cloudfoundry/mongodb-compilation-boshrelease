@@ -55,9 +55,7 @@ instance_groups:
   
   - name: import
     release: shield
-    consumes:
-      shield: {from: shield, deployment: shield-test}
-        
+       
     properties:
       import:
         core: ((shield-url))

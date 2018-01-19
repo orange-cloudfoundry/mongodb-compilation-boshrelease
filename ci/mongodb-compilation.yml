@@ -85,10 +85,10 @@ jobs:
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
       params:
-        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
-        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
-        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
-        BUCKET: ((compilation-blobstore.bucket))
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
 
     - task: upload-bosh
       file: mongodb-compilation-bosh-release/ci/jobs/upload-src/tasks/upload-bosh.yml
@@ -99,15 +99,15 @@ jobs:
       file: mongodb-compilation-bosh-release/ci/jobs/upload-src/tasks/update-config-files.yml
       params:
         ALIAS: ((bosh-server.alias))
-        BOSH_RELEASE: ((bosh-deployment.release))
+        BOSH_RELEASE: ((deployment.compilation.release))
 
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/upload-config-files.yml
       params:
-        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
-        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
-        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
-        BUCKET: ((compilation-blobstore.bucket))
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
     - put: uploaded
       params: { file: uploaded/keyval.properties }
 
@@ -132,20 +132,20 @@ jobs:
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
       params:
-        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
-        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
-        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
-        BUCKET: ((compilation-blobstore.bucket))
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
     
     - task: create-release
       file: mongodb-compilation-bosh-release/ci/jobs/compilation/tasks/create-release.yml
       params:
         ALIAS: ((bosh-server.alias))
         UUID: ((bosh-server.uuid))
-        BOSH_RELEASE: ((bosh-deployment.release))
-        DEPLOYMENT_NAME: ((bosh-deployment.name))
-        INSTANCE_GROUP: ((bosh-deployment.instance-group))
-        NETWORK: ((bosh-deployment.network))
+        BOSH_RELEASE: ((deployment.compilation.release))
+        DEPLOYMENT_NAME: ((deployment.compilation.name))
+        INSTANCE_GROUP: ((deployment.compilation.instance-group))
+        NETWORK: ((deployment.compilation.network))
 
     - put: compiled
       params: { file: compiled/keyval.properties }        
@@ -171,24 +171,24 @@ jobs:
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
       params:
-        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
-        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
-        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
-        BUCKET: ((compilation-blobstore.bucket))
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
     
     - task: make-archive
       file: mongodb-compilation-bosh-release/ci/jobs/create-archive/tasks/make-archive.yml
       params:
         ALIAS: ((bosh-server.alias))
-        DEPLOYMENT_NAME: ((bosh-deployment.name))
+        DEPLOYMENT_NAME: ((deployment.compilation.name))
 
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/upload-config-files.yml
       params:
-        ACCESS_KEY_ID: ((compilation-blobstore.access_key_id))
-        SECRET_ACCESS_KEY: ((compilation-blobstore.secret_access_key))
-        ENDPOINT_URL: ((compilation-blobstore.endpoint-url))
-        BUCKET: ((compilation-blobstore.bucket))
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
 
     - put: uploaded
       params: { file: uploaded/keyval.properties }    

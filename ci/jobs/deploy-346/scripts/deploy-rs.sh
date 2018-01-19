@@ -13,7 +13,13 @@ pushd mongodb-bosh-release-patched || exit 666
 sed -i -e "s/\(^final_name: \).*$/\1 ${RELEASE_NAME}/" config/final.yml
 
 # avoid checking jobs fingerprints
-rm -rf .final_*
+for i in $(find .final_builds -type d ! -path '*/packages' \
+                           ! -path '*/packages/golang*' \
+                           ! -path '.final_builds' \
+                           -print )
+do
+        [ -d $i ] && rm -rf $i
+done
 
 bosh -e ${ALIAS} cr --force
 
