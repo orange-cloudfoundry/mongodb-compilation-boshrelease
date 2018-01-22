@@ -119,6 +119,29 @@ jobs:
       params: { file: deployed/keyval.properties }    
 
 
+- name: acceptance-tests
+  serial: true
+  plan:
+    - get: deployed
+      trigger: true
+      passed: [deploy-346]
+
+    - get: mongodb-compilation-bosh-release
+    - aggregate:
+      - task: create-bosh-config
+        file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+        params:
+          CA_CERT:  ((bosh-server.ca))
+          IP:       ((bosh-server.ip))
+          ALIAS:    ((bosh-server.alias))
+          USER:     ((bosh-server.user))
+          PASSWORD: ((bosh-server.password))
+
+    - task: run-acceptance-tests
+      file: mongodb-compilation-bosh-release/ci/jobs/acceptance-tests/tasks/run-acceptance-tests.yml
+      params:
+        ALIAS:    ((bosh-server.alias))      
+
 - name: insertion-tests
   serial: true
   plan:

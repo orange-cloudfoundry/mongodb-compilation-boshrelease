@@ -1,6 +1,6 @@
 
 TARGET?=dw
-PIPELINES_LIST?=mongodb-compilation mongodb-deployment mongodb-check-blobstore mongodb-clone-blobstore
+PIPELINES_LIST?=mongodb-compilation mongodb-deployment mongodb-clone-blobstore
 SETTINGS?=settings.yml
 
 login:
