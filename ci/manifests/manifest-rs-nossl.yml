@@ -112,17 +112,6 @@ instance_groups:
   stemcell: trusty
   networks:
     - name: ((deployments-network))
-  persistent_disk_type: ((persistent-disk-type))
-  env:
-    persistent_disk_fs: xfs
-    bosh:
-      swap_size: 0 
-
-properties:
-  aliases:
-    bbs.service.cf.internal:
-    - "*.database-z1.diego1.cf-cfapps-io2-diego.bosh"
-    - "*.database-z2.diego2.cf-cfapps-io2-diego.bosh"
 
 variables:
   - name: mongo_admin_password
