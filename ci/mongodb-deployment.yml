@@ -239,6 +239,12 @@ jobs:
         SHIELD_TARGET:      ((deployment.tests.name))
         MONGO_PORT:         ((deployment.tests.mongod.port))  
 
+    - task: check-content-before-backup
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/test-restoration.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))   
+
     - task: run-backup
       file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/run-backup.yml
       params:
