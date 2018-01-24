@@ -108,12 +108,6 @@ instance_groups:
   jobs:
     - name: mongodb-acceptance-tests
       release: ((mongodb-release))
-      properties:
-        acceptance_tests:
-          mongo_ports: [((mongod-port))]
-          mongo_root_username: ((root-username))
-          mongo_root_password: ((mongo_root_password))
-          mongo_replica_set_name: rs0
   vm_type: ((vm-type))
   stemcell: trusty
   networks:
