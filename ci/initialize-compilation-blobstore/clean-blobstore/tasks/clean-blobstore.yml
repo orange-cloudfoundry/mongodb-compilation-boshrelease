@@ -1,0 +1,17 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: garland/aws-cli-docker
+    tag: latest
+
+inputs:
+  - name: mongodb-compilation-bosh-release
+
+outputs:
+  - name: cleaned  
+
+run:
+  path: mongodb-compilation-bosh-release/ci/initialize-compilation-blobstore/clean-blobstore/scripts/clean-blobstore.sh

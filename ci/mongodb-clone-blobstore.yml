@@ -11,13 +11,13 @@ resources:
     type: git
     source:
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: ((mongodb-compilation-boshrelease-repo.branch))
+      branch: ((repositories.mongodb-compilation.branch))
 
   - name: mongodb-bosh-release
     type: git
     source:
       uri: https://github.com/orange-cloudfoundry/mongodb-boshrelease.git
-      branch: ((mongodb-boshrelease-repo.branch))
+      branch: ((repositories.mongodb.branch))
 
 jobs:
 - name: clone-blobstore

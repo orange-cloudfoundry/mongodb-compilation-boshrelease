@@ -1,0 +1,19 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: concourse/bosh-cli
+    tag: latest
+
+inputs:
+  - name: mongodb-compilation-bosh-release
+
+outputs:
+  - name: ci
+  - name: to_rename
+
+run:
+  path: mongodb-compilation-bosh-release/ci/initialize-compilation-blobstore/get-dependencies/scripts/get-dependencies.sh
+  
