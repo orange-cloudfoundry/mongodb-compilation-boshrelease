@@ -10,14 +10,14 @@ resources:
   - name: mongodb-compilation-bosh-release
     type: git
     source:
-      uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: ((mongodb-compilation-boshrelease-repo.branch))
+      uri:    ((repositories.mongodb-compilation.uri))
+      branch: ((repositories.mongodb-compilation.branch))
 
   - name: mongodb-bosh-release
     type: git
     source:
-      uri: https://github.com/orange-cloudfoundry/mongodb-boshrelease.git
-      branch: ((mongodb-boshrelease-repo.branch))    
+      uri:    ((repositories.mongodb.uri))
+      branch: ((repositories.mongodb.branch))
 
   - name: mongodb-version
     type: semver
@@ -25,11 +25,11 @@ resources:
       initial_version: 1.0.0
       driver: git
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: ((mongodb-compilation-boshrelease-repo.branch))
+      branch: ((repositories.mongodb-compilation.branch))
       file: mongodb_compiled_version
-      username: ((mongodb-compilation-boshrelease-repo.username))
-      password: ((mongodb-compilation-boshrelease-repo.password))
-      git_user: "((mongodb-compilation-boshrelease-repo.git_user)) <((mongodb-compilation-boshrelease-repo.email))>"
+      username: ((repositories.mongodb-compilation.username))
+      password: ((repositories.mongodb-compilation.password))
+      git_user: "((repositories.mongodb-compilation.git_user)) <((repositories.mongodb-compilation.email))>"
 
   - name: rocksdb-version
     type: semver
@@ -37,12 +37,12 @@ resources:
       initial_version: 1.0.0
       driver: git
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
-      branch: ((mongodb-compilation-boshrelease-repo.branch))
+      branch: ((repositories.mongodb-compilation.branch))
       file: rocksdb_compiled_version
-      username: ((mongodb-compilation-boshrelease-repo.username))
-      password: ((mongodb-compilation-boshrelease-repo.password))
-      git_user: "((mongodb-compilation-boshrelease-repo.git_user)) <((mongodb-compilation-boshrelease-repo.email))>"
-
+      username: ((repositories.mongodb-compilation.username))
+      password: ((repositories.mongodb-compilation.password))
+      git_user: "((repositories.mongodb-compilation.git_user)) <((repositories.mongodb-compilation.email))>"
+  
   - name: deployed
     type: keyval
 
@@ -54,6 +54,15 @@ resources:
 
   - name: removed
     type: keyval
+
+  - name: bosh-errand-lock
+    type: pool
+    source:
+      uri: ((repositories.locks-pool.uri))
+      branch: ((repositories.locks-pool.branch))
+      pool: bosh
+      username: ((repositories.locks-pool.username))
+      password: ((repositories.locks-pool.password))
 
 jobs:
 - name: deploy-346
@@ -114,10 +123,39 @@ jobs:
         PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
         VM_TYPE:              ((deployment.tests.mongod.vm-type))
         ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
+        
 
     - put: deployed
       params: { file: deployed/keyval.properties }    
 
+- name: acceptance-tests
+  serial: true
+  plan:
+    - get: deployed
+      trigger: true
+      passed: [deploy-346]
+
+    - get: mongodb-compilation-bosh-release
+    - aggregate:
+      - task: create-bosh-config
+        file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+        params:
+          CA_CERT:  ((bosh-server.ca))
+          IP:       ((bosh-server.ip))
+          ALIAS:    ((bosh-server.alias))
+          USER:     ((bosh-server.user))
+          PASSWORD: ((bosh-server.password))
+
+    - put: bosh-errand-lock
+      params: {claim: errand}
+
+    - task: run-acceptance-tests
+      file: mongodb-compilation-bosh-release/ci/jobs/acceptance-tests/tasks/run-acceptance-tests.yml
+      params:
+        ALIAS:    ((bosh-server.alias))  
+
+    - put: bosh-errand-lock
+      params: {release: bosh-errand-lock}        
 
 - name: insertion-tests
   serial: true
@@ -200,11 +238,19 @@ jobs:
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
 
+    
+    - put: bosh-errand-lock
+      params: {claim: errand}
+
     - task: run-shield-import-errand
       file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/run-shield-errand.yml
       params:
         ALIAS:      ((bosh-server.alias))
         DEPLOYMENT: ((deployment.tests.name))
+
+    - put: bosh-errand-lock
+      params: {release: bosh-errand-lock}
+    
 
     - task: update-targets-hosts
       file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/update-targets-hosts.yml
@@ -215,6 +261,12 @@ jobs:
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
         MONGO_PORT:         ((deployment.tests.mongod.port))  
+
+    - task: check-content-before-backup
+      file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/test-restoration.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))   
 
     - task: run-backup
       file: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/tasks/run-backup.yml

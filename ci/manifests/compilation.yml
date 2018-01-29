@@ -15,7 +15,7 @@ update:
 stemcells:
 - alias: trusty
   os: ubuntu-trusty
-  version: 3445.11
+  version: latest
 
 instance_groups:
 - name: ((instance_group))

@@ -1,10 +1,15 @@
 
 TARGET?=dw
-PIPELINES_LIST?=mongodb-compilation mongodb-deployment mongodb-check-blobstore mongodb-clone-blobstore
+PIPELINES_LIST?=mongodb-compilation mongodb-deployment mongodb-clone-blobstore
 SETTINGS?=settings.yml
-
+delete-team:
+	fly -t $(TARGET) destroy-team --team-name mongo --non-interactive
+set-team:
+	fly -t $(TARGET) set-team --team-name mongo --non-interactive \
+	--basic-auth-username mongo \
+	--basic-auth-password mongo
 login:
-	fly -t $(TARGET) login
+	fly -t $(TARGET) login -n mongo -u mongo -p mongo
 
 pipeline:
 	for PIPELINE in $(PIPELINES_LIST) ; do \
