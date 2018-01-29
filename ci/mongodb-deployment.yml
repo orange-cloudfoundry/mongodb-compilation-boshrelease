@@ -65,7 +65,7 @@ resources:
       password: ((repositories.locks-pool.password))
 
 jobs:
-- name: deploy-346
+- name: deploy-strap
   serial: true
   plan:
     - get: mongodb-bosh-release
@@ -76,7 +76,7 @@ jobs:
       - get: rocksdb-version
         trigger: true
       - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
         params:
           CA_CERT:  ((bosh-server.ca))
           IP:       ((bosh-server.ip))
@@ -85,7 +85,7 @@ jobs:
           PASSWORD: ((bosh-server.password)) 
 
     - task: get-config-files
-      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/get-config-files.yml
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
       params:
         ACCESS_KEY_ID:      ((blobstores.compilation.access_key_id))
         SECRET_ACCESS_KEY:  ((blobstores.compilation.secret_access_key))
@@ -93,7 +93,7 @@ jobs:
         BUCKET:             ((blobstores.compilation.bucket))       
     
     - task: get-config-files-mainrelease
-      file: mongodb-compilation-bosh-release/ci/jobs/deploy-346/tasks/get-config-files-mainrelease.yml
+      file: mongodb-compilation-bosh-release/ci/jobs/deploy-strap/tasks/get-config-files-mainrelease.yml
       params:
         ACCESS_KEY_ID:            ((blobstores.release.access_key_id))
         SECRET_ACCESS_KEY:        ((blobstores.release.secret_access_key))
@@ -105,7 +105,7 @@ jobs:
         COMPIL_BUCKET:            ((blobstores.compilation.bucket))
    
     - task: deploy-rs
-      file: mongodb-compilation-bosh-release/ci/jobs/deploy-346/tasks/deploy-rs.yml
+      file: mongodb-compilation-bosh-release/ci/jobs/deploy-strap/tasks/deploy-rs.yml
       params:
         CA_CERT:              ((bosh-server.ca))
         IP:                   ((bosh-server.ip))
@@ -133,12 +133,12 @@ jobs:
   plan:
     - get: deployed
       trigger: true
-      passed: [deploy-346]
+      passed: [deploy-strap]
 
     - get: mongodb-compilation-bosh-release
     - aggregate:
       - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
         params:
           CA_CERT:  ((bosh-server.ca))
           IP:       ((bosh-server.ip))
@@ -162,12 +162,12 @@ jobs:
   plan:
     - get: deployed
       trigger: true
-      passed: [deploy-346]
+      passed: [deploy-strap]
 
     - get: mongodb-compilation-bosh-release
     - aggregate:
       - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
         params:
           CA_CERT:  ((bosh-server.ca))
           IP:       ((bosh-server.ip))
@@ -221,7 +221,7 @@ jobs:
     - get: mongodb-compilation-bosh-release
     - aggregate:
       - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
         params:
           CA_CERT:  ((bosh-server.ca))
           IP:       ((bosh-server.ip))
@@ -303,7 +303,7 @@ jobs:
 
     - get: mongodb-compilation-bosh-release
     - task: create-bosh-config
-      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
       params:
         CA_CERT:  ((bosh-server.ca))
         IP:       ((bosh-server.ip))
@@ -313,7 +313,7 @@ jobs:
 
     - get: deployed
       trigger: false
-      passed: [deploy-346]
+      passed: [deploy-strap]
 
     - task: remove-deployment
       file: mongodb-compilation-bosh-release/ci/jobs/remove-deployment/tasks/remove-deployment.yml      
