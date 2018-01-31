@@ -30,6 +30,7 @@ jobs:
         SECRET_ACCESS_KEY:        ((blobstores.compilation.secret_access_key))
         ENDPOINT_URL:             ((blobstores.compilation.endpoint-url))
         BUCKET:                   ((blobstores.compilation.bucket))
+        SIGNATURE_VERSION:        ((blobstores.compilation.signature-version)) 
 
     - put: cleaned
       params: { file: cleaned/keyval.properties }
@@ -59,7 +60,8 @@ jobs:
         ACCESS_KEY_ID:      ((blobstores.compilation.access_key_id))
         SECRET_ACCESS_KEY:  ((blobstores.compilation.secret_access_key))
         ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
-        BUCKET:             ((blobstores.compilation.bucket))   
+        BUCKET:             ((blobstores.compilation.bucket))
+        SIGNATURE_VERSION:  ((blobstores.compilation.signature-version))   
  
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/initialize-compilation-blobstore/get-dependencies/tasks/upload-config-files.yml
@@ -68,3 +70,4 @@ jobs:
         SECRET_ACCESS_KEY:        ((blobstores.compilation.secret_access_key))
         ENDPOINT_URL:             ((blobstores.compilation.endpoint-url))
         BUCKET:                   ((blobstores.compilation.bucket))
+        SIGNATURE_VERSION:        ((blobstores.compilation.signature-version))

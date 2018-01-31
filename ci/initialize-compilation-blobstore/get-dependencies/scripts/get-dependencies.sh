@@ -36,8 +36,11 @@ cat > config/private.yml <<-EOF
 	    access_key_id: '${ACCESS_KEY_ID}'
 	    secret_access_key: '${SECRET_ACCESS_KEY}'
 	    ssl_verify_peer: false
-	    signature_version: '2'
 	EOF
+if [ ${SIGNATURE_VERSION} -ne 4 ]
+then
+	echo "    signature_version: '${SIGNATURE_VERSION}'" >> config/private.yml
+fi
 
 # create empty blobs.yml
 touch config/blobs.yml
