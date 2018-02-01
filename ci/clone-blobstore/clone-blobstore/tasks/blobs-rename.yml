@@ -12,5 +12,5 @@ inputs:
   - name: mongodb-compilation-bosh-release
 
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/clone-blobstore/scripts/blobs-rename.sh
+  path: mongodb-compilation-bosh-release/ci/clone-blobstore/clone-blobstore/scripts/blobs-rename.sh
 

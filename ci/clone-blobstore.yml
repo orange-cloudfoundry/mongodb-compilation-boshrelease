@@ -27,7 +27,7 @@ jobs:
     - get: mongodb-compilation-bosh-release
 
     - task: create-bosh-config
-      file: mongodb-compilation-bosh-release/ci/jobs/common/tasks/create-bosh-config.yml
+      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
       params:
         CA_CERT:  ((bosh-server.ca))
         IP:       ((bosh-server.ip))
@@ -36,18 +36,20 @@ jobs:
         PASSWORD: ((bosh-server.password))
 
     - task: get-release-blobs
-      file: mongodb-compilation-bosh-release/ci/jobs/clone-blobstore/tasks/get-release-blobs.yml
+      file: mongodb-compilation-bosh-release/ci/clone-blobstore/clone-blobstore/tasks/get-release-blobs.yml
       params:
         ALIAS:              ((bosh-server.alias))
         ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
         SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
         ENDPOINT_URL:       ((blobstores.release.endpoint-url))
         BUCKET:             ((blobstores.release.bucket))     
- 
+        SIGNATURE_VERSION:  ((blobstores.release.signature-version))
+
     - task: blobs-rename
-      file: mongodb-compilation-bosh-release/ci/jobs/clone-blobstore/tasks/blobs-rename.yml
+      file: mongodb-compilation-bosh-release/ci/clone-blobstore/clone-blobstore/tasks/blobs-rename.yml
       params:
-        ACCESS_KEY_ID:            ((blobstores.release.access_key_id))
-        SECRET_ACCESS_KEY:        ((blobstores.release.secret_access_key))
-        ENDPOINT_URL:             ((blobstores.release.endpoint-url))
-        BUCKET:                   ((blobstores.release.bucket))
+        ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.release.endpoint-url))
+        BUCKET:             ((blobstores.release.bucket))
+        SIGNATURE_VERSION:  ((blobstores.release.signature-version))

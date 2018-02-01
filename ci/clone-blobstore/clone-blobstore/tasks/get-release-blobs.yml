@@ -16,5 +16,5 @@ outputs:
   - name: mongodb-bosh-release-patched   
 
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/clone-blobstore/scripts/get-release-blobs.sh
+  path: mongodb-compilation-bosh-release/ci/clone-blobstore/clone-blobstore/scripts/get-release-blobs.sh
 
