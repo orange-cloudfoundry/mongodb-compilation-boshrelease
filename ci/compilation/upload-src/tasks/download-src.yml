@@ -15,4 +15,4 @@ outputs:
   - name: downloaded-src
 
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/upload-src/scripts/download-src.sh
+  path: mongodb-compilation-bosh-release/ci/compilation/upload-src/scripts/download-src.sh

@@ -17,4 +17,4 @@ outputs:
   - name: to-upload-pre
 
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/upload-src/scripts/upload-bosh.sh
+  path: mongodb-compilation-bosh-release/ci/compilation/upload-src/scripts/upload-bosh.sh

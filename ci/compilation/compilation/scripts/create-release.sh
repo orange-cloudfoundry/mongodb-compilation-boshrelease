@@ -42,20 +42,22 @@ EOF
     done    
 }
 
+MONGO_VERSION=$(grep "^mongodb" ${ROOT_FOLDER}/uploaded/keyval.properties|cut -d"=" -f2)
+
 export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 
 pushd mongodb-compilation-bosh-release-patched|| exit 666
 
 create_fake_files
 
-bosh -e ${ALIAS} create-release --force
+bosh -e ${ALIAS} create-release --force --version ${MONGO_VERSION}
 
 bosh -e ${ALIAS} upload-release
 
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n deploy \
     ci/manifests/compilation.yml -v deployment=${DEPLOYMENT_NAME} -v release=${BOSH_RELEASE} \
     -v instance_group=${INSTANCE_GROUP} -v network=${NETWORK} -v director_uuid=${UUID} \
-    -v version=$(grep "^mongodb" ${ROOT_FOLDER}/uploaded/keyval.properties|cut -d"=" -f2)
+    -v version=${MONGO_VERSION}
 popd
 
 # copy uploaded to versions to be abble to reuse the upload config files task
