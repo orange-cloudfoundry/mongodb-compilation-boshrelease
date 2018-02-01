@@ -26,4 +26,4 @@ bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n delete-vm $(bosh -e ${ALIAS} -d \
 
 # needed to reuse upload-config-files
 mkdir -p ${ROOT_FOLDER}/versions
-cp -rp ${ROOT_FOLDER}/compiled/. ${ROOT_FOLDER}/versions
+cp -rp ${ROOT_FOLDER}/deployed/. ${ROOT_FOLDER}/versions
