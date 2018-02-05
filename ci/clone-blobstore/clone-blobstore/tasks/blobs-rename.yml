@@ -1,0 +1,16 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: garland/aws-cli-docker
+    tag: latest
+
+inputs:
+  - name: mongodb-bosh-release-patched
+  - name: mongodb-compilation-bosh-release
+
+run:
+  path: mongodb-compilation-bosh-release/ci/clone-blobstore/clone-blobstore/scripts/blobs-rename.sh
+

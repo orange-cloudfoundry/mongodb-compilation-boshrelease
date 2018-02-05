@@ -1,0 +1,16 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: garland/aws-cli-docker
+    tag: latest
+
+inputs:
+  - name: mongodb-compilation-bosh-release
+  - name: ci
+  - name: to_rename
+
+run:
+  path: mongodb-compilation-bosh-release/ci/initialize-compilation-blobstore/get-dependencies/scripts/upload-config-files.sh

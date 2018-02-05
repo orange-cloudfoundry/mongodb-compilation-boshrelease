@@ -1,0 +1,73 @@
+---
+resource_types:
+  - name: keyval
+    type: docker-image
+    source:
+      repository: swce/keyval-resource
+
+resources:
+
+  - name: mongodb-compilation-bosh-release
+    type: git
+    source:
+      uri:    ((repositories.mongodb-compilation.uri))
+      branch: ((repositories.mongodb-compilation.branch))
+
+  - name: cleaned
+    type: keyval
+
+jobs:
+- name: clean-blobstore
+  serial: true
+  plan:
+
+    - get: mongodb-compilation-bosh-release
+
+    - task: clean-blobstore
+      file: mongodb-compilation-bosh-release/ci/initialize-compilation-blobstore/clean-blobstore/tasks/clean-blobstore.yml
+      params:
+        ACCESS_KEY_ID:            ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY:        ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL:             ((blobstores.compilation.endpoint-url))
+        BUCKET:                   ((blobstores.compilation.bucket))
+        SIGNATURE_VERSION:        ((blobstores.compilation.signature-version)) 
+
+    - put: cleaned
+      params: { file: cleaned/keyval.properties }
+
+- name: get-dependencies
+  serial: true
+  plan:
+    - get: cleaned
+      trigger: true
+      passed: [clean-blobstore]
+
+    - get: mongodb-compilation-bosh-release
+
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
+      params:
+        CA_CERT:  ((bosh-server.ca))
+        IP:       ((bosh-server.ip))
+        ALIAS:    ((bosh-server.alias)) 
+        USER:     ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+
+    - task: get-release-blobs
+      file: mongodb-compilation-bosh-release/ci/initialize-compilation-blobstore/get-dependencies/tasks/get-dependencies.yml
+      params:
+        ALIAS:              ((bosh-server.alias))
+        ACCESS_KEY_ID:      ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
+        BUCKET:             ((blobstores.compilation.bucket))
+        SIGNATURE_VERSION:  ((blobstores.compilation.signature-version))   
+ 
+    - task: upload-config-files
+      file: mongodb-compilation-bosh-release/ci/initialize-compilation-blobstore/get-dependencies/tasks/upload-config-files.yml
+      params:
+        ACCESS_KEY_ID:            ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY:        ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL:             ((blobstores.compilation.endpoint-url))
+        BUCKET:                   ((blobstores.compilation.bucket))
+        SIGNATURE_VERSION:        ((blobstores.compilation.signature-version))
