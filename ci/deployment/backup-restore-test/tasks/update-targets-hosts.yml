@@ -12,4 +12,4 @@ inputs:
   - name: deployment-specs
    
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/scripts/update-targets-hosts.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/scripts/update-targets-hosts.sh

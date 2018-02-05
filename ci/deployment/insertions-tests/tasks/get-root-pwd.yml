@@ -14,4 +14,4 @@ outputs:
   - name: output
 
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/scripts/get-root-pwd.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/scripts/get-root-pwd.sh

@@ -16,5 +16,5 @@ outputs:
   - name: mongodb-bosh-release-patched
 
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/deploy-strap/scripts/get-config-files-mainrelease.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/deploy-strap/scripts/get-config-files-mainrelease.sh
 

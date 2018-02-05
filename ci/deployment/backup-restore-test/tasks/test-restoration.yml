@@ -13,4 +13,4 @@ inputs:
   - name: filled
   
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/scripts/test-restoration.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/scripts/test-restoration.sh

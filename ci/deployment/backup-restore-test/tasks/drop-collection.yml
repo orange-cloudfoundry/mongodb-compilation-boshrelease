@@ -4,7 +4,7 @@ platform: linux
 image_resource:
   type: docker-image
   source:
-    repository: jraverdyorange/shield-cli
+    repository: jraverdyorange/mongodb-cli
     tag: latest
 
 inputs:
@@ -12,4 +12,4 @@ inputs:
   - name: deployment-specs
   
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/scripts/run-backup.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/scripts/drop-collection.sh

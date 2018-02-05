@@ -15,4 +15,4 @@ outputs:
   - name: removed   
 
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/remove-deployment/scripts/remove-deployment.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/remove-deployment/scripts/remove-deployment.sh

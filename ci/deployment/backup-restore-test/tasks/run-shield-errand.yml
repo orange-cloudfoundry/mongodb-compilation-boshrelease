@@ -8,9 +8,8 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: deployed
-  - name: bosh-director-config
   - name: mongodb-compilation-bosh-release
-
+  - name: bosh-director-config
+  
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/acceptance-tests/scripts/run-acceptance-tests.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/scripts/run-shield-errand.sh

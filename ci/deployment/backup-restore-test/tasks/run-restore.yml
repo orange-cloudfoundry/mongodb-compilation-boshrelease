@@ -10,6 +10,6 @@ image_resource:
 inputs:
   - name: mongodb-compilation-bosh-release
   - name: deployment-specs
-   
+  
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/backup-restore-test/scripts/shield-clean-up.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/scripts/run-restore.sh

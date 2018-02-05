@@ -17,4 +17,4 @@ outputs:
   - name: filled
 
 run:
-  path: mongodb-compilation-bosh-release/ci/jobs/insertions-tests/scripts/insert-collection.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/scripts/insert-collection.sh
