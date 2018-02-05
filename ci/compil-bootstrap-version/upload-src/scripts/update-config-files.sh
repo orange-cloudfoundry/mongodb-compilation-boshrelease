@@ -16,8 +16,8 @@ for i in $(find ${ROOT_FOLDER}/downloaded-src -type f -name '*.tar.gz' -print)
 do
     product="$(basename $(dirname $i))"
     archive="$(basename $i)"
-    version=$(${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/compil-strap-version/upload-src/scripts/get-archive-version.pl -v ${archive})
-    prefix=$(${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/compil-strap-version/upload-src/scripts/get-archive-version.pl -p ${archive})
+    version=$(${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/compil-bootstrap-version/upload-src/scripts/get-archive-version.pl -v ${archive})
+    prefix=$(${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/compil-bootstrap-version/upload-src/scripts/get-archive-version.pl -p ${archive})
 
     # removing old blobs
     for j in $(bosh -e $ALIAS blobs|sed -e $"s/\t/ /g" | cut -d" " -f1 | grep "^${product}/${prefix}" \

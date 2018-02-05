@@ -32,7 +32,7 @@ else
     cat > /tmp/ca-bundle.crt <<-EOF
 	${SSL_CERT}
 	EOF
-	aws_opt="${aws_opt} --ca-bundle /tmp/ca-bundle.crt"   
+	aws_opt="${aws_opt} --ca-bundle /tmp/ca-bundle.crt"
   fi  
 fi
 
@@ -44,18 +44,18 @@ cd mongodb-compilation-bosh-release-patched || exit 666
 
 #retrieve blob list
 aws ${aws_opt} s3 \
-	cp s3://${BUCKET}/ci/blobs-${MONGODB_VERSION}.yml config/blobs.yml 2>/dev/null \
+	cp s3://${BUCKET}/ci/blobs-${MONGODB_VERSION}.yml config/blobs.yml \
 	||echo "no archived blobs.yml, use release default one"
 
 #retrieve final.yml
 aws ${aws_opt} s3 \
-	cp s3://${BUCKET}/ci/final-${MONGODB_VERSION}.yml config/final.yml 2>/dev/null \
+	cp s3://${BUCKET}/ci/final-${MONGODB_VERSION}.yml config/final.yml \
 	||echo "no archived final.yml, use release default one"
 
 #retrieve private.yml
 aws ${aws_opt} s3 \
-	cp s3://${BUCKET}/ci/private-${MONGODB_VERSION}.yml config/private.yml 2>/dev/null \
+	cp s3://${BUCKET}/ci/private-${MONGODB_VERSION}.yml config/private.yml  \
 	||echo "no archived private.yml, use release default one"
 
 #get the list of availables blobs ids on blobsore
-aws ${aws_opt} s3 ls s3://${BUCKET}/ 2>/dev/null > blobstore_ids.list
+aws ${aws_opt} s3 ls s3://${BUCKET}/ > blobstore_ids.list

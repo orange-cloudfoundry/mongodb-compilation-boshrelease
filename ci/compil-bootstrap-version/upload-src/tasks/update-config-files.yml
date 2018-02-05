@@ -8,14 +8,13 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: deployed
   - name: bosh-director-config
+  - name: downloaded-src
   - name: mongodb-compilation-bosh-release
-  - name: mongodb-compilation-bosh-release-patched
+  - name: to-upload-pre
   
 outputs:
   - name: to-upload
-  - name: versions
 
 run:
-  path: mongodb-compilation-bosh-release/ci/compil-strap-version/create-archive/scripts/make-archive.sh
+  path: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/upload-src/scripts/update-config-files.sh

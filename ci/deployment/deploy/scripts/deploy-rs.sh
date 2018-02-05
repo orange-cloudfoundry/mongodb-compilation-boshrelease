@@ -60,24 +60,36 @@ for i in $(find .final_builds -type d ! -path '*/packages' \
 do
         [ -d $i ] && rm -rf $i
 done
+deployment_var_init="   -v appli=${DEPLOYMENT_NAME} \
+                        -v mongodb-release=${RELEASE_NAME} \
+                        -v deployments-network=${DEPLOYMENT_NETWORK} \
+                        -v shield-url=${SHIELD_URL} \
+                        -v shield-token=${SHIELD_TOKEN} \
+                        -v shield-tenant=${SHIELD_TENANT} \
+                        -v shield-storage=${SHIELD_STORAGE} \
+                        -v mongo-port=${MONGO_PORT} \
+                        -v persistent-disk-type=${PERSISTENT_DISK_TYPE} \
+                        -v vm-type=${VM_TYPE} \
+                        -v root-username=${ROOT_USERNAME}"
+
+deployment_ops_files_cmd=""
+
+if [ "${STEMCELL}" != "" ]
+then
+    deployment_var_init="${deployment_var_init} \
+                    -v stemcell=${STEMCELL}"
+    deployment_ops_files_cmd="${deployment_ops_files_cmd} \
+                    -o ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/opsfiles/mongo-bootstrap-stemcell.yml"
+fi
 
 bosh -e ${ALIAS} cr --force
 
 bosh -e ${ALIAS} ur 
 
 bosh -e ${ALIAS} deploy -n -d mongodb-ci-rs \
-        -v appli=${DEPLOYMENT_NAME} \
-        -v mongodb-release=${RELEASE_NAME} \
-        -v deployments-network=${DEPLOYMENT_NETWORK} \
-        -v shield-url=${SHIELD_URL} \
-        -v shield-token=${SHIELD_TOKEN} \
-        -v shield-tenant=${SHIELD_TENANT} \
-        -v shield-storage=${SHIELD_STORAGE} \
-        -v mongo-port=${MONGO_PORT} \
-        -v persistent-disk-type=${PERSISTENT_DISK_TYPE} \
-        -v vm-type=${VM_TYPE} \
-        -v root-username=${ROOT_USERNAME} \
-        ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/manifest-rs-nossl.yml
+        ${deployment_var_init} \
+        ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/manifest-rs-nossl.yml \
+        ${deployment_ops_files_cmd}
 
 popd
 
