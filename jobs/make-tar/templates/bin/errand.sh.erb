@@ -17,9 +17,14 @@ rm -rf ${SRC_DIR}/*
 [ -f ${ARCHIVE} ] && rm -f ${ARCHIVE}
 
 cp -rp /var/vcap/packages/mongodb/* ${SRC_DIR}
+
 [ ! -d ${SRC_DIR}/lib ] && mkdir -p ${SRC_DIR}/lib
 cp -rp /var/vcap/packages/compressors/lib/*  ${SRC_DIR}/lib
+cp -rp /var/vcap/packages/openssl/lib/libssl* ${SRC_DIR}/lib
+cp -rp /var/vcap/packages/openssl/lib/libcrypto* ${SRC_DIR}/lib
+
 [ ! -d ${SRC_DIR}/lib64 ] && mkdir -p ${SRC_DIR}/lib64
 cp -rp /var/vcap/packages/gcc/lib64/libstdc++.so.6* ${SRC_DIR}/lib64
+cp -rp /var/vcap/packages/gcc/lib64/libc.so.6* ${SRC_DIR}/lib64
 
 tar cvzf ${ARCHIVE} -C ${SRC_DIR} .
