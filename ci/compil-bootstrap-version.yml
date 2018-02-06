@@ -103,6 +103,8 @@ jobs:
         trigger: true
         passed: [upload-src]
 
+    - get: versions
+
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
       params:
@@ -143,6 +145,8 @@ jobs:
       - get: created
         trigger: true
         passed: [create-release]
+    
+    - get: versions
 
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
@@ -184,6 +188,8 @@ jobs:
       - get: deployed
         trigger: true
         passed: [deployment]
+
+    - get: versions
 
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
