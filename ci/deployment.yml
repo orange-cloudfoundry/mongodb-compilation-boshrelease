@@ -330,10 +330,10 @@ jobs:
     - task: run-acceptance-tests
       file: mongodb-compilation-bosh-release/ci/deployment/acceptance-tests/tasks/run-acceptance-tests.yml
       params:
-        ALIAS:    ((bosh-server.alias))  
-
-    - put: bosh-errand-lock
-      params: {release: bosh-errand-lock}
+        ALIAS:    ((bosh-server.alias))
+      ensure:
+        put: bosh-errand-lock
+        params: {release: bosh-errand-lock}
 
 ########################################################################################################
 #                                      Mongodb Shield Test 
@@ -376,10 +376,9 @@ jobs:
       params:
         ALIAS:      ((bosh-server.alias))
         DEPLOYMENT: ((deployment.tests.name))
-
-    - put: bosh-errand-lock
-      params: {release: bosh-errand-lock}
-    
+      ensure:
+        put: bosh-errand-lock
+        params: {release: bosh-errand-lock}  
 
     - task: update-targets-hosts
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/update-targets-hosts.yml
