@@ -8,7 +8,7 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: deployed
+  - name: filled
   - name: bosh-director-config
   - name: mongodb-compilation-bosh-release
 
