@@ -55,9 +55,6 @@ resources:
   - name: filled
     type: keyval
 
-  - name: removed
-    type: keyval
-
   - name: bosh-errand-lock
     type: pool
     source:
@@ -453,7 +450,3 @@ jobs:
         ALIAS:                ((bosh-server.alias)) 
         RELEASE_NAME:         ((deployment.tests.name))
         DEPLOYMENT_NAME:      ((deployment.tests.name))
-        
-    - put: removed
-      params: { file: removed/keyval.properties }
-    
