@@ -301,7 +301,7 @@ jobs:
       params:
         USER: ((deployment.tests.mongod.root-username))
         PORT: ((deployment.tests.mongod.port))
-        
+
 ########################################################################################################
 #                                      Mongodb Acceptance Tests
 ########################################################################################################
@@ -451,20 +451,10 @@ jobs:
     - task: remove-deployment
       file: mongodb-compilation-bosh-release/ci/deployment/remove-deployment/tasks/remove-deployment.yml      
       params:
-        CA_CERT:              ((bosh-server.ca))
-        IP:                   ((bosh-server.ip))
         ALIAS:                ((bosh-server.alias)) 
-        USER:                 ((bosh-server.user))
-        PASSWORD:             ((bosh-server.password))
         RELEASE_NAME:         ((deployment.tests.name))
         DEPLOYMENT_NAME:      ((deployment.tests.name))
-        DEPLOYMENTS_NETWORK:  ((deployment.tests.network))
-        SHIELD_URL:           ((deployment.tests.shield.core))
-        MONGO_PORT:           ((deployment.tests.mongod.port))
-        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
-        VM_TYPE:              ((deployment.tests.mongod.vm-type))
-        ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
-
+        
     - put: removed
       params: { file: removed/keyval.properties }
     

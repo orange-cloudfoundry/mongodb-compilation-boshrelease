@@ -27,3 +27,14 @@ then
 	echo "Mongodb server version is ${installed_version} and don\'t match expected one (${needed_version})" \
   exit 666
 fi
+
+# checking values in db
+
+cat ${ROOT_FOLDER}/filled/keyval.properties| grep -v -E "^UPDATED|^UUID" |tr -s '=' ' '|while read x y
+do
+	mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin \
+ 		--eval "if (db.testBackup.find({x:$x,y:$y}).count() == 0)
+ 				{
+ 					throw new Error('values (x:$x,y:$y) not found in collection');
+ 				}" --quiet
+done
