@@ -13,7 +13,7 @@ curl --connect-timeout 10 -w 200 --retry 5 -o mpfr-3.1.5.tar.bz2 -L https://ftp.
 curl --connect-timeout 10 -w 200 --retry 5 -o isl-0.18.tar.gz -L http://isl.gforge.inria.fr/isl-0.18.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o Python-2.7.13.tgz -L https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz
 curl --connect-timeout 10 -w 200 --retry 5 -o scons-2.5.1.tar.gz -L https://ftp.osuosl.org/pub/blfs/conglomeration/scons/scons-2.5.1.tar.gz
-curl --connect-timeout 10 -w 200 --retry 5 -o openssl-1.0.2l.tar.gz -L https://www.openssl.org/source/openssl-1.0.2l.tar.gz
+curl --connect-timeout 10 -w 200 --retry 5 -o openssl-1.0.2n.tar.gz -L https://www.openssl.org/source/openssl-1.0.2n.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o lzip-1.19.tar.gz -L http://download.savannah.gnu.org/releases/lzip/lzip-1.19.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o ed-1.14.2.tar.lz -L https://ftp.gnu.org/gnu/ed/ed-1.14.2.tar.lz
 curl --connect-timeout 10 -w 200 --retry 5 -o texinfo-6.4.tar.gz -L https://ftp.gnu.org/gnu/texinfo/texinfo-6.4.tar.gz
