@@ -13,6 +13,31 @@ resources:
       uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
       branch: ((repositories.mongodb-compilation.branch))
 
+  - name: mongodb-version
+    type: semver
+    source: 
+      initial_version:  1.0.0
+      driver:           git
+      uri:              https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
+      branch:           ((repositories.mongodb-compilation.branch))
+      file:             mongodb_compiled_version
+      username:         ((repositories.mongodb-compilation.username))
+      password:         ((repositories.mongodb-compilation.password))
+      git_user:         "((repositories.mongodb-compilation.git_user)) <((repositories.mongodb-compilation.email))>"
+
+  - name: rocksdb-version
+    type: semver
+    source: 
+      initial_version:  1.0.0
+      driver:           git
+      uri:              https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
+      branch:           ((repositories.mongodb-compilation.branch))
+      file:             rocksdb_compiled_version
+      username:         ((repositories.mongodb-compilation.username))
+      password:         ((repositories.mongodb-compilation.password))
+      git_user:         "((repositories.mongodb-compilation.git_user)) <((repositories.mongodb-compilation.email))>"
+    
+
   - name: versions
     type: keyval
 
@@ -31,6 +56,8 @@ jobs:
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
+      - get: mongodb-version
+      - get: rocksdb-version 
 
     - task: set-versions
       file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/set-versions/tasks/set-versions.yml
