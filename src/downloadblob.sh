@@ -9,7 +9,7 @@ curl --connect-timeout 10 -w 200 --retry 5 -o gmp-6.1.2.tar.bz2 -L https://ftp.g
 curl --connect-timeout 10 -w 200 --retry 5 -o libpcap-1.8.1.tar.gz -L http://www.tcpdump.org/release/libpcap-1.8.1.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o m4-1.4.18.tar.bz2 -L https://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.bz2
 curl --connect-timeout 10 -w 200 --retry 5 -o mpc-1.0.3.tar.gz -L https://ftp.gnu.org/gnu/mpc/mpc-1.0.3.tar.gz
-curl --connect-timeout 10 -w 200 --retry 5 -o mpfr-3.1.5.tar.bz2 -L https://ftp.gnu.org/gnu/mpfr/mpfr-3.1.5.tar.bz2
+curl --connect-timeout 10 -w 200 --retry 5 -o mpfr-3.1.6.tar.bz2 -L https://ftp.gnu.org/gnu/mpfr/mpfr-3.1.6.tar.bz2
 curl --connect-timeout 10 -w 200 --retry 5 -o isl-0.18.tar.gz -L http://isl.gforge.inria.fr/isl-0.18.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o Python-2.7.13.tgz -L https://www.python.org/ftp/python/2.7.13/Python-2.7.13.tgz
 curl --connect-timeout 10 -w 200 --retry 5 -o scons-2.5.1.tar.gz -L https://ftp.osuosl.org/pub/blfs/conglomeration/scons/scons-2.5.1.tar.gz
