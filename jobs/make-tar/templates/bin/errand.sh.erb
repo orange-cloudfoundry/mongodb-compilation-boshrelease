@@ -25,6 +25,11 @@ cp -rp /var/vcap/packages/openssl/lib/libcrypto* ${SRC_DIR}/lib
 
 [ ! -d ${SRC_DIR}/lib64 ] && mkdir -p ${SRC_DIR}/lib64
 cp -rp /var/vcap/packages/gcc/lib64/libstdc++.so.6* ${SRC_DIR}/lib64
-cp -rp /var/vcap/packages/gcc/lib64/libc.so.6* ${SRC_DIR}/lib64
+cp -rp /lib/x86_64-linux-gnu/libc-2.19.so ${SRC_DIR}/lib64
+cp -rp /lib/x86_64-linux-gnu/ld-2.19.so ${SRC_DIR}/lib64
+cd ${SRC_DIR}/lib64
+ln -s libc-2.19.so libc.so.6
+ln -s ld-2.19.so ld-linux-x86-64.so.2
+cd -
 
 tar cvzf ${ARCHIVE} -C ${SRC_DIR} .
