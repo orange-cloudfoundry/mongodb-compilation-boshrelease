@@ -177,12 +177,13 @@ jobs:
     - task: get-mongo-pwd
       file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/get-root-pwd.yml
       params:
-        BOSH_ALIAS: ((bosh-server.alias))
-        IP:         ((deployment.tests.credhub.ip))
-        PORT:       ((deployment.tests.credhub.port))
-        USER:       ((deployment.tests.credhub.username))
-        PASSWORD:   ((deployment.tests.credhub.password))
-        VAR:        mongo_root_password
+        BOSH_ALIAS:       ((bosh-server.alias))
+        IP:               ((deployment.tests.credhub.ip))
+        PORT:             ((deployment.tests.credhub.port))
+        USER:             ((deployment.tests.credhub.username))
+        PASSWORD:         ((deployment.tests.credhub.password))
+        VAR:              mongo_root_password
+        DEPLOYMENT_NAME:  ((deployment.tests.name))
 
     - put: deployment-specs
       params: { file: output/keyval.properties}
@@ -190,11 +191,12 @@ jobs:
     - task: get-deployment-ips
       file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/get-deployment-ips.yml
       params:
-        CA_CERT:  ((bosh-server.ca))
-        IP:       ((bosh-server.ip))
-        ALIAS:    ((bosh-server.alias)) 
-        USER:     ((bosh-server.user))
-        PASSWORD: ((bosh-server.password))
+        CA_CERT:          ((bosh-server.ca))
+        IP:               ((bosh-server.ip))
+        ALIAS:            ((bosh-server.alias)) 
+        USER:             ((bosh-server.user))
+        PASSWORD:         ((bosh-server.password))
+        DEPLOYMENT_NAME:  ((deployment.tests.name))
 
     - put: deployment-specs
       params: { file: output/keyval.properties}    
@@ -328,6 +330,7 @@ jobs:
       file: mongodb-compilation-bosh-release/ci/deployment/acceptance-tests/tasks/run-acceptance-tests.yml
       params:
         ALIAS:    ((bosh-server.alias))
+        DEPLOYMENT_NAME:  ((deployment.tests.name))
       ensure:
         put: bosh-errand-lock
         params: {release: bosh-errand-lock}
