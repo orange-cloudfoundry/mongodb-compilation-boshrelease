@@ -1,4 +1,4 @@
-# set -e # exit immediately if a simple command exits with a non-zero status
+set -e # exit immediately if a simple command exits with a non-zero status
 set -u # report the usage of uninitialized variables
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
@@ -107,6 +107,7 @@ done
   export _mongo_version=`echo $i|sed -e "s/.*[^[0-9]]*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/"`
 
   scons -j $cpun_ --ssl --prefix=$BOSH_INSTALL_TARGET   \
+  LINKFLAGS='-static-libstdc++' \
 --disable-warnings-as-errors \
   MONGO_VERSION=$_mongo_version \
   core install
@@ -131,4 +132,3 @@ do
   cp -rp bin/* $BOSH_INSTALL_TARGET/bin
   cd ..
 done
-
