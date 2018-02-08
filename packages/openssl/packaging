@@ -22,7 +22,8 @@ do
   ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]|cut -d" " -f6 |cut -d"/" -f1`
   tar xzf $i
   cd $ext_dir
-  RANLIB=/var/vcap/packages/binutils/bin/ranlib ./Configure --prefix=$BOSH_INSTALL_TARGET linux-x86_64 -I/var/vcap/packages/gcc/include -L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64
+  RANLIB=/var/vcap/packages/binutils/bin/ranlib ./Configure -fPIC shared --prefix=$BOSH_INSTALL_TARGET linux-x86_64 -I/var/vcap/packages/gcc/include -L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 
   make -j $cpun_
   make install
 done
+
