@@ -1,0 +1,7 @@
+- type: replace
+  path: /stemcells/alias=trusty/alias
+  value: centos
+
+- type: replace
+  path: /stemcells/alias=centos/os
+  value: centos-7
