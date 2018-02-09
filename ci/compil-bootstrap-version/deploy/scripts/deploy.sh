@@ -22,7 +22,6 @@ deployment_ops_files_cmd=""
 if [ "${STEMCELL_TYPE}" == "centos" ]
 then
     DEPLOYMENT_NAME="${DEPLOYMENT_NAME}-centos"
-    RELEASE_NAME="${RELEASE_NAME}-centos"
     deployment_ops_files_cmd="${deployment_ops_files_cmd} \
                 -o ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/opsfiles/compilation-centos.yml"
 fi
