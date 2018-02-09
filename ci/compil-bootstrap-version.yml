@@ -47,8 +47,12 @@ resources:
   - name: created
     type: keyval
 
-  - name: deployed
+  - name: deployed-ubuntu
     type: keyval    
+
+  - name: deployed-centos
+    type: keyval    
+  
 
 jobs:
 - name: set-versions
@@ -67,6 +71,13 @@ jobs:
 
     - put: versions
       params: {file: versions/keyval.properties}
+
+##############################################################################################################
+##############################################################################################################
+##                                          COMMON BRANCH                                                   ##
+##############################################################################################################
+##############################################################################################################
+
            
 - name: upload-src
   serial: true
@@ -162,9 +173,15 @@ jobs:
         MONGODB_VERSION:  ((deployment.bootstrap.mongodb-version))
 
     - put: created
-      params: { file: created/keyval.properties }
+      params: { file: created/keyval.properties }      
 
-- name: deployment
+##############################################################################################################
+##############################################################################################################
+##                                          UBUNTU BRANCH                                                   ##
+##############################################################################################################
+##############################################################################################################
+
+- name: deployment-ubuntu
   serial: true
   plan:
     - aggregate:
@@ -204,17 +221,17 @@ jobs:
         NETWORK:          ((deployment.compilation.network))
         MONGODB_VERSION:  ((deployment.bootstrap.mongodb-version))
     
-    - put: deployed
-      params: { file: deployed/keyval.properties }
+    - put: deployed-ubuntu
+      params: { file: deployed-ubuntu/keyval.properties }
 
-- name: create-archive
+- name: create-archive-ubuntu
   serial: true
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
-      - get: deployed
+      - get: deployed-ubuntu
         trigger: true
-        passed: [deployment]
+        passed: [deployment-ubuntu]
 
     - get: versions
 
@@ -250,3 +267,101 @@ jobs:
         ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
         BUCKET:             ((blobstores.compilation.bucket))
         MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
+
+
+
+##############################################################################################################
+##############################################################################################################
+##                                          CENTOS BRANCH                                                   ##
+##############################################################################################################
+##############################################################################################################
+
+
+- name: deployment-centos
+  serial: true
+  plan:
+    - aggregate:
+      - get: mongodb-compilation-bosh-release
+      - get: created
+        trigger: true
+        passed: [create-release]
+    
+    - get: versions
+
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+    
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
+        MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+
+    - task: deploy
+      file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/deploy/tasks/deploy.yml
+      params:
+        ALIAS:            ((bosh-server.alias))
+        UUID:             ((bosh-server.uuid))
+        BOSH_RELEASE:     ((deployment.compilation.release))
+        DEPLOYMENT_NAME:  ((deployment.compilation.name))
+        INSTANCE_GROUP:   ((deployment.compilation.instance-group))
+        NETWORK:          ((deployment.compilation.network))
+        MONGODB_VERSION:  ((deployment.bootstrap.mongodb-version))
+        STEMCELL_TYPE:    centos
+
+    - put: deployed-centos
+      params: { file: deployed-centos/keyval.properties }
+
+- name: create-archive-centos
+  serial: true
+  plan:
+    - aggregate:
+      - get: mongodb-compilation-bosh-release
+      - get: deployed-centos
+        trigger: true
+        passed: [deployment-centos]
+
+    - get: versions
+
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
+        MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+
+    - task: make-archive
+      file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/create-archive/tasks/make-archive.yml
+      params:
+        ALIAS:           ((bosh-server.alias))
+        DEPLOYMENT_NAME: ((deployment.compilation.name))
+
+    - task: upload-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/upload-config-files.yml
+      params:
+        ACCESS_KEY_ID:      ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
+        BUCKET:             ((blobstores.compilation.bucket))
+        MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
+        STEMCELL_TYPE:      centos
