@@ -15,6 +15,8 @@ then
     DEPLOYMENT_NAME="${DEPLOYMENT_NAME}-centos"
     deployment_ops_files="${deployment_ops_files} \
                 -o ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/opsfiles/compilation-centos.yml"
+else 
+	STEMCELL_TYPE="ubuntu"
 fi
 
 
@@ -37,6 +39,5 @@ popd
 mkdir -p deployed
 
 pushd deployed || exit 666
-echo "Compilation_date=$(date '+%Y-%d-%m %H:%M')"> keyval.properties
 grep "^mongodb" ${ROOT_FOLDER}/created/keyval.properties >> keyval.properties
 popd

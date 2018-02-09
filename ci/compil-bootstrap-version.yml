@@ -47,12 +47,8 @@ resources:
   - name: created
     type: keyval
 
-  - name: deployed-ubuntu
+  - name: deployed
     type: keyval    
-
-  - name: deployed-centos
-    type: keyval    
-  
 
 jobs:
 - name: set-versions
@@ -221,15 +217,15 @@ jobs:
         NETWORK:          ((deployment.compilation.network))
         MONGODB_VERSION:  ((deployment.bootstrap.mongodb-version))
     
-    - put: deployed-ubuntu
-      params: { file: deployed-ubuntu/keyval.properties }
+    - put: deployed
+      params: { file: deployed/keyval.properties }
 
 - name: create-archive-ubuntu
   serial: true
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
-      - get: deployed-ubuntu
+      - get: deployed
         trigger: true
         passed: [deployment-ubuntu]
 
@@ -318,15 +314,15 @@ jobs:
         MONGODB_VERSION:  ((deployment.bootstrap.mongodb-version))
         STEMCELL_TYPE:    centos
 
-    - put: deployed-centos
-      params: { file: deployed-centos/keyval.properties }
+    - put: deployed
+      params: { file: deployed/keyval.properties }
 
 - name: create-archive-centos
   serial: true
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
-      - get: deployed-centos
+      - get: deployed
         trigger: true
         passed: [deployment-centos]
 
