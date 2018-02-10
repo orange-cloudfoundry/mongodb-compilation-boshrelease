@@ -8,6 +8,15 @@ export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 
 pushd mongodb-compilation-bosh-release-patched|| exit 666
 
+if [ "${STEMCELL_TYPE}" == "centos" ]
+then
+    DEPLOYMENT_NAME="${DEPLOYMENT_NAME}-centos"
+    BOSH_RELEASE="${BOSH_RELEASE}-centos"
+else 
+	STEMCELL_TYPE="ubuntu"
+fi
+
+
 # removing deployments which uses this release
 bosh -e ${ALIAS} deployments | cat | grep ${BOSH_RELEASE}/${MONGODB_VERSION} | while read dep other
 do
@@ -29,6 +38,5 @@ popd
 mkdir -p created
 
 pushd created || exit 666
-echo "Compilation_date=$(date '+%Y-%d-%m %H:%M')"> keyval.properties
 grep "^mongodb" ${ROOT_FOLDER}/uploaded/keyval.properties >> keyval.properties
 popd

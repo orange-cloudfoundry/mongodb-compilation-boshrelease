@@ -9,7 +9,6 @@ cp -rp mongodb-compilation-bosh-release-patched/. to-upload/
 export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 
 
-
 if [ "${STEMCELL_TYPE}" == "centos" ]
 then
     DEPLOYMENT_NAME="${DEPLOYMENT_NAME}-centos"
@@ -24,11 +23,9 @@ src_vm=$(bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} vms --column="instance"|tr -d [:
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} scp \
 ${src_vm}:/var/vcap/store/make-tar/archive/mongodb-${STEMCELL_TYPE}-x86_64-*.tar.gz ${ROOT_FOLDER}/to-upload
 
-
-
 pushd to-upload || exit 666
 
-file=`ls mongodb-linux-x86_64-*.tar.gz`
+file=`ls mongodb-${STEMCELL_TYPE}-x86_64-*.tar.gz`
 
 bosh -e ${ALIAS} add-blob $file mongodb/$file
 bosh -e ${ALIAS} upload-blobs
