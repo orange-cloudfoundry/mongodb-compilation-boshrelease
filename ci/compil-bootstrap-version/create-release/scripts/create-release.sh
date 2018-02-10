@@ -27,9 +27,12 @@ do
 done
 
 # removing already existing release if exists
-bosh -e ${ALIAS} releases | cat | grep ${MONGODB_VERSION} | grep ${BOSH_RELEASE}|while read rel ver other
+bosh -e ${ALIAS} releases | cat | grep ${MONGODB_VERSION} |while read rel ver other
 do
-	bosh -e ${ALIAS} -n delete-release ${rel}/${ver}
+	if [ "${rel}" == "${BOSH_RELEASE}" ]
+	then	
+		bosh -e ${ALIAS} -n delete-release ${rel}/${ver}
+	fi
 done
  
 bosh -e ${ALIAS} create-release --force --version ${MONGODB_VERSION}
