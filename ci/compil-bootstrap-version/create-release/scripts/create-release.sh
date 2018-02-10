@@ -16,6 +16,9 @@ else
 	STEMCELL_TYPE="ubuntu"
 fi
 
+# Updating final.yml with release name specified in settings
+sed -i -e "s/^\(final_name:\).*/\1 ${BOSH_RELEASE}/" config/final.yml
+
 
 # removing deployments which uses this release
 bosh -e ${ALIAS} deployments | cat | grep ${BOSH_RELEASE}/${MONGODB_VERSION} | while read dep other
