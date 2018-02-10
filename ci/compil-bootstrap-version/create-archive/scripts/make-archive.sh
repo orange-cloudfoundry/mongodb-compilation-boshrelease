@@ -37,4 +37,4 @@ bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} vms \
 
 # needed to reuse upload-config-files
 mkdir -p ${ROOT_FOLDER}/versions
-cp -rp ${ROOT_FOLDER}/deployed-${STEMCELL_TYPE}/. ${ROOT_FOLDER}/versions
+cp -rp ${ROOT_FOLDER}/deployed/. ${ROOT_FOLDER}/versions
