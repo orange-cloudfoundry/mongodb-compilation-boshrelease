@@ -48,7 +48,16 @@ resources:
     type: keyval
 
   - name: deployed
-    type: keyval    
+    type: keyval
+
+  - name: upload-lock
+    type: pool
+    source:
+      uri: ((repositories.locks-pool.uri))
+      branch: ((repositories.locks-pool.branch))
+      pool: bosh
+      username: ((repositories.locks-pool.username))
+      password: ((repositories.locks-pool.password))    
 
 jobs:
 - name: set-versions
@@ -240,6 +249,7 @@ jobs:
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
 
+
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
       params:
@@ -255,7 +265,35 @@ jobs:
         ALIAS: ((bosh-server.alias))
         DEPLOYMENT_NAME: ((deployment.compilation.name))
         INSTANCE_GROUP:  ((deployment.compilation.instance-group))
-        
+
+    - put: upload-lock
+      params: {claim: upload-s3}    
+
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
+        MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+      on_failure:
+        put: upload-lock
+        params: {release: upload-lock}
+      on_abort:
+        put: upload-lock
+        params: {release: upload-lock}
+    
+    - task: patch-config-files
+      file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/create-archive/tasks/patch-config-files.yml
+     
+      on_failure:
+        put: upload-lock
+        params: {release: upload-lock}
+      on_abort:
+        put: upload-lock
+        params: {release: upload-lock}
+
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/common/tasks/upload-config-files.yml
       params:
@@ -264,7 +302,9 @@ jobs:
         ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
         BUCKET:             ((blobstores.compilation.bucket))
         MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
-
+      ensure:
+        put: upload-lock
+        params: {release: upload-lock}
 
 
 ##############################################################################################################
@@ -397,6 +437,35 @@ jobs:
         INSTANCE_GROUP:  ((deployment.compilation.instance-group))
         STEMCELL_TYPE:   centos
 
+    - put: upload-lock
+      params: {claim: upload-s3}    
+
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
+        MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+      on_failure:
+        put: upload-lock
+        params: {release: upload-lock}
+      on_abort:
+        put: upload-lock
+        params: {release: upload-lock}
+
+    - task: patch-config-files
+      file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/create-archive/tasks/patch-config-files.yml
+      params:
+        STEMCELL_TYPE: centos
+      on_failure:
+        put: upload-lock
+        params: {release: upload-lock}
+      on_abort:
+        put: upload-lock
+        params: {release: upload-lock}
+          
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/common/tasks/upload-config-files.yml
       params:
@@ -405,4 +474,6 @@ jobs:
         ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
         BUCKET:             ((blobstores.compilation.bucket))
         MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
-        STEMCELL_TYPE:      centos
+      ensure:
+        put: upload-lock
+        params: {release: upload-lock}
