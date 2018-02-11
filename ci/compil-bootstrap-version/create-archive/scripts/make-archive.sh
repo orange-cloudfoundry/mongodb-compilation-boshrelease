@@ -33,7 +33,7 @@ bosh -e ${ALIAS} upload-blobs
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} vms \
 	| grep "^make-tar" \
 	| awk '{print $4}' \
-	| xargs -i -t bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} delete-vm {}
+	| xargs -i -t bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n delete-vm {}
 
 # needed to reuse upload-config-files
 mkdir -p ${ROOT_FOLDER}/versions
