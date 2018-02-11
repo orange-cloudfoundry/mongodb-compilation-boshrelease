@@ -8,8 +8,7 @@ export ARC_DIR=/var/vcap/store/$JOB_NAME/archive
 export SRC_DIR=/var/vcap/store/$JOB_NAME/src
 
 
-typeset -l stemcell=$(lsb_release -i -s 2>/dev/null)
-[ "${stemcell}" == "" ] && stemcell="centos" #lsb_release is not supported on centeos stemcell
+typeset -l stemcell=$(grep -w "^ID" /etc/os-release|cut -d"=" -f2|tr -d \")
 
 export ARCHIVE=${ARC_DIR}/mongodb-${stemcell}-x86_64-<%= p("mongodb-version") -%>.tar.gz 
 
