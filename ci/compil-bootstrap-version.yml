@@ -254,7 +254,8 @@ jobs:
       params:
         ALIAS: ((bosh-server.alias))
         DEPLOYMENT_NAME: ((deployment.compilation.name))
-
+        INSTANCE_GROUP:  ((deployment.compilation.instance-group))
+        
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/common/tasks/upload-config-files.yml
       params:
@@ -393,6 +394,7 @@ jobs:
       params:
         ALIAS:           ((bosh-server.alias))
         DEPLOYMENT_NAME: ((deployment.compilation.name))
+        INSTANCE_GROUP:  ((deployment.compilation.instance-group))
         STEMCELL_TYPE:   centos
 
     - task: upload-config-files

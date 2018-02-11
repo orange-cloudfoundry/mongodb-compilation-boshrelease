@@ -31,8 +31,8 @@ bosh -e ${ALIAS} add-blob $file mongodb/$file
 bosh -e ${ALIAS} upload-blobs
 # killing the vm
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} vms \
-	| grep "^make-tar" \
-	| awk '{print $4}' \
+	| grep "^${INSTANCE_GROUP}" \
+	| awk '{print $5}' \
 	| xargs -i -t bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n delete-vm {}
 
 # needed to reuse upload-config-files
