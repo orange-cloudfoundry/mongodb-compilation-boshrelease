@@ -12,6 +12,7 @@ inputs:
   - name: mongodb-compilation-bosh-release
   - name: mongodb-compilation-bosh-release-patched  
   - name: versions
+  - name: uploaded 
 
 outputs:
   - name: created  
