@@ -148,6 +148,7 @@ jobs:
         VM_TYPE:              ((deployment.tests.mongod.vm-type))
         ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
         STEMCELL:             ((deployment.bootstrap.stemcell))
+        STEMCELL_TYPE:        centos
     
     - put: deployed
       params: { file: deployed/keyval.properties }
@@ -182,8 +183,9 @@ jobs:
         PORT:             ((deployment.tests.credhub.port))
         USER:             ((deployment.tests.credhub.username))
         PASSWORD:         ((deployment.tests.credhub.password))
-        VAR:              mongo_root_password
         DEPLOYMENT_NAME:  ((deployment.tests.name))
+        STEMCELL_TYPE:    centos
+        VAR:              mongo_root_password
 
     - put: deployment-specs
       params: { file: output/keyval.properties}
@@ -197,6 +199,7 @@ jobs:
         USER:             ((bosh-server.user))
         PASSWORD:         ((bosh-server.password))
         DEPLOYMENT_NAME:  ((deployment.tests.name))
+        STEMCELL_TYPE:    centos
 
     - put: deployment-specs
       params: { file: output/keyval.properties}    
@@ -294,7 +297,8 @@ jobs:
         VM_TYPE:              ((deployment.tests.mongod.vm-type))
         ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
         STEMCELL:             ((deployment.bootstrap.stemcell))
-
+        STEMCELL_TYPE:        centos
+        
     - task: check-mongo-version
       file: mongodb-compilation-bosh-release/ci/deployment/version-upgrade/tasks/check-mongo-version.yml    
       params:
@@ -329,8 +333,9 @@ jobs:
     - task: run-acceptance-tests
       file: mongodb-compilation-bosh-release/ci/deployment/acceptance-tests/tasks/run-acceptance-tests.yml
       params:
-        ALIAS:    ((bosh-server.alias))
+        ALIAS:            ((bosh-server.alias))
         DEPLOYMENT_NAME:  ((deployment.tests.name))
+        STEMCELL_TYPE:    centos
       ensure:
         put: bosh-errand-lock
         params: {release: bosh-errand-lock}
@@ -453,3 +458,4 @@ jobs:
         ALIAS:                ((bosh-server.alias)) 
         RELEASE_NAME:         ((deployment.tests.name))
         DEPLOYMENT_NAME:      ((deployment.tests.name))
+        STEMCELL_TYPE:        centos

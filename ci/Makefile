@@ -1,6 +1,6 @@
 
 TARGET?=dw
-PIPELINES_LIST?=initialize-compilation-blobstore clone-blobstore compil-strap-version compilation deployment
+PIPELINES_LIST?=initialize-compilation-blobstore clone-blobstore compil-bootstrap-version compilation deployment deployment-centos
 SETTINGS?=settings.yml
 delete-team:
 	fly -t $(TARGET) destroy-team --team-name mongo --non-interactive
