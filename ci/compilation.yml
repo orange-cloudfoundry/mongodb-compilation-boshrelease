@@ -310,9 +310,12 @@ jobs:
         put: upload-lock
         params: {release: upload-lock}
 
-    - put: uploaded
-      params: { file: uploaded/keyval.properties }
-
+    - task: delete-deployment
+      file: mongodb-compilation-bosh-release/ci/compilation/create-archive/tasks/delete-deployment.yml
+      params:
+        ALIAS:           ((bosh-server.alias))
+        DEPLOYMENT_NAME: ((deployment.compilation.name))
+ 
 ##############################################################################################################
 ##############################################################################################################
 ##                                          CENTOS BRANCH                                                   ##
@@ -487,9 +490,13 @@ jobs:
       ensure:
         put: upload-lock
         params: {release: upload-lock}
-
-    - put: uploaded
-      params: { file: uploaded/keyval.properties }         
+    
+    - task: delete-deployment
+      file: mongodb-compilation-bosh-release/ci/compilation/create-archive/tasks/delete-deployment.yml
+      params:
+        ALIAS:           ((bosh-server.alias))
+        DEPLOYMENT_NAME: ((deployment.compilation.name))
+        STEMCELL_TYPE:   centos        
 
 ##############################################################################################################
 ##############################################################################################################
@@ -500,15 +507,26 @@ jobs:
 - name: bump-versions
   serial: true
   plan:
-    - aggregate:
+     - aggregate:
       - get: versions
-      - get: uploaded
+        passed: [create-archive-centos, create-archive-ubuntu]
         trigger: true
-        passed: [create-archive-ubuntu,create-archive-centos]
-      - get: mongodb-compilation-bosh-release  
+
+      - get: mongodb-compilation-bosh-release
+
     - task: propagate-versions
       file: mongodb-compilation-bosh-release/ci/compilation/bump-versions/tasks/propagate-versions.yml
     - put: mongodb-version
       params: { file: new_versions/mongodb }
     - put: rocksdb-version   
       params: { file: new_versions/rocksdb }
+
+    - task: clean-blobstore
+      file: mongodb-compilation-bosh-release/ci/common/tasks/blobstore-cleanup.yml
+      params:
+        ACCESS_KEY_ID:      ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
+        BUCKET:             ((blobstores.compilation.bucket))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
