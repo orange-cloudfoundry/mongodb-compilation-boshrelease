@@ -9,6 +9,7 @@ image_resource:
 
 inputs:
   - name: mongodb-compilation-bosh-release
-  
+  - name: bosh-director-config
+    
 run:
   path: mongodb-compilation-bosh-release/ci/compilation/create-archive/scripts/delete-deployment.sh

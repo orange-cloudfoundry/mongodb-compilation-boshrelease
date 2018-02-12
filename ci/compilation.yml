@@ -507,7 +507,7 @@ jobs:
 - name: bump-versions
   serial: true
   plan:
-     - aggregate:
+    - aggregate:
       - get: versions
         passed: [create-archive-centos, create-archive-ubuntu]
         trigger: true
