@@ -16,6 +16,11 @@ else
 	STEMCELL_TYPE="ubuntu"
 fi
 
+if [ "${MONGODB_VERSION}" == "" ]
+then
+  MONGODB_VERSION=`grep "^mongodb" ${ROOT_FOLDER}/versions/keyval.properties|cut -d"=" -f2`
+fi
+
 # Updating final.yml with release name specified in settings
 sed -i -e "s/^\(final_name:\).*/\1 ${BOSH_RELEASE}/" config/final.yml
 

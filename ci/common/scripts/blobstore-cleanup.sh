@@ -16,11 +16,6 @@ aws_access_key_id=$ACCESS_KEY_ID
 aws_secret_access_key=$SECRET_ACCESS_KEY
 EOF
 
-if [ "${MONGODB_VERSION}" == "" ]
-then
-  MONGODB_VERSION=`grep "^mongodb" ${ROOT_FOLDER}/versions/keyval.properties|cut -d"=" -f2`
-fi
-
 aws_opt="--endpoint-url ${ENDPOINT_URL}"
 
 if ${SKIP_SSL}
@@ -55,7 +50,7 @@ cat blobs*.yml \
 	| sed -e 's/^[[:space:]]*//g' \
 	| grep "object_id:" \
 	| awk '{print $2}' \
-	| sort -u ) >> used_blobs.lst
+	| sort -u >> used_blobs.lst
 
 # Proceed the purge
 for i in $(cat blobs.lst)

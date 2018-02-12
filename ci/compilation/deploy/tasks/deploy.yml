@@ -17,4 +17,4 @@ outputs:
   - name: deployed  
 
 run:
-  path: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/deploy/scripts/deploy.sh
+  path: mongodb-compilation-bosh-release/ci/compilation/deploy/scripts/deploy.sh

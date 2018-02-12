@@ -47,7 +47,5 @@ aws ${aws_opt} s3 cp config/private.yml s3://${BUCKET}/ci/private-${MONGODB_VERS
 
 mkdir -p ${ROOT_FOLDER}/uploaded
 cd ${ROOT_FOLDER}/uploaded || exit 666
-# create keyval file to indicate the end of sources upload job
-echo "Upload_date=$(date '+%Y-%d-%m %H:%M')" > keyval.properties
 # propagate mongodb version
-grep "^mongodb" ${ROOT_FOLDER}/versions/keyval.properties >> keyval.properties
+grep "^mongodb" ${ROOT_FOLDER}/versions/keyval.properties > keyval.properties
