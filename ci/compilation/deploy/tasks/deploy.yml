@@ -11,7 +11,7 @@ inputs:
   - name: bosh-director-config
   - name: mongodb-compilation-bosh-release
   - name: mongodb-compilation-bosh-release-patched  
-  - name: created
+  - name: versions
 
 outputs:
   - name: deployed  

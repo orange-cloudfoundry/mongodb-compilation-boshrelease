@@ -25,11 +25,8 @@ fi
 sed -i -e "s/^\(final_name:\).*/\1 ${BOSH_RELEASE}/" config/final.yml
 
 
-# removing deployments which uses this release
-bosh -e ${ALIAS} deployments | cat | grep ${BOSH_RELEASE}/${MONGODB_VERSION} | while read dep other
-do
-	bosh -e ${ALIAS} delete-deployment -n -d ${dep}
-done
+# removing deployment
+bosh -e ${ALIAS} delete-deployment -n -d ${DEPLOYMENT_NAME}
 
 # removing already existing release if exists
 bosh -e ${ALIAS} releases | cat | grep ${MONGODB_VERSION} |while read rel ver other
@@ -49,5 +46,5 @@ popd
 mkdir -p created
 
 pushd created || exit 666
-grep "^mongodb" ${ROOT_FOLDER}/uploaded/keyval.properties >> keyval.properties
+touch keyval.properties
 popd

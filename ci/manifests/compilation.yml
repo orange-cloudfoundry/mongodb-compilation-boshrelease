@@ -3,7 +3,7 @@ director_uuid: ((director_uuid))
 
 releases:
   - name: ((release))
-    version: latest
+    version: ((release_version))
  
 update:
   canaries: 0

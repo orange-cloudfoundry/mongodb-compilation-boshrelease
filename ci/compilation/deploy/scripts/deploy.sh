@@ -25,13 +25,16 @@ fi
 sed -i -e "s/^\(final_name:\).*/\1 ${BOSH_RELEASE}/" config/final.yml
 
 
+RELEASE_VERSION=$(grep '^mongodb' ${ROOT_FOLDER}/versions/keyval.properties \
+                | cut -d'=' -f2)
+
 deployment_var="  	-v deployment=${DEPLOYMENT_NAME} \
 						-v release=${BOSH_RELEASE} \
+                        -v release_version=${RELEASE_VERSION} \
     					-v instance_group=${INSTANCE_GROUP} \
     					-v network=${NETWORK} \
     					-v director_uuid=${UUID} \
-    					-v version=$(grep '^mongodb' ${ROOT_FOLDER}/created/keyval.properties \
-    					    								|cut -d'=' -f2)"
+    					-v version=${RELEASE_VERSION}"
 
 
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n deploy \
@@ -39,10 +42,8 @@ bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n deploy \
 				ci/manifests/compilation.yml ${deployment_ops_files}
 popd
 
-# copy uploaded to versions to be abble to reuse the upload config files task
-
 mkdir -p deployed
 
 pushd deployed || exit 666
-grep "^mongodb" ${ROOT_FOLDER}/created/keyval.properties >> keyval.properties
+touch keyval.properties
 popd
