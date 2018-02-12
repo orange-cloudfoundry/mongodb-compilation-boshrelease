@@ -52,6 +52,14 @@ cat blobs*.yml \
 	| awk '{print $2}' \
 	| sort -u >> used_blobs.lst
 
+# Adding golang bosh vendor package to protected blobs
+
+cat ${ROOT_FOLDER}/mongodb-compilation-bosh-release/.final_builds/packages/golang-1.8-linux/index.yml \
+	| sed -e 's/^[[:space:]]*//g' \
+	| grep "blobstore_id:" \
+	| awk '{print $2}' >> used_blobs.lst
+
+
 # Proceed the purge
 for i in $(cat blobs.lst)
 do
@@ -61,4 +69,3 @@ do
 		aws ${aws_opt} s3 rm s3://${BUCKET}/$i
 	fi	
 done
-
