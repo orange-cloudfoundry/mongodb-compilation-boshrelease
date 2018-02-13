@@ -78,29 +78,31 @@ aws ${aws_opt} s3 \
 	||echo "no archived private.yml, use release default one"
 
 
-# Retrieving last compiled blob informations
-first_line=$(grep -nw "mongodb/mongodb-linux-x86_64-${MONGODB_VERSION}.tar.gz" \
-             ${ROOT_FOLDER}/mongodb-compilation-bosh-release-patched/config/blobs.yml \
-            | cut -d":" -f1)
-last_line=$((${first_line}+3))
 
-blob_info=$(sed -n "${first_line},${last_line}p" ${ROOT_FOLDER}/mongodb-compilation-bosh-release-patched/config/blobs.yml)
 
-blobstore_id=$(echo "${blob_info}" |grep "object_id:"|tr -d [:space:] | cut -d":" -f2)
+for dist in ubuntu centos
+do
+  # Removing previous mongodb references from blob.yml
+  sed -i "/^mongodb\/mongodb-.${dist}-x86_64.*/,/sha:.*/d" ${ROOT_FOLDER}/mongodb-bosh-release-patched/config/blobs.yml
+ 
+  # Retrieving last compiled blob informations
+  blob_info=$(sed -e "/^mongodb\/mongodb-.${dist}-x86_64.*/,/sha:.*/!d" \
+              ${ROOT_FOLDER}/mongodb-compilation-bosh-release-patched/config/blobs.yml)
+  blobstore_id=$(echo "${blob_info}" |grep "object_id:"|tr -d [:space:] | cut -d":" -f2)
 
-# Adding compiled blob to release blobstore
+  # Adding compiled blob to release blobstore
 
-aws ${aws_compil_opt} s3 \
-	cp s3://${COMPIL_BUCKET}/${blobstore_id} /tmp
-aws ${aws_opt} s3 \
-	cp /tmp/${blobstore_id} s3://${BUCKET}/
-# Removing previous mongodb references from blob.yml
+  aws ${aws_compil_opt} s3 \
+    cp s3://${COMPIL_BUCKET}/${blobstore_id} /tmp
+  aws ${aws_opt} s3 \
+    cp /tmp/${blobstore_id} s3://${BUCKET}/
 
-sed -i '/^mongodb\/mongodb-linux-x86_64.*/,/sha:.*/d' ${ROOT_FOLDER}/mongodb-bosh-release-patched/config/blobs.yml
+  # Adding last uploaded blob to blobs.yml 
+  echo "${blob_info}" \
+    >> ${ROOT_FOLDER}/mongodb-bosh-release-patched/config/blobs.yml
 
-# Adding last uploaded blob to blobs.yml 
-echo "${blob_info}" \
-	>> ${ROOT_FOLDER}/mongodb-bosh-release-patched/config/blobs.yml
+done
+
 
 #get the list of availables blobs ids on blobstore
 aws ${aws_opt} s3 \
