@@ -78,15 +78,14 @@ aws ${aws_opt} s3 \
 	||echo "no archived private.yml, use release default one"
 
 
-
+# Removing previous mongodb references from blob.yml
+sed -i "/^mongodb\/mongodb-.*-x86_64.*/,/sha:.*/d" ${ROOT_FOLDER}/mongodb-bosh-release-patched/config/blobs.yml
 
 for dist in ubuntu centos
 do
-  # Removing previous mongodb references from blob.yml
-  sed -i "/^mongodb\/mongodb-.${dist}-x86_64.*/,/sha:.*/d" ${ROOT_FOLDER}/mongodb-bosh-release-patched/config/blobs.yml
- 
+
   # Retrieving last compiled blob informations
-  blob_info=$(sed -e "/^mongodb\/mongodb-.${dist}-x86_64.*/,/sha:.*/!d" \
+  blob_info=$(sed -e "/^mongodb\/mongodb-${dist}-x86_64.*/,/sha:.*/!d" \
               ${ROOT_FOLDER}/mongodb-compilation-bosh-release-patched/config/blobs.yml)
   blobstore_id=$(echo "${blob_info}" |grep "object_id:"|tr -d [:space:] | cut -d":" -f2)
 
