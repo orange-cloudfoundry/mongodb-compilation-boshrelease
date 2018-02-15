@@ -56,11 +56,11 @@ else
   fi  
 fi
 
-mkdir -p ${ROOT_FOLDER}/mongodb-bosh-release-patched
+mkdir -p ${ROOT_FOLDER}/to-upload
 
-cp -rp ${ROOT_FOLDER}/mongodb-bosh-release/. ${ROOT_FOLDER}/mongodb-bosh-release-patched
+cp -rp ${ROOT_FOLDER}/mongodb-bosh-release/. ${ROOT_FOLDER}/to-upload
 
-cd mongodb-bosh-release-patched || exit 666
+cd to-upload || exit 666
 
 #retrieve blob list
 aws ${aws_opt} s3 \
@@ -79,7 +79,7 @@ aws ${aws_opt} s3 \
 
 
 # Removing previous mongodb references from blob.yml
-sed -i "/^mongodb\/mongodb-.*-x86_64.*/,/sha:.*/d" ${ROOT_FOLDER}/mongodb-bosh-release-patched/config/blobs.yml
+sed -i "/^mongodb\/mongodb-.*-x86_64.*/,/sha:.*/d" ${ROOT_FOLDER}/to-upload/config/blobs.yml
 
 for dist in ubuntu centos
 do
@@ -98,6 +98,6 @@ do
 
   # Adding last uploaded blob to blobs.yml 
   echo "${blob_info}" \
-    >> ${ROOT_FOLDER}/mongodb-bosh-release-patched/config/blobs.yml
+    >> ${ROOT_FOLDER}/to-upload/config/blobs.yml
 
 done

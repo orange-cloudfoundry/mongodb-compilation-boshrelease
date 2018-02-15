@@ -125,6 +125,16 @@ jobs:
         COMPIL_SKIP_SSL:          ((blobstores.compilation.skip-ssl-validation))
         COMPIL_SSL_CERT:          ((blobstores.compilation.certificate))
 
+    - task: upload-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/upload-config-files.yml
+      params:
+        ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.release.endpoint-url))
+        BUCKET:             ((blobstores.release.bucket))
+        SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.release.certificate))
+        MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
 
 ##############################################################################################################
 ##############################################################################################################
