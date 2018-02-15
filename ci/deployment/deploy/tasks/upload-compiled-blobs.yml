@@ -17,5 +17,5 @@ outputs:
   - name: to-upload
 
 run:
-  path: mongodb-compilation-bosh-release/ci/deployment/deploy/scripts/get-config-files-mainrelease.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/deploy/scripts/upload-compiled-blobs.sh
 
