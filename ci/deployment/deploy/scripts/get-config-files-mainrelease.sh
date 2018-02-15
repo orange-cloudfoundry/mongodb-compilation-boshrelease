@@ -101,8 +101,3 @@ do
     >> ${ROOT_FOLDER}/mongodb-bosh-release-patched/config/blobs.yml
 
 done
-
-
-#get the list of availables blobs ids on blobstore
-aws ${aws_opt} s3 \
-	ls s3://${BUCKET}/ 1>blobstore_ids.list
