@@ -9,7 +9,7 @@ ROOT_FOLDER=${PWD}
 if [ "${STEMCELL_TYPE}" == "centos" ]
 then
     # If we are on a centos deployment, deloyment name will be suffixed
-    DEPLOYMENT_NAME="${DEPLOYMENT_NAME}-centos"
+    DEPLOYMENT="${DEPLOYMENT}-centos"
 fi
 
 bosh -e ${ALIAS} -d ${DEPLOYMENT} run-errand import

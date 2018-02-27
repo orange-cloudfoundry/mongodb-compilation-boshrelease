@@ -16,8 +16,13 @@ shield api --ca-cert "${SHIELD_CA}" ${SHIELD_CORE} shield-tests
 
 export SHIELD_CORE=shield-tests
 
-shield login
+if [ "${STEMCELL_TYPE}" == "centos" ]
+then
+    # If we are on a centos deployment, deloyment name will be suffixed
+    SHIELD_TARGET="${SHIELD_TARGET}-centos"
+fi
 
+shield login
 
 for ip in $(echo ${ips}|tr -s ',' ' ') # getting ips from deployment-specs
 do

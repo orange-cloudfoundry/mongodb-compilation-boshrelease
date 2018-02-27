@@ -804,6 +804,7 @@ jobs:
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
+        STEMCELL_TYPE:      centos
 
     - put: bosh-errand-lock
       params: {claim: errand}
@@ -813,6 +814,7 @@ jobs:
       params:
         ALIAS:      ((bosh-server.alias))
         DEPLOYMENT: ((deployment.tests.name))
+        STEMCELL_TYPE: centos
       ensure:
         put: bosh-errand-lock
         params: {release: bosh-errand-lock}  
@@ -825,7 +827,8 @@ jobs:
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
-        MONGO_PORT:         ((deployment.tests.mongod.port))  
+        MONGO_PORT:         ((deployment.tests.mongod.port))
+        STEMCELL_TYPE:      centos
 
     - task: check-content-before-backup
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/test-restoration.yml
