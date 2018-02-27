@@ -50,7 +50,7 @@ resources:
     type: keyval
 
   - name: deployment-specs
-    type: keyval  
+    type: keyval
   
   - name: filled
     type: keyval
@@ -63,6 +63,15 @@ resources:
       pool: bosh
       username: ((repositories.locks-pool.username))
       password: ((repositories.locks-pool.password))
+
+  - name: deployment-spec-lock
+    type: pool
+    source:
+      uri: ((repositories.locks-pool.uri))
+      branch: ((repositories.locks-pool.branch))
+      pool: bosh
+      username: ((repositories.locks-pool.username))
+      password: ((repositories.locks-pool.password))    
 
 jobs:
 
@@ -278,6 +287,8 @@ jobs:
       trigger: true
       passed: [deploy-bootstrap-ubuntu]
 
+    - get: deployment-specs
+
     - get: mongodb-compilation-bosh-release
     - aggregate:
       - task: create-bosh-config
@@ -289,6 +300,10 @@ jobs:
           USER:     ((bosh-server.user))
           PASSWORD: ((bosh-server.password))
 
+
+    - put: deployment-spec-lock
+      params: {claim: deploy-specs}
+
     - task: get-mongo-pwd
       file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/get-root-pwd.yml
       params:
@@ -299,6 +314,12 @@ jobs:
         PASSWORD:         ((deployment.tests.credhub.password))
         VAR:              mongo_root_password
         DEPLOYMENT_NAME:  ((deployment.tests.name))
+      on_failure:
+        put: deployment-spec-lock
+        params: {release: deployment-spec-lock}
+      on_abort:
+        put: deployment-spec-lock
+        params: {release: deployment-spec-lock}
 
     - put: deployment-specs
       params: { file: output/keyval.properties}
@@ -312,6 +333,9 @@ jobs:
         USER:             ((bosh-server.user))
         PASSWORD:         ((bosh-server.password))
         DEPLOYMENT_NAME:  ((deployment.tests.name))
+      ensure:
+        put: deployment-spec-lock
+        params: {release: deployment-spec-lock}
 
     - put: deployment-specs
       params: { file: output/keyval.properties}    
@@ -622,6 +646,8 @@ jobs:
       trigger: true
       passed: [deploy-bootstrap-centos]
 
+    - get: deployment-specs
+
     - get: mongodb-compilation-bosh-release
     - aggregate:
       - task: create-bosh-config
@@ -632,6 +658,9 @@ jobs:
           ALIAS:    ((bosh-server.alias)) 
           USER:     ((bosh-server.user))
           PASSWORD: ((bosh-server.password))
+
+    - put: deployment-spec-lock
+      params: {claim: deploy-specs}      
 
     - task: get-mongo-pwd
       file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/get-root-pwd.yml
@@ -644,6 +673,12 @@ jobs:
         DEPLOYMENT_NAME:  ((deployment.tests.name))
         STEMCELL_TYPE:    centos
         VAR:              mongo_root_password
+      on_failure:
+        put: deployment-spec-lock
+        params: {release: deployment-spec-lock}
+      on_abort:
+        put: deployment-spec-lock
+        params: {release: deployment-spec-lock}  
 
     - put: deployment-specs
       params: { file: output/keyval.properties}
@@ -658,6 +693,9 @@ jobs:
         PASSWORD:         ((bosh-server.password))
         DEPLOYMENT_NAME:  ((deployment.tests.name))
         STEMCELL_TYPE:    centos
+      ensure:
+        put: deployment-spec-lock
+        params: {release: deployment-spec-lock}
 
     - put: deployment-specs
       params: { file: output/keyval.properties}    
@@ -665,8 +703,9 @@ jobs:
     - task: insert-collection
       file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/insert-collection.yml
       params:
-        USER: ((deployment.tests.mongod.root-username))
-        PORT: ((deployment.tests.mongod.port))
+        USER:           ((deployment.tests.mongod.root-username))
+        PORT:           ((deployment.tests.mongod.port))
+        STEMCELL_TYPE:  centos
 
     - put: filled
       params: { file: filled/keyval.properties }
@@ -843,12 +882,14 @@ jobs:
         SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+        STEMCELL_TYPE:      centos
 
     - task: drop-collection
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/drop-collection.yml
       params:
-        USER: ((deployment.tests.mongod.root-username))
-        PORT: ((deployment.tests.mongod.port))
+        USER:           ((deployment.tests.mongod.root-username))
+        PORT:           ((deployment.tests.mongod.port))
+        STEMCELL_TYPE:  centos
 
     - task: run-restore
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/run-restore.yml
@@ -858,12 +899,14 @@ jobs:
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
+        STEMCELL_TYPE:      centos
 
     - task: test-restoration
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/test-restoration.yml
       params:
-        USER: ((deployment.tests.mongod.root-username))
-        PORT: ((deployment.tests.mongod.port))
+        USER:           ((deployment.tests.mongod.root-username))
+        PORT:           ((deployment.tests.mongod.port))
+        STEMCELL_TYPE:  centos
 
 ########################################################################################################
 #                                      Removing the deployment 

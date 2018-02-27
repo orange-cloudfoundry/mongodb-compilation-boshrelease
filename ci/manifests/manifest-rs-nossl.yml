@@ -76,7 +76,7 @@ instance_groups:
                   when: "every 8 hours from 0:15"
                   policy: Short-Term
                   storage: ((shield-storage))
-                  paused:  true
+                  paused: true
     
   - name: shield-agent
     release: shield
