@@ -422,6 +422,65 @@ jobs:
         PORT: ((deployment.tests.mongod.port))
 
 ########################################################################################################
+#                                      Stemcell Upgrade Test 
+########################################################################################################
+
+- name: stemcell-upgrade-ubuntu
+  serial: true
+  plan:
+    - get: filled
+      trigger: true
+      passed: [mongo-version-upgrade-ubuntu]
+
+    - get: mongodb-bosh-release
+    - get: mongodb-compilation-bosh-release
+    - get: deployment-specs
+
+    - get: versions
+      passed: [mongo-version-upgrade-ubuntu]
+
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
+      params:
+        CA_CERT:  ((bosh-server.ca))
+        IP:       ((bosh-server.ip))
+        ALIAS:    ((bosh-server.alias)) 
+        USER:     ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+    
+    - task: get-config-files-mainrelease
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files-mainrelease.yml
+      params:
+        ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.release.endpoint-url))
+        BUCKET:             ((blobstores.release.bucket))
+        SIGNATURE_VERSION:  ((blobstores.release.signature-version))
+        SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.release.certificate))
+  
+    - task: upgrade-stemcell
+      file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/deploy-rs.yml
+      params:
+        CA_CERT:              ((bosh-server.ca))
+        IP:                   ((bosh-server.ip))
+        ALIAS:                ((bosh-server.alias)) 
+        USER:                 ((bosh-server.user))
+        PASSWORD:             ((bosh-server.password))
+        RELEASE_NAME:         ((deployment.tests.name))
+        DEPLOYMENT_NAME:      ((deployment.tests.name))
+        DEPLOYMENT_NETWORK:   ((deployment.tests.network))
+        SHIELD_URL:           ((deployment.tests.shield.core))
+        SHIELD_TOKEN:         ((deployment.tests.shield.token))
+        SHIELD_TENANT:        ((deployment.tests.shield.tenant))
+        SHIELD_STORAGE:       ((deployment.tests.shield.storage))
+        MONGO_PORT:           ((deployment.tests.mongod.port))
+        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
+        VM_TYPE:              ((deployment.tests.mongod.vm-type))
+        ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
+
+
+########################################################################################################
 #                                      Mongodb Acceptance Tests
 ########################################################################################################
 
@@ -430,7 +489,7 @@ jobs:
   plan:
     - get: filled
       trigger: true
-      passed: [mongo-version-upgrade-ubuntu]
+      passed: [stemcell-upgrade-ubuntu]
 
     - get: mongodb-compilation-bosh-release
     - aggregate:
@@ -464,7 +523,7 @@ jobs:
   plan:
     - get: filled
       trigger: true
-      passed: [mongo-version-upgrade-ubuntu]
+      passed: [stemcell-upgrade-ubuntu]
 
     - get: deployment-specs
 
@@ -785,6 +844,65 @@ jobs:
         PORT: ((deployment.tests.mongod.port))
 
 ########################################################################################################
+#                                      Stemcell Upgrade Test 
+########################################################################################################
+
+- name: stemcell-upgrade-centos
+  serial: true
+  plan:
+    - get: filled
+      trigger: true
+      passed: [mongo-version-upgrade-centos]
+
+    - get: mongodb-bosh-release
+    - get: mongodb-compilation-bosh-release
+    - get: deployment-specs
+
+    - get: versions
+      passed: [mongo-version-upgrade-centos]
+
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
+      params:
+        CA_CERT:  ((bosh-server.ca))
+        IP:       ((bosh-server.ip))
+        ALIAS:    ((bosh-server.alias)) 
+        USER:     ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+    
+    - task: get-config-files-mainrelease
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files-mainrelease.yml
+      params:
+        ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.release.endpoint-url))
+        BUCKET:             ((blobstores.release.bucket))
+        SIGNATURE_VERSION:  ((blobstores.release.signature-version))
+        SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.release.certificate))
+  
+    - task: upgrade-stemcell
+      file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/deploy-rs.yml
+      params:
+        CA_CERT:              ((bosh-server.ca))
+        IP:                   ((bosh-server.ip))
+        ALIAS:                ((bosh-server.alias)) 
+        USER:                 ((bosh-server.user))
+        PASSWORD:             ((bosh-server.password))
+        RELEASE_NAME:         ((deployment.tests.name))
+        DEPLOYMENT_NAME:      ((deployment.tests.name))
+        DEPLOYMENT_NETWORK:   ((deployment.tests.network))
+        SHIELD_URL:           ((deployment.tests.shield.core))
+        SHIELD_TOKEN:         ((deployment.tests.shield.token))
+        SHIELD_TENANT:        ((deployment.tests.shield.tenant))
+        SHIELD_STORAGE:       ((deployment.tests.shield.storage))
+        MONGO_PORT:           ((deployment.tests.mongod.port))
+        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
+        VM_TYPE:              ((deployment.tests.mongod.vm-type))
+        ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
+        STEMCELL_TYPE:        centos
+
+########################################################################################################
 #                                      Mongodb Acceptance Tests
 ########################################################################################################
 
@@ -793,7 +911,7 @@ jobs:
   plan:
     - get: filled
       trigger: true
-      passed: [mongo-version-upgrade-centos]
+      passed: [stemcell-upgrade-centos]
 
     - get: mongodb-compilation-bosh-release
     - aggregate:
@@ -828,7 +946,7 @@ jobs:
   plan:
     - get: filled
       trigger: true
-      passed: [mongo-version-upgrade-centos]
+      passed: [stemcell-upgrade-centos]
 
     - get: deployment-specs
 
