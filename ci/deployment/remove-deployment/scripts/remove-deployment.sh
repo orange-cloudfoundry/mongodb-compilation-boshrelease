@@ -21,12 +21,15 @@ bosh -e ${ALIAS} -n delete-release ${RELEASE_NAME}
 
 # removing orphaned disks
 
-for i in $(bosh -e ${ALIAS} -n disks --orphaned \
-	| grep -w mongodb-ci-rs \
-	| sed -e 's/\(^[^[:space:]]*\).*/\1/g')
-do
-	bosh -e ${ALIAS} -n -d ${DEPLOYMENT_NAME} delete-disk $i
-done	
+bosh -e ${ALIAS} disks --orphaned --column "Disk CID" --column "Deployment" \
+	| cat \
+	| awk -v dn=${DEPLOYMENT_NAME} '{
+										if($2==dn)
+											{
+												printf "%s\n",$1
+											}
+										}' \
+	| xargs -i -t bosh -e ${ALIAS} -n -d ${DEPLOYMENT_NAME} delete-disk {}
 
 mkdir -p removed
 
