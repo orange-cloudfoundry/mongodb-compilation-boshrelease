@@ -11,10 +11,10 @@ inputs:
   - name: bosh-director-config
   - name: mongodb-compilation-bosh-release
   - name: mongodb-compilation-bosh-release-patched  
-  - name: created
+  - name: versions
 
 outputs:
   - name: deployed  
 
 run:
-  path: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/deploy/scripts/deploy.sh
+  path: mongodb-compilation-bosh-release/ci/compilation/deploy/scripts/deploy.sh

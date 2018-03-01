@@ -42,7 +42,7 @@ do
   ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
   cd $ext_dir
-  ./configure --prefix=$BOSH_INSTALL_TARGET --with-gmp=$BOSH_INSTALL_TARGET 
+  ./configure --prefix=$BOSH_INSTALL_TARGET --with-gmp=$BOSH_INSTALL_TARGET
   make && make install
   cd ..
 done
@@ -74,17 +74,22 @@ do
   cd build
   LDFLAGS="-L$BOSH_INSTALL_TARGET/lib" CPPFLAGS="-I$BOSH_INSTALL_TARGET/include" ../configure -v \
   --prefix=$BOSH_INSTALL_TARGET --enable-shared --enable-linker-build-id --without-included-gettext --enable-threads=posix  \
-  --enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes \
+  --enable-nls --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes \
   --enable-gnu-unique-object --disable-libmudflap --enable-plugin --with-system-zlib --disable-browser-plugin \
   --enable-gtk-cairo --with-arch-directory=amd64 --enable-objc-gc --with-tune=generic \
   --enable-checking=release --build=x86_64-linux-gnu \
   --with-gmp=$BOSH_INSTALL_TARGET --with-mpfr=$BOSH_INSTALL_TARGET \
   --with-mpc=$BOSH_INSTALL_TARGET --disable-multilib
 
-  #LDFLAGGS="-L$BOSH_INSTALL_TARGET/lib" CPPFLAGS="-I$BOSH_INSTALL_TARGET/include" ../configure \
-  #--prefix=$BOSH_INSTALL_TARGET \
+  #LDFLAGS="-L$BOSH_INSTALL_TARGET/lib" CPPFLAGS="-I$BOSH_INSTALL_TARGET/include" ../configure -v \
+  #--prefix=$BOSH_INSTALL_TARGET --enable-shared --enable-linker-build-id --without-included-gettext #--enable-threads=posix  \
+  #--enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes \
+  #--enable-gnu-unique-object --disable-libmudflap --enable-plugin --with-system-zlib --disable-browser-plugin \
+  #--enable-gtk-cairo --with-arch-directory=amd64 --enable-objc-gc --with-tune=generic \
+  #--enable-checking=release --build=x86_64-linux-gnu \
   #--with-gmp=$BOSH_INSTALL_TARGET --with-mpfr=$BOSH_INSTALL_TARGET \
-  #--with-mpc=$BOSH_INSTALL_TARGET --with-isl=$BOSH_INSTALL_TARGET --disable-multilib
+  #--with-mpc=$BOSH_INSTALL_TARGET --disable-multilib
+
   make -j $cpun_ 
   make install
   cd ../..

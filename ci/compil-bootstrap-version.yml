@@ -48,7 +48,16 @@ resources:
     type: keyval
 
   - name: deployed
-    type: keyval    
+    type: keyval
+      
+  - name: upload-lock
+    type: pool
+    source:
+      uri: ((repositories.locks-pool.uri))
+      branch: ((repositories.locks-pool.branch))
+      pool: bosh
+      username: ((repositories.locks-pool.username))
+      password: ((repositories.locks-pool.password))    
 
 jobs:
 - name: set-versions
@@ -60,13 +69,19 @@ jobs:
       - get: rocksdb-version 
 
     - task: set-versions
-      file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/set-versions/tasks/set-versions.yml
+      file: mongodb-compilation-bosh-release/ci/compilation/set-versions/tasks/set-versions.yml
       params: 
         MONGO_VERSION:  ((deployment.bootstrap.mongodb-version))
         ROCKS_VERSION:  ((deployment.bootstrap.rocksdb-version))
 
     - put: versions
       params: {file: versions/keyval.properties}
+
+##############################################################################################################
+##############################################################################################################
+##                                          COMMON BRANCH                                                   ##
+##############################################################################################################
+##############################################################################################################
            
 - name: upload-src
   serial: true
@@ -87,7 +102,7 @@ jobs:
       passed: [set-versions]
 
     - task: download-src
-      file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/upload-src/tasks/download-src.yml
+      file: mongodb-compilation-bosh-release/ci/compilation/upload-src/tasks/download-src.yml
 
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
@@ -96,15 +111,17 @@ jobs:
         SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
         ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
         BUCKET: ((blobstores.compilation.bucket))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
         MONGODB_VERSION: "ori"
 
     - task: upload-bosh
-      file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/upload-src/tasks/upload-bosh.yml
+      file: mongodb-compilation-bosh-release/ci/compilation/upload-src/tasks/upload-bosh.yml
       params:
         ALIAS: ((bosh-server.alias))
 
     - task: update-config-files
-      file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/upload-src/tasks/update-config-files.yml
+      file: mongodb-compilation-bosh-release/ci/compilation/upload-src/tasks/update-config-files.yml
       params:
         ALIAS: ((bosh-server.alias))
         BOSH_RELEASE: ((deployment.compilation.release))
@@ -117,11 +134,20 @@ jobs:
         ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
         BUCKET: ((blobstores.compilation.bucket))
         MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
 
     - put: uploaded
       params: { file: uploaded/keyval.properties }
 
-- name: create-release
+  
+
+##############################################################################################################
+##############################################################################################################
+##                                          UBUNTU BRANCH                                                   ##
+##############################################################################################################
+##############################################################################################################
+- name: create-release-ubuntu
   serial: true
   plan:
     - aggregate:
@@ -149,9 +175,11 @@ jobs:
         ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
         BUCKET: ((blobstores.compilation.bucket))
         MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
 
     - task: create-release
-      file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/create-release/tasks/create-release.yml
+      file: mongodb-compilation-bosh-release/ci/compilation/create-release/tasks/create-release.yml
       params:
         ALIAS:            ((bosh-server.alias))
         UUID:             ((bosh-server.uuid))
@@ -164,14 +192,14 @@ jobs:
     - put: created
       params: { file: created/keyval.properties }
 
-- name: deployment
+- name: deployment-ubuntu
   serial: true
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
       - get: created
         trigger: true
-        passed: [create-release]
+        passed: [create-release-ubuntu]
     
     - get: versions
 
@@ -192,9 +220,11 @@ jobs:
         ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
         BUCKET: ((blobstores.compilation.bucket))
         MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
 
     - task: deploy
-      file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/deploy/tasks/deploy.yml
+      file: mongodb-compilation-bosh-release/ci/compilation/deploy/tasks/deploy.yml
       params:
         ALIAS:            ((bosh-server.alias))
         UUID:             ((bosh-server.uuid))
@@ -207,14 +237,102 @@ jobs:
     - put: deployed
       params: { file: deployed/keyval.properties }
 
-- name: create-archive
+- name: create-archive-ubuntu
   serial: true
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
       - get: deployed
         trigger: true
-        passed: [deployment]
+        passed: [deployment-ubuntu]
+
+    - get: versions
+
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
+
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
+        MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+
+    - task: make-archive
+      file: mongodb-compilation-bosh-release/ci/compilation/create-archive/tasks/make-archive.yml
+      params:
+        ALIAS: ((bosh-server.alias))
+        DEPLOYMENT_NAME: ((deployment.compilation.name))
+        INSTANCE_GROUP:  ((deployment.compilation.instance-group))
+
+    - put: upload-lock
+      params: {claim: upload-s3}    
+
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
+        MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
+      on_failure:
+        put: upload-lock
+        params: {release: upload-lock}
+      on_abort:
+        put: upload-lock
+        params: {release: upload-lock}
+    
+    - task: patch-config-files
+      file: mongodb-compilation-bosh-release/ci/compilation/create-archive/tasks/patch-config-files.yml
+     
+      on_failure:
+        put: upload-lock
+        params: {release: upload-lock}
+      on_abort:
+        put: upload-lock
+        params: {release: upload-lock}
+
+    - task: upload-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/upload-config-files.yml
+      params:
+        ACCESS_KEY_ID:      ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
+        BUCKET:             ((blobstores.compilation.bucket))
+        MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
+      ensure:
+        put: upload-lock
+        params: {release: upload-lock}
+
+##############################################################################################################
+##############################################################################################################
+##                                          CENTOS BRANCH                                                   ##
+##############################################################################################################
+##############################################################################################################
+
+- name: create-release-centos
+  serial: true
+  plan:
+    - aggregate:
+      - get: mongodb-compilation-bosh-release
+      - get: uploaded
+        trigger: true
+        passed: [upload-src]
 
     - get: versions
 
@@ -235,13 +353,140 @@ jobs:
         ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
         BUCKET: ((blobstores.compilation.bucket))
         MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
+
+    - task: create-release
+      file: mongodb-compilation-bosh-release/ci/compilation/create-release/tasks/create-release.yml
+      params:
+        ALIAS:            ((bosh-server.alias))
+        UUID:             ((bosh-server.uuid))
+        BOSH_RELEASE:     ((deployment.compilation.release))
+        DEPLOYMENT_NAME:  ((deployment.compilation.name))
+        INSTANCE_GROUP:   ((deployment.compilation.instance-group))
+        NETWORK:          ((deployment.compilation.network))
+        MONGODB_VERSION:  ((deployment.bootstrap.mongodb-version))
+        STEMCELL_TYPE:    centos
+
+    - put: created
+      params: { file: created/keyval.properties }    
+
+- name: deployment-centos
+  serial: true
+  plan:
+    - aggregate:
+      - get: mongodb-compilation-bosh-release
+      - get: created
+        trigger: true
+        passed: [create-release-centos]
+    
+    - get: versions
+
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+    
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
+        MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
+
+    - task: deploy
+      file: mongodb-compilation-bosh-release/ci/compilation/deploy/tasks/deploy.yml
+      params:
+        ALIAS:            ((bosh-server.alias))
+        UUID:             ((bosh-server.uuid))
+        BOSH_RELEASE:     ((deployment.compilation.release))
+        DEPLOYMENT_NAME:  ((deployment.compilation.name))
+        INSTANCE_GROUP:   ((deployment.compilation.instance-group))
+        NETWORK:          ((deployment.compilation.network))
+        MONGODB_VERSION:  ((deployment.bootstrap.mongodb-version))
+        STEMCELL_TYPE:    centos
+
+    - put: deployed
+      params: { file: deployed/keyval.properties }
+
+- name: create-archive-centos
+  serial: true
+  plan:
+    - aggregate:
+      - get: mongodb-compilation-bosh-release
+      - get: deployed
+        trigger: true
+        passed: [deployment-centos]
+
+    - get: versions
+
+    - task: create-bosh-config
+      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
+      params:
+        CA_CERT: ((bosh-server.ca))
+        IP: ((bosh-server.ip))
+        ALIAS: ((bosh-server.alias)) 
+        USER: ((bosh-server.user))
+        PASSWORD: ((bosh-server.password))
+
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
+        MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
 
     - task: make-archive
-      file: mongodb-compilation-bosh-release/ci/compil-bootstrap-version/create-archive/tasks/make-archive.yml
+      file: mongodb-compilation-bosh-release/ci/compilation/create-archive/tasks/make-archive.yml
       params:
-        ALIAS: ((bosh-server.alias))
+        ALIAS:           ((bosh-server.alias))
         DEPLOYMENT_NAME: ((deployment.compilation.name))
+        INSTANCE_GROUP:  ((deployment.compilation.instance-group))
+        STEMCELL_TYPE:   centos
 
+    - put: upload-lock
+      params: {claim: upload-s3}    
+
+    - task: get-config-files
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
+      params:
+        ACCESS_KEY_ID: ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL: ((blobstores.compilation.endpoint-url))
+        BUCKET: ((blobstores.compilation.bucket))
+        MONGODB_VERSION: ((deployment.bootstrap.mongodb-version))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
+      on_failure:
+        put: upload-lock
+        params: {release: upload-lock}
+      on_abort:
+        put: upload-lock
+        params: {release: upload-lock}
+
+    - task: patch-config-files
+      file: mongodb-compilation-bosh-release/ci/compilation/create-archive/tasks/patch-config-files.yml
+      params:
+        STEMCELL_TYPE: centos
+      on_failure:
+        put: upload-lock
+        params: {release: upload-lock}
+      on_abort:
+        put: upload-lock
+        params: {release: upload-lock}
+          
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/common/tasks/upload-config-files.yml
       params:
@@ -250,3 +495,33 @@ jobs:
         ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
         BUCKET:             ((blobstores.compilation.bucket))
         MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
+      ensure:
+        put: upload-lock
+        params: {release: upload-lock}
+
+##############################################################################################################
+##############################################################################################################
+##                                          Clean blobstore                                                  ##
+##############################################################################################################
+##############################################################################################################
+
+- name: clean-blobstore
+  plan:
+    - aggregate:
+      - get: versions
+        passed: [create-archive-centos, create-archive-ubuntu]
+        trigger: true
+
+      - get: mongodb-compilation-bosh-release
+        
+    - task: clean-blobstore
+      file: mongodb-compilation-bosh-release/ci/common/tasks/blobstore-cleanup.yml
+      params:
+        ACCESS_KEY_ID:      ((blobstores.compilation.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.compilation.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
+        BUCKET:             ((blobstores.compilation.bucket))
+        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.compilation.certificate))
