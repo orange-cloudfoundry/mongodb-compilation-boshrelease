@@ -24,20 +24,18 @@ fi
 
 shield login
 
-for ip in $(echo ${ips}|tr -s ',' ' ') # getting ips from deployment-specs
+for target_name in $(shield targets --json \
+	| jq -r '.[].name' \
+	| sed -e '/^$'{SHIELD_TARGET}'-[0-9.]*$/!d')
 do
 	# retrieving targets UUID
-	target=$(shield target ${SHIELD_TARGET}-${ip} --json | jq -r '.uuid') 
+	target_uuid=$(shield target ${target_name} --json | jq -r '.uuid') 
 
-	# removing all jobs linked to target
-	if [ "$target" != "" ]
-	then
-		for i in $(shield jobs --target ${target} --json |jq -r '.[].uuid')
-		do
-			shield delete-job $i --yes
-		done
+	for i in $(shield jobs --target ${target_uuid} --json |jq -r '.[].uuid')
+	do
+		shield delete-job $i --yes
+	done
 
-		# removing the target itself
-		shield delete-target ${target} --yes
-	fi
+	shield delete-target ${target_uuid} --yes
+	
 done
