@@ -145,13 +145,6 @@ jobs:
         SSL_CERT:           ((blobstores.release.certificate))
         MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
 
-    - task: initialize-deployment-spec-ressource
-      file: mongodb-compilation-bosh-release/ci/common/tasks/initialize-keyval-ressource.yml
-
-    - put: deployment-specs
-      params: {file: output/keyval.properties}     
-
-
 - name: init-new-config
   plan:
     - get: mongodb-bosh-release
@@ -292,9 +285,6 @@ jobs:
     - get: deployed
       trigger: true
       passed: [deploy-bootstrap-ubuntu]
-
-    - get: deployment-specs
-      trigger: false
 
     - get: mongodb-compilation-bosh-release
     - aggregate:
@@ -712,9 +702,6 @@ jobs:
       trigger: true
       passed: [deploy-bootstrap-centos]
 
-    - get: deployment-specs
-      trigger: false
- 
     - get: mongodb-compilation-bosh-release
     - aggregate:
       - task: create-bosh-config
