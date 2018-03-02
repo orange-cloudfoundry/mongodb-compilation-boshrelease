@@ -55,7 +55,7 @@ resources:
   - name: filled
     type: keyval
 
-  - name: bosh-errand-lock
+  - name: bosh-errand-lock-ubuntu
     type: pool
     source:
       uri: ((repositories.locks-pool.uri))
@@ -63,6 +63,15 @@ resources:
       pool: bosh
       username: ((repositories.locks-pool.username))
       password: ((repositories.locks-pool.password))
+
+  - name: bosh-errand-lock-centos
+    type: pool
+    source:
+      uri: ((repositories.locks-pool.uri))
+      branch: ((repositories.locks-pool.branch))
+      pool: bosh
+      username: ((repositories.locks-pool.username))
+      password: ((repositories.locks-pool.password))    
 
   - name: deployment-spec-lock
     type: pool
@@ -492,8 +501,8 @@ jobs:
           USER:     ((bosh-server.user))
           PASSWORD: ((bosh-server.password))
 
-    - put: bosh-errand-lock
-      params: {claim: errand}
+    - put: bosh-errand-lock-ubuntu
+      params: {claim: errand-ubuntu}
 
     - task: run-acceptance-tests
       file: mongodb-compilation-bosh-release/ci/deployment/acceptance-tests/tasks/run-acceptance-tests.yml
@@ -501,8 +510,8 @@ jobs:
         ALIAS:    ((bosh-server.alias))
         DEPLOYMENT_NAME:  ((deployment.tests.name))
       ensure:
-        put: bosh-errand-lock
-        params: {release: bosh-errand-lock}
+        put: bosh-errand-lock-ubuntu
+        params: {release: bosh-errand-lock-ubuntu}
 
 ########################################################################################################
 #                                      Mongodb Shield Test 
@@ -537,8 +546,8 @@ jobs:
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
 
-    - put: bosh-errand-lock
-      params: {claim: errand}
+    - put: bosh-errand-lock-ubuntu
+      params: {claim: errand-ubuntu}
 
     - task: run-shield-import-errand
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/run-shield-errand.yml
@@ -546,8 +555,8 @@ jobs:
         ALIAS:      ((bosh-server.alias))
         DEPLOYMENT: ((deployment.tests.name))
       ensure:
-        put: bosh-errand-lock
-        params: {release: bosh-errand-lock}  
+        put: bosh-errand-lock-ubuntu
+        params: {release: bosh-errand-lock-ubuntu}  
 
     - task: update-targets-hosts
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/update-targets-hosts.yml
@@ -911,8 +920,8 @@ jobs:
           USER:     ((bosh-server.user))
           PASSWORD: ((bosh-server.password))
 
-    - put: bosh-errand-lock
-      params: {claim: errand}
+    - put: bosh-errand-lock-centos
+      params: {claim: errand-centos}
 
     - task: run-acceptance-tests
       file: mongodb-compilation-bosh-release/ci/deployment/acceptance-tests/tasks/run-acceptance-tests.yml
@@ -921,8 +930,8 @@ jobs:
         DEPLOYMENT_NAME:  ((deployment.tests.name))
         STEMCELL_TYPE:    centos
       ensure:
-        put: bosh-errand-lock
-        params: {release: bosh-errand-lock}
+        put: bosh-errand-lock-centos
+        params: {release: bosh-errand-lock-centos}
 
 ########################################################################################################
 #                                      Mongodb Shield Test 
@@ -958,8 +967,8 @@ jobs:
         SHIELD_TARGET:      ((deployment.tests.name))
         STEMCELL_TYPE:      centos
 
-    - put: bosh-errand-lock
-      params: {claim: errand}
+    - put: bosh-errand-lock-centos
+      params: {claim: errand-centos}
 
     - task: run-shield-import-errand
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/run-shield-errand.yml
@@ -968,8 +977,8 @@ jobs:
         DEPLOYMENT: ((deployment.tests.name))
         STEMCELL_TYPE: centos
       ensure:
-        put: bosh-errand-lock
-        params: {release: bosh-errand-lock}  
+        put: bosh-errand-lock-centos
+        params: {release: bosh-errand-lock-centos}  
 
     - task: update-targets-hosts
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/update-targets-hosts.yml
