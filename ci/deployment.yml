@@ -366,12 +366,14 @@ jobs:
       trigger: true
       passed: [insert-datas-ubuntu]
 
-    - get: mongodb-bosh-release
-    - get: mongodb-compilation-bosh-release
-    - get: deployment-specs
-
     - get: versions
       passed: [init-new-config]
+
+    - get: deployment-specs
+      passed: [insert-datas-ubuntu]
+
+    - get: mongodb-bosh-release
+    - get: mongodb-compilation-bosh-release
 
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
@@ -437,12 +439,14 @@ jobs:
       trigger: true
       passed: [mongo-version-upgrade-ubuntu]
 
-    - get: mongodb-bosh-release
-    - get: mongodb-compilation-bosh-release
     - get: deployment-specs
+      passed: [mongo-version-upgrade-ubuntu]
 
     - get: versions
       passed: [mongo-version-upgrade-ubuntu]
+
+    - get: mongodb-bosh-release
+    - get: mongodb-compilation-bosh-release
 
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
@@ -536,6 +540,7 @@ jobs:
       passed: [stemcell-upgrade-ubuntu]
 
     - get: deployment-specs
+      passed: [stemcell-upgrade-ubuntu]
 
     - get: mongodb-compilation-bosh-release
     - aggregate:
@@ -795,12 +800,14 @@ jobs:
       trigger: true
       passed: [insert-datas-centos]
 
+    - get: deployment-specs
+      passed: [insert-datas-centos]
+      
+    - get: versions
+      passed: [init-new-config]      
+
     - get: mongodb-bosh-release
     - get: mongodb-compilation-bosh-release
-    - get: deployment-specs
-
-    - get: versions
-      passed: [init-new-config]
 
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
@@ -867,12 +874,14 @@ jobs:
       trigger: true
       passed: [mongo-version-upgrade-centos]
 
-    - get: mongodb-bosh-release
-    - get: mongodb-compilation-bosh-release
     - get: deployment-specs
+      passed: [mongo-version-upgrade-centos]
 
     - get: versions
       passed: [mongo-version-upgrade-centos]
+
+    - get: mongodb-bosh-release
+    - get: mongodb-compilation-bosh-release
 
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
@@ -968,7 +977,8 @@ jobs:
       passed: [stemcell-upgrade-centos]
 
     - get: deployment-specs
-
+      passed: [stemcell-upgrade-centos]
+      
     - get: mongodb-compilation-bosh-release
     - aggregate:
       - task: create-bosh-config
