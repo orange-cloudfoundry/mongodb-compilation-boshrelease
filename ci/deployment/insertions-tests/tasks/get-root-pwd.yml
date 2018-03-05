@@ -9,7 +9,6 @@ image_resource:
 
 inputs:
   - name: mongodb-compilation-bosh-release
-  - name: deployment-specs
 
 outputs:
   - name: output

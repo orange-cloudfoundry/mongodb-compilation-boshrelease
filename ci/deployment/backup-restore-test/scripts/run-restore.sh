@@ -8,23 +8,13 @@ ROOT_FOLDER=${PWD}
 
 cat ${ROOT_FOLDER}/deployment-specs/keyval.properties \
   | grep -v -E "^UPDATED|^UUID" \
-  | sed -e 's/"/\\"/g' \
   > ${ROOT_FOLDER}/deployment-specs/sourced.properties
 
-
 source ${ROOT_FOLDER}/deployment-specs/sourced.properties
-
-if [ "${STEMCELL_TYPE}" != "centos" ]
-then
-	STEMCELL_TYPE="ubuntu"   
-fi
 
 shield api --ca-cert "${SHIELD_CA}" ${SHIELD_CORE} shield-tests
 
 export SHIELD_CORE=shield-tests
-
-ips=`eval echo \\$${STEMCELL_TYPE} \
-   | jq -r '.ips'`
 
 shield login
 
