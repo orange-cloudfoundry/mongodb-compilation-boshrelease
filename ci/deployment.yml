@@ -420,6 +420,12 @@ jobs:
         USER: ((deployment.tests.mongod.root-username))
         PORT: ((deployment.tests.mongod.port))
 
+    - task: check-datas-after-version-upgrade
+      file: mongodb-compilation-bosh-release/ci/common/tasks/check-datas.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))
+
 ########################################################################################################
 #                                      Stemcell Upgrade Test 
 ########################################################################################################
@@ -478,6 +484,11 @@ jobs:
         VM_TYPE:              ((deployment.tests.mongod.vm-type))
         ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
 
+    - task: check-datas-after-stemcell-upgrade
+      file: mongodb-compilation-bosh-release/ci/common/tasks/check-datas.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))
 
 ########################################################################################################
 #                                      Mongodb Acceptance Tests
@@ -569,7 +580,7 @@ jobs:
         MONGO_PORT:         ((deployment.tests.mongod.port))  
 
     - task: check-content-before-backup
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/test-restoration.yml
+      file: mongodb-compilation-bosh-release/ci/common/tasks/check-datas.yml
       params:
         USER: ((deployment.tests.mongod.root-username))
         PORT: ((deployment.tests.mongod.port))   
@@ -598,7 +609,7 @@ jobs:
         SHIELD_TARGET:      ((deployment.tests.name))
 
     - task: test-restoration
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/test-restoration.yml
+      file: mongodb-compilation-bosh-release/ci/common/tasks/check-datas.yml
       params:
         USER: ((deployment.tests.mongod.root-username))
         PORT: ((deployment.tests.mongod.port))
@@ -839,6 +850,12 @@ jobs:
         USER: ((deployment.tests.mongod.root-username))
         PORT: ((deployment.tests.mongod.port))
 
+    - task: check-datas-after-version-upgrade
+      file: mongodb-compilation-bosh-release/ci/common/tasks/check-datas.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))
+
 ########################################################################################################
 #                                      Stemcell Upgrade Test 
 ########################################################################################################
@@ -897,6 +914,12 @@ jobs:
         VM_TYPE:              ((deployment.tests.mongod.vm-type))
         ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
         STEMCELL_TYPE:        centos
+
+    - task: check-datas-after-stemcell-upgrade
+      file: mongodb-compilation-bosh-release/ci/common/tasks/check-datas.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))        
 
 ########################################################################################################
 #                                      Mongodb Acceptance Tests
@@ -992,7 +1015,7 @@ jobs:
         STEMCELL_TYPE:      centos
 
     - task: check-content-before-backup
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/test-restoration.yml
+      file: mongodb-compilation-bosh-release/ci/common/tasks/check-datas.yml
       params:
         USER: ((deployment.tests.mongod.root-username))
         PORT: ((deployment.tests.mongod.port))   
@@ -1024,7 +1047,7 @@ jobs:
         STEMCELL_TYPE:      centos
 
     - task: test-restoration
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/test-restoration.yml
+      file: mongodb-compilation-bosh-release/ci/common/tasks/check-datas.yml
       params:
         USER:           ((deployment.tests.mongod.root-username))
         PORT:           ((deployment.tests.mongod.port))
