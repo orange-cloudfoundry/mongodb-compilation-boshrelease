@@ -16,6 +16,12 @@ shield api --ca-cert "${SHIELD_CA}" ${SHIELD_CORE} shield-tests
 
 export SHIELD_CORE=shield-tests
 
+if [ "${STEMCELL_TYPE}" == "centos" ]
+then
+    # If we are on a centos deployment, deloyment name will be suffixed
+    SHIELD_TARGET="${SHIELD_TARGET}-centos"
+fi
+
 shield login
 
 restore_ok=false
