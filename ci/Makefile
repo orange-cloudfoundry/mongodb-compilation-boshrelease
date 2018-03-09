@@ -5,6 +5,7 @@ SETTINGS?=settings.yml
 delete-team:
 	fly -t $(TARGET) destroy-team --team-name mongo --non-interactive
 set-team:
+	fly -t $(TARGET) login -n main ;	
 	fly -t $(TARGET) set-team --team-name mongo --non-interactive \
 	--basic-auth-username mongo \
 	--basic-auth-password mongo

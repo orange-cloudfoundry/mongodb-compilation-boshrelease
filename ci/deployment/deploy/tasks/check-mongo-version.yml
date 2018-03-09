@@ -13,5 +13,5 @@ inputs:
   - name: deployment-specs
   
 run:
-  path: mongodb-compilation-bosh-release/ci/deployment/version-upgrade/scripts/check-mongo-version.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/deploy/scripts/check-mongo-version.sh
 
