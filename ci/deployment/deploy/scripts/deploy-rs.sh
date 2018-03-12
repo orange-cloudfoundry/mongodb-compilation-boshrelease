@@ -112,9 +112,3 @@ bosh -e ${ALIAS} deploy -n -d ${DEPLOYMENT_NAME} \
         ${deployment_ops_files_cmd}
 
 popd
-
-mkdir -p deployed
-
-pushd deployed || exit 666
-echo "Deployment_date=$(date '+%Y-%d-%m %H:%M')"> keyval.properties
-popd

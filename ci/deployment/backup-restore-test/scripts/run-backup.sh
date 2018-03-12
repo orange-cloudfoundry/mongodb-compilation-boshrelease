@@ -19,6 +19,10 @@ export SHIELD_CORE=shield-tests
 
 shield login
 
+# removing previous archives
+
+
+
 backup_ok=false
 
 for ip in $(echo ${ips}|tr -s ',' ' ') 

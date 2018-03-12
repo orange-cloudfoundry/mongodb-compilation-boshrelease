@@ -46,9 +46,6 @@ resources:
   - name: versions
     type: keyval
 
-  - name: deployed
-    type: keyval
-
   - name: deployment-specs
     type: keyval
   
@@ -249,16 +246,6 @@ jobs:
         ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
         STEMCELL:             ((deployment.bootstrap.stemcell))
 
-    - &check-mongo-version
-      task: check-mongo-version
-      file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/check-mongo-version.yml
-      params:
-        USER: ((deployment.tests.mongod.root-username))
-        PORT: ((deployment.tests.mongod.port))
-
-    - &bs-set-keyval
-      put: deployed
-      params: { file: deployed/keyval.properties }
 
 ########################################################################################################
 #                                      Insert some datas  
@@ -267,9 +254,10 @@ jobs:
 - name: insert-datas-ubuntu
   serial: true
   plan:
-    - get: deployed
+
+    - get: versions
       trigger: true
-      passed: [deploy-bootstrap-ubuntu]
+      passed: [deploy-bootstrap-ubuntu]    
 
     - *create-bosh-config
      
@@ -312,6 +300,13 @@ jobs:
         *deployment-spec-unlock
 
     - *update-deployment-specs
+
+    - &check-mongo-version
+      task: check-mongo-version
+      file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/check-mongo-version.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))
 
     - &insert-collection
       task: insert-collection
@@ -516,16 +511,12 @@ jobs:
 #                                      Removing the deployment 
 ########################################################################################################            
  
-- name: delete-deployment
+- name: delete-deployment-ubuntu
   serial: false
   plan:
 
     - *create-bosh-config
  
-    - get: deployed
-      trigger: false
-      passed: [deploy-bootstrap-ubuntu]
-
     - &remove-deployment
       task: remove-deployment
       file: mongodb-compilation-bosh-release/ci/deployment/remove-deployment/tasks/remove-deployment.yml      
@@ -554,7 +545,6 @@ jobs:
       params: 
         <<: *deploy-params
         STEMCELL_TYPE: centos
-    - *bs-set-keyval    
 
 ########################################################################################################
 #                                      Insert some datas  
@@ -563,9 +553,9 @@ jobs:
 - name: insert-datas-centos
   serial: true
   plan:
-    - get: deployed
+    - get: versions
       trigger: true
-      passed: [deploy-bootstrap-centos]
+      passed: [deploy-bootstrap-centos] 
 
     - *create-bosh-config
      
@@ -584,6 +574,8 @@ jobs:
         STEMCELL_TYPE:    centos
     
     - *update-deployment-specs
+
+    - *check-mongo-version
 
     - <<: *insert-collection
       params: 
@@ -756,10 +748,6 @@ jobs:
   plan:
 
     - *create-bosh-config
-
-    - get: deployed
-      trigger: false
-      passed: [deploy-bootstrap-centos]
 
     - <<: *remove-deployment
       params:
