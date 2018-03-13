@@ -13,7 +13,7 @@ inputs:
   - name: deployment-specs
   
 outputs:
-  - name: filled
+  - name: datas
 
 run:
   path: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/scripts/insert-collection.sh

@@ -7,6 +7,13 @@ resource_types:
       
 resources:
 
+#  - name: daily-build
+#    type: time
+#    source:
+#      start:    22:00 
+#      stop:     23:00
+#      location: Europe/Paris
+
   - name: mongodb-compilation-bosh-release
     type: git
     source:
@@ -49,7 +56,7 @@ resources:
   - name: deployment-specs
     type: keyval
   
-  - name: filled
+  - name: datas
     type: keyval
 
   - name: bosh-errand-lock-ubuntu
@@ -85,7 +92,12 @@ jobs:
   plan:
     - get: mongodb-bosh-release
    
+
     - aggregate:
+#      - try:
+#        get: daily-build
+#        trigger: true
+
       - get: mongodb-version
         trigger: true
       - get: rocksdb-version
@@ -227,6 +239,7 @@ jobs:
     - &deploy
       task: deploy-rs
       file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/deploy-rs.yml
+      attempts: 3 
       params: &deploy-params
         CA_CERT:              ((bosh-server.ca))
         IP:                   ((bosh-server.ip))
@@ -312,12 +325,14 @@ jobs:
       task: insert-collection
       file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/insert-collection.yml
       params: &insert-collection-params
-        USER: ((deployment.tests.mongod.root-username))
-        PORT: ((deployment.tests.mongod.port))
+        USER:       ((deployment.tests.mongod.root-username))
+        PORT:       ((deployment.tests.mongod.port))
+        DB:         ((deployment.tests.mongod.database-name))
+        COLLECTION: ((deployment.tests.mongod.collection-name))
 
     - &list-inserted-values
-      put: filled
-      params: { file: filled/keyval.properties }
+      put: datas
+      params: { file: datas/keyval.properties }
 
 ########################################################################################################
 #                                      Reinsert datas for test purposes  
@@ -326,7 +341,7 @@ jobs:
 - name: reinsert-datas-ubuntu
   serial: true
   plan:
-    - get: filled
+    - get: datas
       passed: [insert-datas-ubuntu]
 
     - get: deployment-specs
@@ -340,6 +355,8 @@ jobs:
       params: &reinsert-collection-params
         USER: ((deployment.tests.mongod.root-username))
         PORT: ((deployment.tests.mongod.port))
+        DB:         ((deployment.tests.mongod.database-name))
+        COLLECTION: ((deployment.tests.mongod.collection-name))
 
 ########################################################################################################
 #                                      Mongodb Version Upgrade Test 
@@ -348,7 +365,7 @@ jobs:
 - name: mongo-version-upgrade-ubuntu
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [insert-datas-ubuntu]
 
@@ -368,6 +385,8 @@ jobs:
       params:
         USER: ((deployment.tests.mongod.root-username))
         PORT: ((deployment.tests.mongod.port))
+        DB:   ((deployment.tests.mongod.database-name))
+        COLLECTION: ((deployment.tests.mongod.collection-name))
           
     - &get-config-files-mainrelease
       task: get-config-files-mainrelease
@@ -396,7 +415,7 @@ jobs:
 - name: stemcell-upgrade-ubuntu
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [mongo-version-upgrade-ubuntu]
 
@@ -428,7 +447,7 @@ jobs:
 - name: acceptance-tests-ubuntu
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [stemcell-upgrade-ubuntu]
 
@@ -456,7 +475,7 @@ jobs:
 - name: backup-restore-test-ubuntu
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [stemcell-upgrade-ubuntu]
 
@@ -495,7 +514,8 @@ jobs:
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
-        MONGO_PORT:         ((deployment.tests.mongod.port))  
+        MONGO_PORT:         ((deployment.tests.mongod.port))
+        DB:                 ((deployment.tests.mongod.database-name))  
 
     - <<: *check-datas
       task: check-content-before-backup
@@ -516,6 +536,8 @@ jobs:
       params: &drop-collection-params
         USER: ((deployment.tests.mongod.root-username))
         PORT: ((deployment.tests.mongod.port))
+        DB:         ((deployment.tests.mongod.database-name))
+        COLLECTION: ((deployment.tests.mongod.collection-name))        
 
     - &run-restore
       task: run-restore
@@ -538,7 +560,7 @@ jobs:
   serial: true
   plan:
 
-    - get: filled
+    - get: datas
       trigger: true
       passed: [backup-restore-test-ubuntu,acceptance-tests-ubuntu]  
     - *create-bosh-config
@@ -618,7 +640,7 @@ jobs:
 - name: reinsert-datas-centos
   serial: true
   plan:
-    - get: filled
+    - get: datas
       passed: [insert-datas-centos]
 
     - get: deployment-specs
@@ -638,7 +660,7 @@ jobs:
 - name: mongo-version-upgrade-centos
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [insert-datas-centos]
 
@@ -677,7 +699,7 @@ jobs:
 - name: stemcell-upgrade-centos
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [mongo-version-upgrade-centos]
 
@@ -710,7 +732,7 @@ jobs:
 - name: acceptance-tests-centos
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [stemcell-upgrade-centos]
 
@@ -736,7 +758,7 @@ jobs:
 - name: backup-restore-test-centos
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [stemcell-upgrade-centos]
 
@@ -793,7 +815,7 @@ jobs:
   serial: true
   plan:
 
-    - get: filled
+    - get: datas
       trigger: true
       passed: [backup-restore-test-centos,acceptance-tests-centos]    
 

@@ -8,7 +8,7 @@ image_resource:
     tag: latest
 
 inputs:
-  - name: filled
+  - name: datas
   - name: bosh-director-config
   - name: mongodb-compilation-bosh-release
 

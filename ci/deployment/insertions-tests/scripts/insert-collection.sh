@@ -22,19 +22,23 @@ CI_IP=`echo ${ips} \
 
 # remove collection before insertion
 
-mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin \
-  --eval "db.testBackup.drop()"
+mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin <<-EOF
+	use ${DB}
+	if (db.${COLLECTION}.exists()){db.${COLLECTION}.drop()}
+	EOF
 
 mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin <<-EOF
+  use ${DB}
 	for (var i = 1; i <= 5; i++) {
-	db.testBackup.insert( { x : i, y : Math.floor(Math.random() * ((1000000 + 1) - 1)) + 1 } )
+	db.${COLLECTION}.insert( { x : i, y : Math.floor(Math.random() * ((1000000 + 1) - 1)) + 1 } )
 	}
 	EOF
 
-cd ${ROOT_FOLDER}/filled || exit 666
+cd ${ROOT_FOLDER}/datas || exit 666
 
-mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin \
-  --eval  "db.testBackup.find({},{_id:0})" \
-  | grep "^{" | tr -d ' ' \
-  | sed -e 's/.[^:]*:\([0-9]*\).[^:]*:\([0-9]*\).*/\1=\2/' \
-  > keyval.properties
+mongo "mongodb://${CI_IP}/${DB}?replicaSet=rs0" -u ${USER} -p "${password}" --authenticationDatabase admin \
+  --eval "db.${COLLECTION}.find({},{_id:0})" \
+						| grep "^{" | tr -d ' ' \
+						| sed -e 's/.[^:]*:\([0-9]*\).[^:]*:\([0-9]*\).*/\1=\2/' \
+						> keyval.properties
+exit 1						

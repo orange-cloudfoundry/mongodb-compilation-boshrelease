@@ -23,10 +23,10 @@ CI_IP=`echo ${ips} \
 # remove collection before insertion
 
 mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin \
-  --eval "db.testBackup.drop()"
+  --eval "db.${COLLECTION}.drop()" ${DB}
 
-cat ${ROOT_FOLDER}/filled/keyval.properties| grep -v -E "^UPDATED|^UUID" |tr -s '=' ' '|while read x y
+cat ${ROOT_FOLDER}/datas/keyval.properties| grep -v -E "^UPDATED|^UUID" |tr -s '=' ' '|while read x y
 do
   mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin \
-    --eval "db.testBackup.insert( { x : ${x}, y : ${y} })" --quiet
+    --eval "db.${COLLECTION}.insert( { x : ${x}, y : ${y} })" --quiet ${DB}
 done

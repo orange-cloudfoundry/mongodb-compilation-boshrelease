@@ -10,7 +10,7 @@ image_resource:
 inputs:
   - name: mongodb-compilation-bosh-release
   - name: deployment-specs
-  - name: filled
+  - name: datas
   
 run:
   path: mongodb-compilation-bosh-release/ci/common/scripts/check-datas.sh
