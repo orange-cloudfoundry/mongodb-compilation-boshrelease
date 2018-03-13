@@ -28,12 +28,14 @@ restore_ok=false
 
 for ip in $(echo ${ips}|tr -s ',' ' ') # getting ips from deployment-specs
 do
-	target=$(shield target ${SHIELD_TARGET}-${ip} --json | jq -r '.uuid')
-
-	archive=$(shield archives --target ${target} --json \
-		| jq -r '.[] | select(.status |contains("valid"))|.uuid')
-
 	if ! ${restore_ok}; then
+		
+		target=$(shield target ${SHIELD_TARGET}-${ip} --json | jq -r '.uuid')
+
+		archive=$(shield archives --target ${target} --json \
+			| jq -r '.[] | select(.status |contains("valid"))|.uuid')
+
+	
 		if [ "${archive}" != "" ] ; then
 			shield restore-archive "${archive}"
 			[ $? -eq 0 ] && restore_ok=true 

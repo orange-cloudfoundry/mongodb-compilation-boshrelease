@@ -486,7 +486,8 @@ jobs:
         SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
-
+        SHIELD_TARGET:      ((deployment.tests.name))
+        
     - &drop-collection
       task: drop-collection
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/drop-collection.yml
