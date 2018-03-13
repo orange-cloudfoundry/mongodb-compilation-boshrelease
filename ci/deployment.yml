@@ -535,9 +535,12 @@ jobs:
 ########################################################################################################            
  
 - name: delete-deployment-ubuntu
-  serial: false
+  serial: true
   plan:
 
+    - get: filled
+      trigger: true
+      passed: [backup-restore-test-ubuntu,acceptance-tests-ubuntu]  
     - *create-bosh-config
  
     - &remove-deployment
@@ -787,8 +790,12 @@ jobs:
 ########################################################################################################            
  
 - name: delete-deployment-centos
-  serial: false
+  serial: true
   plan:
+
+    - get: filled
+      trigger: true
+      passed: [backup-restore-test-centos,acceptance-tests-centos]    
 
     - *create-bosh-config
 
