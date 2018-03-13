@@ -320,6 +320,28 @@ jobs:
       params: { file: filled/keyval.properties }
 
 ########################################################################################################
+#                                      Reinsert datas for test purposes  
+########################################################################################################      
+
+- name: reinsert-datas-ubuntu
+  serial: true
+  plan:
+    - get: filled
+      passed: [insert-datas-ubuntu]
+
+    - get: deployment-specs
+      passed: [insert-datas-ubuntu]  
+
+    - *create-bosh-config
+     
+    - &reinsert-collection
+      task: insert-collection
+      file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/reinsert-collection.yml
+      params: &reinsert-collection-params
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))
+
+########################################################################################################
 #                                      Mongodb Version Upgrade Test 
 ########################################################################################################
 
@@ -487,7 +509,7 @@ jobs:
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
-        
+
     - &drop-collection
       task: drop-collection
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/drop-collection.yml
@@ -585,6 +607,26 @@ jobs:
 
     - *list-inserted-values
        
+
+########################################################################################################
+#                                      Reinsert datas for test purposes  
+########################################################################################################      
+
+- name: reinsert-datas-centos
+  serial: true
+  plan:
+    - get: filled
+      passed: [insert-datas-centos]
+
+    - get: deployment-specs
+      passed: [insert-datas-centos]  
+
+    - *create-bosh-config
+    
+    - <<: *reinsert-collection
+      params: 
+        <<: *reinsert-collection-params
+        STEMCELL_TYPE:    centos
    
 ########################################################################################################
 #                                      Mongodb Version Upgrade Test 
