@@ -551,6 +551,7 @@ jobs:
 
     - <<: *check-datas
       task: test-restoration
+      attempts: 3
    
 ########################################################################################################
 #                                      Removing the deployment 
@@ -806,6 +807,7 @@ jobs:
 
     - <<: *check-datas
       task: test-restoration
+      attempts: 3
 
 ########################################################################################################
 #                                      Removing the deployment 
