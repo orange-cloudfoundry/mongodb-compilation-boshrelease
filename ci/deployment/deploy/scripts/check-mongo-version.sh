@@ -22,7 +22,7 @@ CI_IP=`echo ${ips} \
 
 # get mongodb server version
 
-installed_version=$(mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin \
+installed_version=$(mongo "mongodb://${CI_IP}/?replicaSet=rs0" -u ${USER} -p "${password}" --authenticationDatabase admin \
   --eval "db.version()"|tail -1)
 
 needed_version=$(grep "^mongodb" ${ROOT_FOLDER}/versions/keyval.properties|cut -d"=" -f2)

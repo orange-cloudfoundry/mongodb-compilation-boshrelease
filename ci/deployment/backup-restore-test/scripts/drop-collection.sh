@@ -15,5 +15,5 @@ source ${ROOT_FOLDER}/deployment-specs/sourced.properties
 CI_IP=`echo ${ips} \
 	 | sed -e "s/,/:${PORT},/g" -e "s/$/:${PORT}/"`
 
-mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin ${DB} \
+mongo "mongodb://${CI_IP}/${DB}?replicaSet=rs0" -u ${USER} -p "${password}" --authenticationDatabase admin \
   --eval "db.${COLLECTION}.drop()"
