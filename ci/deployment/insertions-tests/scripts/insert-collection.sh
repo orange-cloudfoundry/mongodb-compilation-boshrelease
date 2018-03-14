@@ -22,19 +22,18 @@ CI_IP=`echo ${ips} \
 
 # remove collection before insertion
 
-mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin \
-  --eval "db.testBackup.drop()"
+mongo "mongodb://${CI_IP}/${DB}?replicaSet=rs0" -u ${USER} -p "${password}" --authenticationDatabase admin \
+  --eval "if (db.${COLLECTION}.exists()){db.${COLLECTION}.drop()}"
 
-mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin <<-EOF
-	for (var i = 1; i <= 5; i++) {
-	db.testBackup.insert( { x : i, y : Math.floor(Math.random() * ((1000000 + 1) - 1)) + 1 } )
-	}
-	EOF
+mongo "mongodb://${CI_IP}/${DB}?replicaSet=rs0" -u ${USER} -p "${password}" --authenticationDatabase admin \
+  --eval "for (var i = 1; i <= 5; i++) {
+						db.${COLLECTION}.insert( { x : i, y : Math.floor(Math.random() * ((1000000 + 1) - 1)) + 1 } )
+					}"
 
-cd ${ROOT_FOLDER}/filled || exit 666
+cd ${ROOT_FOLDER}/datas || exit 666
 
-mongo --host rs0/${CI_IP} -u ${USER} -p "${password}" --authenticationDatabase admin \
-  --eval  "db.testBackup.find({},{_id:0})" \
-  | grep "^{" | tr -d ' ' \
-  | sed -e 's/.[^:]*:\([0-9]*\).[^:]*:\([0-9]*\).*/\1=\2/' \
-  > keyval.properties
+mongo "mongodb://${CI_IP}/${DB}?replicaSet=rs0" -u ${USER} -p "${password}" --authenticationDatabase admin \
+  --eval "db.${COLLECTION}.find({},{_id:0})" \
+						| grep "^{" | tr -d ' ' \
+						| sed -e 's/.[^:]*:\([0-9]*\).[^:]*:\([0-9]*\).*/\1=\2/' \
+						> keyval.properties

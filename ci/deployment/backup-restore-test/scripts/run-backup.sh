@@ -19,6 +19,28 @@ export SHIELD_CORE=shield-tests
 
 shield login
 
+if [ "${STEMCELL_TYPE}" == "centos" ]
+then
+    # If we are on a centos deployment, deloyment name will be suffixed
+    SHIELD_TARGET="${SHIELD_TARGET}-centos"
+fi
+
+# removing previous archives
+
+for target_name in $(shield targets --json \
+	| jq -r '.[].name' \
+	| sed -e "/^${SHIELD_TARGET}-[0-9.]*$/!d")
+do
+	# retrieving targets UUID
+	target_uuid=$(shield target ${target_name} --json | jq -r '.uuid') 
+
+	for i in $(shield archives --target ${target_uuid} --json |jq -r '.[].uuid')
+	do
+		shield purge-archive $i --yes
+	done
+done
+
+
 backup_ok=false
 
 for ip in $(echo ${ips}|tr -s ',' ' ') 

@@ -11,9 +11,7 @@ inputs:
   - name: bosh-director-config
   - name: mongodb-compilation-bosh-release
   - name: deployment-specs
-  
-outputs:
   - name: datas
 
 run:
-  path: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/scripts/insert-collection.sh
+  path: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/scripts/reinsert-collection.sh

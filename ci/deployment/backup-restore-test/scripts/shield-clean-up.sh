@@ -2,8 +2,6 @@
 
 set -ex
 
-export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
-
 ROOT_FOLDER=${PWD}
 
 cat ${ROOT_FOLDER}/deployment-specs/keyval.properties \
@@ -26,7 +24,7 @@ shield login
 
 for target_name in $(shield targets --json \
 	| jq -r '.[].name' \
-	| sed -e '/^$'{SHIELD_TARGET}'-[0-9.]*$/!d')
+	| sed -e "/^${SHIELD_TARGET}-[0-9.]*$/!d")
 do
 	# retrieving targets UUID
 	target_uuid=$(shield target ${target_name} --json | jq -r '.uuid') 

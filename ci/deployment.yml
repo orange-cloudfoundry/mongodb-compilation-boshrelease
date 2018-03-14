@@ -7,6 +7,13 @@ resource_types:
       
 resources:
 
+#  - name: daily-build
+#    type: time
+#    source:
+#      start:    22:00 
+#      stop:     23:00
+#      location: Europe/Paris
+
   - name: mongodb-compilation-bosh-release
     type: git
     source:
@@ -46,13 +53,10 @@ resources:
   - name: versions
     type: keyval
 
-  - name: deployed
-    type: keyval
-
   - name: deployment-specs
     type: keyval
   
-  - name: filled
+  - name: datas
     type: keyval
 
   - name: bosh-errand-lock-ubuntu
@@ -87,22 +91,29 @@ jobs:
 - name: init-bootstrap-config
   plan:
     - get: mongodb-bosh-release
-    - get: mongodb-compilation-bosh-release  
+   
 
     - aggregate:
+#      - try:
+#        get: daily-build
+#        trigger: true
+
       - get: mongodb-version
         trigger: true
       - get: rocksdb-version
         trigger: true
-      - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-        params:
-          CA_CERT:  ((bosh-server.ca))
-          IP:       ((bosh-server.ip))
-          ALIAS:    ((bosh-server.alias)) 
-          USER:     ((bosh-server.user))
-          PASSWORD: ((bosh-server.password))
-  
+      - &create-bosh-config
+        do:
+          - get: mongodb-compilation-bosh-release 
+          - task: create-bosh-config
+            file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
+            params:
+              CA_CERT:  ((bosh-server.ca))
+              IP:       ((bosh-server.ip))
+              ALIAS:    ((bosh-server.alias)) 
+              USER:     ((bosh-server.user))
+              PASSWORD: ((bosh-server.password))
+
         
     - task: set-versions
       file: mongodb-compilation-bosh-release/ci/compilation/set-versions/tasks/set-versions.yml
@@ -113,9 +124,10 @@ jobs:
     - put: versions
       params: {file: versions/keyval.properties}    
 
-    - task: get-config-files
+    - &get-config-files
+      task: get-config-files
       file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
-      params:
+      params: &get-config-files-params
         ACCESS_KEY_ID:      ((blobstores.compilation.access_key_id))
         SECRET_ACCESS_KEY:  ((blobstores.compilation.secret_access_key))
         ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
@@ -126,7 +138,8 @@ jobs:
         MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
 
 
-    - task: upload-compiled-blobs
+    - &upload-compiled-blobs
+      task: upload-compiled-blobs
       file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/upload-compiled-blobs.yml
       params:
         ACCESS_KEY_ID:            ((blobstores.release.access_key_id))
@@ -143,9 +156,10 @@ jobs:
         COMPIL_SKIP_SSL:          ((blobstores.compilation.skip-ssl-validation))
         COMPIL_SSL_CERT:          ((blobstores.compilation.certificate))
 
-    - task: upload-config-files
+    - &upload-config-files
+      task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/common/tasks/upload-config-files.yml
-      params:
+      params: &upload-config-files-params
         ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
         SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
         ENDPOINT_URL:       ((blobstores.release.endpoint-url))
@@ -157,7 +171,6 @@ jobs:
 - name: init-new-config
   plan:
     - get: mongodb-bosh-release
-    - get: mongodb-compilation-bosh-release  
 
     - aggregate:
       - get: versions
@@ -165,14 +178,7 @@ jobs:
         passed: [init-bootstrap-config] 
       - get: mongodb-version
       - get: rocksdb-version
-      - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-        params:
-          CA_CERT:  ((bosh-server.ca))
-          IP:       ((bosh-server.ip))
-          ALIAS:    ((bosh-server.alias)) 
-          USER:     ((bosh-server.user))
-          PASSWORD: ((bosh-server.password))
+      - *create-bosh-config
           
     - task: set-versions
       file: mongodb-compilation-bosh-release/ci/compilation/set-versions/tasks/set-versions.yml
@@ -180,44 +186,18 @@ jobs:
     - put: versions
       params: {file: versions/keyval.properties}    
 
-    - task: get-config-files
-      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
+    - <<: *get-config-files
       params:
-        ACCESS_KEY_ID:      ((blobstores.compilation.access_key_id))
-        SECRET_ACCESS_KEY:  ((blobstores.compilation.secret_access_key))
-        ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
-        BUCKET:             ((blobstores.compilation.bucket))       
-        SIGNATURE_VERSION:  ((blobstores.compilation.signature-version))
-        SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
-        SSL_CERT:           ((blobstores.compilation.certificate))
- 
+        <<: *get-config-files-params
+        MONGODB_VERSION:    "" 
+        
+    - *upload-compiled-blobs
+      
 
-    - task: upload-compiled-blobs
-      file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/upload-compiled-blobs.yml
+    - <<: *upload-config-files
       params:
-        ACCESS_KEY_ID:            ((blobstores.release.access_key_id))
-        SECRET_ACCESS_KEY:        ((blobstores.release.secret_access_key))
-        ENDPOINT_URL:             ((blobstores.release.endpoint-url))
-        BUCKET:                   ((blobstores.release.bucket))
-        COMPIL_ACCESS_KEY_ID:     ((blobstores.compilation.access_key_id))
-        COMPIL_SECRET_ACCESS_KEY: ((blobstores.compilation.secret_access_key))
-        COMPIL_ENDPOINT_URL:      ((blobstores.compilation.endpoint-url))
-        COMPIL_BUCKET:            ((blobstores.compilation.bucket))
-        SIGNATURE_VERSION:        ((blobstores.compilation.signature-version))
-        SKIP_SSL:                 ((blobstores.compilation.skip-ssl-validation))
-        SSL_CERT:                 ((blobstores.compilation.certificate))
-        COMPIL_SKIP_SSL:          ((blobstores.compilation.skip-ssl-validation))
-        COMPIL_SSL_CERT:          ((blobstores.compilation.certificate))
-
-    - task: upload-config-files
-      file: mongodb-compilation-bosh-release/ci/common/tasks/upload-config-files.yml
-      params:
-        ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
-        SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
-        ENDPOINT_URL:       ((blobstores.release.endpoint-url))
-        BUCKET:             ((blobstores.release.bucket))
-        SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
-        SSL_CERT:           ((blobstores.release.certificate))
+        <<: *upload-config-files-params
+        MONGODB_VERSION:    "" 
 
 ##############################################################################################################
 ##############################################################################################################
@@ -232,22 +212,18 @@ jobs:
 - name: deploy-bootstrap-ubuntu
   serial: true
   plan:
-    - get: mongodb-bosh-release
-    - get: mongodb-compilation-bosh-release 
-    - aggregate: 
-      - get: versions
-        trigger: true
-        passed: [init-bootstrap-config]
-      - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-        params:
-          CA_CERT:  ((bosh-server.ca))
-          IP:       ((bosh-server.ip))
-          ALIAS:    ((bosh-server.alias)) 
-          USER:     ((bosh-server.user))
-          PASSWORD: ((bosh-server.password))
-
-    - task: get-config-files
+    - &bs-init
+      do:
+        - get: mongodb-bosh-release
+        
+        - aggregate: 
+          - get: versions
+            trigger: true
+            passed: [init-bootstrap-config]
+          - *create-bosh-config 
+            
+    - &bs-get-config-files
+      task: get-config-files
       file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files-mainrelease.yml
       params:
         ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
@@ -260,9 +236,11 @@ jobs:
         MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
       
   
-    - task: deploy-rs
+    - &deploy
+      task: deploy-rs
       file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/deploy-rs.yml
-      params:
+      attempts: 3 
+      params: &deploy-params
         CA_CERT:              ((bosh-server.ca))
         IP:                   ((bosh-server.ip))
         ALIAS:                ((bosh-server.alias)) 
@@ -280,9 +258,7 @@ jobs:
         VM_TYPE:              ((deployment.tests.mongod.vm-type))
         ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
         STEMCELL:             ((deployment.bootstrap.stemcell))
-    
-    - put: deployed
-      params: { file: deployed/keyval.properties }
+
 
 ########################################################################################################
 #                                      Insert some datas  
@@ -291,28 +267,21 @@ jobs:
 - name: insert-datas-ubuntu
   serial: true
   plan:
-    - get: deployed
+
+    - get: versions
       trigger: true
-      passed: [deploy-bootstrap-ubuntu]
+      passed: [deploy-bootstrap-ubuntu]    
 
-    - get: mongodb-compilation-bosh-release
-    - aggregate:
-      - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-        params:
-          CA_CERT:  ((bosh-server.ca))
-          IP:       ((bosh-server.ip))
-          ALIAS:    ((bosh-server.alias)) 
-          USER:     ((bosh-server.user))
-          PASSWORD: ((bosh-server.password))
-
-
-    - put: deployment-spec-lock
+    - *create-bosh-config
+     
+    - &deployment-spec-lock
+      put: deployment-spec-lock
       params: {claim: deploy-specs}
 
-    - task: get-mongo-pwd
+    - &get-mongo-pwd
+      task: get-mongo-pwd
       file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/get-root-pwd.yml
-      params:
+      params: &get-mongo-pwd-params
         BOSH_ALIAS:       ((bosh-server.alias))
         IP:               ((deployment.tests.credhub.ip))
         PORT:             ((deployment.tests.credhub.port))
@@ -320,19 +289,20 @@ jobs:
         PASSWORD:         ((deployment.tests.credhub.password))
         VAR:              mongo_root_password
         DEPLOYMENT_NAME:  ((deployment.tests.name))
-      on_failure:
+      on_failure: &deployment-spec-unlock
         put: deployment-spec-lock
         params: {release: deployment-spec-lock}
       on_abort:
-        put: deployment-spec-lock
-        params: {release: deployment-spec-lock}
+        *deployment-spec-unlock
 
-    - put: deployment-specs
+    - &update-deployment-specs
+      put: deployment-specs
       params: { file: output/keyval.properties}
 
-    - task: get-deployment-ips
+    - &get-deployment-ips
+      task: get-deployment-ips
       file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/get-deployment-ips.yml
-      params:
+      params: &get-deployment-ips-params
         CA_CERT:          ((bosh-server.ca))
         IP:               ((bosh-server.ip))
         ALIAS:            ((bosh-server.alias)) 
@@ -340,20 +310,53 @@ jobs:
         PASSWORD:         ((bosh-server.password))
         DEPLOYMENT_NAME:  ((deployment.tests.name))
       ensure:
-        put: deployment-spec-lock
-        params: {release: deployment-spec-lock}
+        *deployment-spec-unlock
 
-    - put: deployment-specs
-      params: { file: output/keyval.properties}    
+    - *update-deployment-specs
 
-    - task: insert-collection
-      file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/insert-collection.yml
+    - &check-mongo-version
+      task: check-mongo-version
+      file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/check-mongo-version.yml
       params:
         USER: ((deployment.tests.mongod.root-username))
         PORT: ((deployment.tests.mongod.port))
 
-    - put: filled
-      params: { file: filled/keyval.properties }
+    - &insert-collection
+      task: insert-collection
+      file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/insert-collection.yml
+      params: &insert-collection-params
+        USER:       ((deployment.tests.mongod.root-username))
+        PORT:       ((deployment.tests.mongod.port))
+        DB:         ((deployment.tests.mongod.database-name))
+        COLLECTION: ((deployment.tests.mongod.collection-name))
+
+    - &list-inserted-values
+      put: datas
+      params: { file: datas/keyval.properties }
+
+########################################################################################################
+#                                      Reinsert datas for test purposes  
+########################################################################################################      
+
+- name: reinsert-datas-ubuntu
+  serial: true
+  plan:
+    - get: datas
+      passed: [insert-datas-ubuntu]
+
+    - get: deployment-specs
+      passed: [insert-datas-ubuntu]  
+
+    - *create-bosh-config
+     
+    - &reinsert-collection
+      task: insert-collection
+      file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/reinsert-collection.yml
+      params: &reinsert-collection-params
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))
+        DB:         ((deployment.tests.mongod.database-name))
+        COLLECTION: ((deployment.tests.mongod.collection-name))
 
 ########################################################################################################
 #                                      Mongodb Version Upgrade Test 
@@ -362,27 +365,31 @@ jobs:
 - name: mongo-version-upgrade-ubuntu
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [insert-datas-ubuntu]
-
-    - get: mongodb-bosh-release
-    - get: mongodb-compilation-bosh-release
-    - get: deployment-specs
 
     - get: versions
       passed: [init-new-config]
 
-    - task: create-bosh-config
-      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-      params:
-        CA_CERT:  ((bosh-server.ca))
-        IP:       ((bosh-server.ip))
-        ALIAS:    ((bosh-server.alias)) 
-        USER:     ((bosh-server.user))
-        PASSWORD: ((bosh-server.password))
+    - get: deployment-specs
+      passed: [insert-datas-ubuntu]
+
+    - get: mongodb-bosh-release
+ 
+    - *create-bosh-config
     
-    - task: get-config-files-mainrelease
+    - &check-datas
+      task: check-datas-before-version-upgrade
+      file: mongodb-compilation-bosh-release/ci/common/tasks/check-datas.yml
+      params:
+        USER: ((deployment.tests.mongod.root-username))
+        PORT: ((deployment.tests.mongod.port))
+        DB:   ((deployment.tests.mongod.database-name))
+        COLLECTION: ((deployment.tests.mongod.collection-name))
+          
+    - &get-config-files-mainrelease
+      task: get-config-files-mainrelease
       file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files-mainrelease.yml
       params:
         ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
@@ -393,32 +400,13 @@ jobs:
         SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
         SSL_CERT:           ((blobstores.release.certificate))
   
-    - task: upgrade-rs
-      file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/deploy-rs.yml
-      params:
-        CA_CERT:              ((bosh-server.ca))
-        IP:                   ((bosh-server.ip))
-        ALIAS:                ((bosh-server.alias)) 
-        USER:                 ((bosh-server.user))
-        PASSWORD:             ((bosh-server.password))
-        RELEASE_NAME:         ((deployment.tests.name))
-        DEPLOYMENT_NAME:      ((deployment.tests.name))
-        DEPLOYMENT_NETWORK:   ((deployment.tests.network))
-        SHIELD_URL:           ((deployment.tests.shield.core))
-        SHIELD_TOKEN:         ((deployment.tests.shield.token))
-        SHIELD_TENANT:        ((deployment.tests.shield.tenant))
-        SHIELD_STORAGE:       ((deployment.tests.shield.storage))
-        MONGO_PORT:           ((deployment.tests.mongod.port))
-        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
-        VM_TYPE:              ((deployment.tests.mongod.vm-type))
-        ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
-        STEMCELL:             ((deployment.bootstrap.stemcell))
+    - <<: *deploy
+      task: upgrade-rs
 
-    - task: check-mongo-version
-      file: mongodb-compilation-bosh-release/ci/deployment/version-upgrade/tasks/check-mongo-version.yml    
-      params:
-        USER: ((deployment.tests.mongod.root-username))
-        PORT: ((deployment.tests.mongod.port))
+    - *check-mongo-version
+
+    - <<: *check-datas
+      task: check-datas-after-version-upgrade
 
 ########################################################################################################
 #                                      Stemcell Upgrade Test 
@@ -427,58 +415,31 @@ jobs:
 - name: stemcell-upgrade-ubuntu
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [mongo-version-upgrade-ubuntu]
 
-    - get: mongodb-bosh-release
-    - get: mongodb-compilation-bosh-release
     - get: deployment-specs
+      passed: [mongo-version-upgrade-ubuntu]
 
     - get: versions
       passed: [mongo-version-upgrade-ubuntu]
 
-    - task: create-bosh-config
-      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-      params:
-        CA_CERT:  ((bosh-server.ca))
-        IP:       ((bosh-server.ip))
-        ALIAS:    ((bosh-server.alias)) 
-        USER:     ((bosh-server.user))
-        PASSWORD: ((bosh-server.password))
-    
-    - task: get-config-files-mainrelease
-      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files-mainrelease.yml
-      params:
-        ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
-        SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
-        ENDPOINT_URL:       ((blobstores.release.endpoint-url))
-        BUCKET:             ((blobstores.release.bucket))
-        SIGNATURE_VERSION:  ((blobstores.release.signature-version))
-        SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
-        SSL_CERT:           ((blobstores.release.certificate))
+    - get: mongodb-bosh-release
+
+    - *create-bosh-config
+          
+    - *get-config-files-mainrelease
   
-    - task: upgrade-stemcell
-      file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/deploy-rs.yml
-      params:
-        CA_CERT:              ((bosh-server.ca))
-        IP:                   ((bosh-server.ip))
-        ALIAS:                ((bosh-server.alias)) 
-        USER:                 ((bosh-server.user))
-        PASSWORD:             ((bosh-server.password))
-        RELEASE_NAME:         ((deployment.tests.name))
-        DEPLOYMENT_NAME:      ((deployment.tests.name))
-        DEPLOYMENT_NETWORK:   ((deployment.tests.network))
-        SHIELD_URL:           ((deployment.tests.shield.core))
-        SHIELD_TOKEN:         ((deployment.tests.shield.token))
-        SHIELD_TENANT:        ((deployment.tests.shield.tenant))
-        SHIELD_STORAGE:       ((deployment.tests.shield.storage))
-        MONGO_PORT:           ((deployment.tests.mongod.port))
-        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
-        VM_TYPE:              ((deployment.tests.mongod.vm-type))
-        ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
+    - <<: *deploy
+      task: upgrade-stemcell
+      params: 
+        <<: *deploy-params
+        STEMCELL: latest
 
-
+    - <<: *check-datas
+      task: check-datas-after-stemcell-upgrade
+ 
 ########################################################################################################
 #                                      Mongodb Acceptance Tests
 ########################################################################################################
@@ -486,30 +447,24 @@ jobs:
 - name: acceptance-tests-ubuntu
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [stemcell-upgrade-ubuntu]
 
-    - get: mongodb-compilation-bosh-release
-    - aggregate:
-      - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-        params:
-          CA_CERT:  ((bosh-server.ca))
-          IP:       ((bosh-server.ip))
-          ALIAS:    ((bosh-server.alias))
-          USER:     ((bosh-server.user))
-          PASSWORD: ((bosh-server.password))
-
-    - put: bosh-errand-lock-ubuntu
+    - *create-bosh-config
+      
+    - &errand-lock-ubuntu
+      put: bosh-errand-lock-ubuntu
       params: {claim: errand-ubuntu}
 
-    - task: run-acceptance-tests
+    - &run-acceptance-tests
+      task: run-acceptance-tests
       file: mongodb-compilation-bosh-release/ci/deployment/acceptance-tests/tasks/run-acceptance-tests.yml
-      params:
+      params: &run-acceptance-tests-params
         ALIAS:    ((bosh-server.alias))
         DEPLOYMENT_NAME:  ((deployment.tests.name))
       ensure:
+        &errand-unlock-ubuntu
         put: bosh-errand-lock-ubuntu
         params: {release: bosh-errand-lock-ubuntu}
 
@@ -520,114 +475,101 @@ jobs:
 - name: backup-restore-test-ubuntu
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [stemcell-upgrade-ubuntu]
 
     - get: deployment-specs
+      passed: [stemcell-upgrade-ubuntu]
 
-    - get: mongodb-compilation-bosh-release
-    - aggregate:
-      - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-        params:
-          CA_CERT:  ((bosh-server.ca))
-          IP:       ((bosh-server.ip))
-          ALIAS:    ((bosh-server.alias)) 
-          USER:     ((bosh-server.user))
-          PASSWORD: ((bosh-server.password))
-
-    - task: shield-clean-up
+    - *create-bosh-config
+      
+    - &shield-clean-up
+      task: shield-clean-up
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/shield-clean-up.yml
-      params:
+      params: &shield-clean-up-params
         SHIELD_CA:          ((deployment.tests.shield.ca))
         SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
 
-    - put: bosh-errand-lock-ubuntu
-      params: {claim: errand-ubuntu}
+    - *errand-lock-ubuntu
 
-    - task: run-shield-import-errand
+    - &run-shield-import-errand
+      task: run-shield-import-errand
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/run-shield-errand.yml
-      params:
+      params: &run-shield-import-errand-params
         ALIAS:      ((bosh-server.alias))
         DEPLOYMENT: ((deployment.tests.name))
       ensure:
-        put: bosh-errand-lock-ubuntu
-        params: {release: bosh-errand-lock-ubuntu}  
+        *errand-unlock-ubuntu 
 
-    - task: update-targets-hosts
+    - &update-targets-hosts
+      task: update-targets-hosts
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/update-targets-hosts.yml
-      params:
+      params: &update-targets-hosts-params
         SHIELD_CA:          ((deployment.tests.shield.ca))
         SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
-        MONGO_PORT:         ((deployment.tests.mongod.port))  
+        MONGO_PORT:         ((deployment.tests.mongod.port))
+        DB:                 ((deployment.tests.mongod.database-name))  
 
-    - task: check-content-before-backup
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/test-restoration.yml
-      params:
-        USER: ((deployment.tests.mongod.root-username))
-        PORT: ((deployment.tests.mongod.port))   
-
-    - task: run-backup
+    - <<: *check-datas
+      task: check-content-before-backup
+    
+    - &run-backup
+      task: run-backup
       file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/run-backup.yml
-      params:
-        SHIELD_CA:          ((deployment.tests.shield.ca))
-        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
-        SHIELD_CORE:        ((deployment.tests.shield.core))
-        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
-
-    - task: drop-collection
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/drop-collection.yml
-      params:
-        USER: ((deployment.tests.mongod.root-username))
-        PORT: ((deployment.tests.mongod.port))
-
-    - task: run-restore
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/run-restore.yml
-      params:
+      params: &run-backup-params
         SHIELD_CA:          ((deployment.tests.shield.ca))
         SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
         SHIELD_CORE:        ((deployment.tests.shield.core))
         SHIELD_TENANT:      ((deployment.tests.shield.tenant))
         SHIELD_TARGET:      ((deployment.tests.name))
 
-    - task: test-restoration
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/test-restoration.yml
-      params:
+    - &drop-collection
+      task: drop-collection
+      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/drop-collection.yml
+      params: &drop-collection-params
         USER: ((deployment.tests.mongod.root-username))
         PORT: ((deployment.tests.mongod.port))
+        DB:         ((deployment.tests.mongod.database-name))
+        COLLECTION: ((deployment.tests.mongod.collection-name))        
 
+    - &run-restore
+      task: run-restore
+      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/run-restore.yml
+      params: &run-restore-params
+        SHIELD_CA:          ((deployment.tests.shield.ca))
+        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
+        SHIELD_CORE:        ((deployment.tests.shield.core))
+        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+        SHIELD_TARGET:      ((deployment.tests.name))
+
+    - <<: *check-datas
+      task: test-restoration
+      attempts: 3
+   
 ########################################################################################################
 #                                      Removing the deployment 
 ########################################################################################################            
  
-- name: delete-deployment
-  serial: false
+- name: delete-deployment-ubuntu
+  serial: true
   plan:
 
-    - get: mongodb-compilation-bosh-release
-    - task: create-bosh-config
-      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-      params:
-        CA_CERT:  ((bosh-server.ca))
-        IP:       ((bosh-server.ip))
-        ALIAS:    ((bosh-server.alias)) 
-        USER:     ((bosh-server.user))
-        PASSWORD: ((bosh-server.password))
-
-    - get: deployed
-      trigger: false
-      passed: [deploy-bootstrap-ubuntu]
-
-    - task: remove-deployment
+    - get: datas
+      trigger: true
+      passed: [backup-restore-test-ubuntu,acceptance-tests-ubuntu]  
+    - *create-bosh-config
+ 
+    - &remove-deployment
+      task: remove-deployment
       file: mongodb-compilation-bosh-release/ci/deployment/remove-deployment/tasks/remove-deployment.yml      
-      params:
+      params: &remove-deployment-params
         ALIAS:                ((bosh-server.alias)) 
         RELEASE_NAME:         ((deployment.tests.name))
         DEPLOYMENT_NAME:      ((deployment.tests.name))
@@ -646,59 +588,12 @@ jobs:
 - name: deploy-bootstrap-centos
   serial: true
   plan:
-    - get: mongodb-bosh-release
-    - get: mongodb-compilation-bosh-release 
-    - aggregate: 
-      - get: versions
-        trigger: true
-        passed: [init-bootstrap-config]
-      - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-        params:
-          CA_CERT:  ((bosh-server.ca))
-          IP:       ((bosh-server.ip))
-          ALIAS:    ((bosh-server.alias)) 
-          USER:     ((bosh-server.user))
-          PASSWORD: ((bosh-server.password))
-
-    - task: get-config-files
-      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files-mainrelease.yml
-      params:
-        ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
-        SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
-        ENDPOINT_URL:       ((blobstores.release.endpoint-url))
-        BUCKET:             ((blobstores.release.bucket))       
-        SIGNATURE_VERSION:  ((blobstores.release.signature-version))
-        SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
-        SSL_CERT:           ((blobstores.release.certificate))
-        MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
-      
-  
-    - task: deploy-rs
-      file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/deploy-rs.yml
-      params:
-        CA_CERT:              ((bosh-server.ca))
-        IP:                   ((bosh-server.ip))
-        ALIAS:                ((bosh-server.alias)) 
-        USER:                 ((bosh-server.user))
-        PASSWORD:             ((bosh-server.password))
-        RELEASE_NAME:         ((deployment.tests.name))
-        DEPLOYMENT_NAME:      ((deployment.tests.name))
-        DEPLOYMENT_NETWORK:   ((deployment.tests.network))
-        SHIELD_URL:           ((deployment.tests.shield.core))
-        SHIELD_TOKEN:         ((deployment.tests.shield.token))
-        SHIELD_TENANT:        ((deployment.tests.shield.tenant))
-        SHIELD_STORAGE:       ((deployment.tests.shield.storage))
-        MONGO_PORT:           ((deployment.tests.mongod.port))
-        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
-        VM_TYPE:              ((deployment.tests.mongod.vm-type))
-        ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
-        STEMCELL:             ((deployment.bootstrap.stemcell))
-        STEMCELL_TYPE:        centos
-
-    - put: deployed
-      params: { file: deployed/keyval.properties }
-
+    - *bs-init
+    - *bs-get-config-files
+    - <<: *deploy
+      params: 
+        <<: *deploy-params
+        STEMCELL_TYPE: centos
 
 ########################################################################################################
 #                                      Insert some datas  
@@ -707,72 +602,58 @@ jobs:
 - name: insert-datas-centos
   serial: true
   plan:
-    - get: deployed
+    - get: versions
       trigger: true
-      passed: [deploy-bootstrap-centos]
+      passed: [deploy-bootstrap-centos] 
 
-    - get: mongodb-compilation-bosh-release
-    - aggregate:
-      - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-        params:
-          CA_CERT:  ((bosh-server.ca))
-          IP:       ((bosh-server.ip))
-          ALIAS:    ((bosh-server.alias)) 
-          USER:     ((bosh-server.user))
-          PASSWORD: ((bosh-server.password))
+    - *create-bosh-config
+     
+    - *deployment-spec-lock
 
-    - put: deployment-spec-lock
-      params: {claim: deploy-specs}      
-
-    - task: get-mongo-pwd
-      file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/get-root-pwd.yml
-      params:
-        BOSH_ALIAS:       ((bosh-server.alias))
-        IP:               ((deployment.tests.credhub.ip))
-        PORT:             ((deployment.tests.credhub.port))
-        USER:             ((deployment.tests.credhub.username))
-        PASSWORD:         ((deployment.tests.credhub.password))
-        DEPLOYMENT_NAME:  ((deployment.tests.name))
+    - <<: *get-mongo-pwd
+      params: 
+        <<: *get-mongo-pwd-params
         STEMCELL_TYPE:    centos
-        VAR:              mongo_root_password
-      on_failure:
-        put: deployment-spec-lock
-        params: {release: deployment-spec-lock}
-      on_abort:
-        put: deployment-spec-lock
-        params: {release: deployment-spec-lock}  
 
-    - put: deployment-specs
-      params: { file: output/keyval.properties}
+    - *update-deployment-specs
 
-    - task: get-deployment-ips
-      file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/get-deployment-ips.yml
-      params:
-        CA_CERT:          ((bosh-server.ca))
-        IP:               ((bosh-server.ip))
-        ALIAS:            ((bosh-server.alias)) 
-        USER:             ((bosh-server.user))
-        PASSWORD:         ((bosh-server.password))
-        DEPLOYMENT_NAME:  ((deployment.tests.name))
+    - <<: *get-deployment-ips
+      params: 
+        <<: *get-deployment-ips-params
         STEMCELL_TYPE:    centos
-      ensure:
-        put: deployment-spec-lock
-        params: {release: deployment-spec-lock}
+    
+    - *update-deployment-specs
 
-    - put: deployment-specs
-      params: { file: output/keyval.properties}    
+    - *check-mongo-version
 
-    - task: insert-collection
-      file: mongodb-compilation-bosh-release/ci/deployment/insertions-tests/tasks/insert-collection.yml
-      params:
-        USER:           ((deployment.tests.mongod.root-username))
-        PORT:           ((deployment.tests.mongod.port))
-        STEMCELL_TYPE:  centos
+    - <<: *insert-collection
+      params: 
+        <<: *insert-collection-params
+        STEMCELL_TYPE:    centos
 
-    - put: filled
-      params: { file: filled/keyval.properties }
+    - *list-inserted-values
+       
 
+########################################################################################################
+#                                      Reinsert datas for test purposes  
+########################################################################################################      
+
+- name: reinsert-datas-centos
+  serial: true
+  plan:
+    - get: datas
+      passed: [insert-datas-centos]
+
+    - get: deployment-specs
+      passed: [insert-datas-centos]  
+
+    - *create-bosh-config
+    
+    - <<: *reinsert-collection
+      params: 
+        <<: *reinsert-collection-params
+        STEMCELL_TYPE:    centos
+   
 ########################################################################################################
 #                                      Mongodb Version Upgrade Test 
 ########################################################################################################
@@ -780,65 +661,38 @@ jobs:
 - name: mongo-version-upgrade-centos
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [insert-datas-centos]
 
-    - get: mongodb-bosh-release
-    - get: mongodb-compilation-bosh-release
     - get: deployment-specs
-
+      passed: [insert-datas-centos]
+      
     - get: versions
-      passed: [init-new-config]
+      passed: [init-new-config]      
 
-    - task: create-bosh-config
-      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-      params:
-        CA_CERT:  ((bosh-server.ca))
-        IP:       ((bosh-server.ip))
-        ALIAS:    ((bosh-server.alias)) 
-        USER:     ((bosh-server.user))
-        PASSWORD: ((bosh-server.password))
+    - get: mongodb-bosh-release
+
+    - *create-bosh-config
     
-    - task: get-config-files-mainrelease
-      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files-mainrelease.yml
-      params:
-        ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
-        SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
-        ENDPOINT_URL:       ((blobstores.release.endpoint-url))
-        BUCKET:             ((blobstores.release.bucket))
-        SIGNATURE_VERSION:  ((blobstores.release.signature-version))
-        SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
-        SSL_CERT:           ((blobstores.release.certificate))
+    - <<: *check-datas
+      task: check-datas-before-version-upgrade
+          
+    - *get-config-files-mainrelease
   
-    - task: upgrade-rs
-      file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/deploy-rs.yml
+    - <<: *deploy
+      task: upgrade-mongo
       params:
-        CA_CERT:              ((bosh-server.ca))
-        IP:                   ((bosh-server.ip))
-        ALIAS:                ((bosh-server.alias)) 
-        USER:                 ((bosh-server.user))
-        PASSWORD:             ((bosh-server.password))
-        RELEASE_NAME:         ((deployment.tests.name))
-        DEPLOYMENT_NAME:      ((deployment.tests.name))
-        DEPLOYMENT_NETWORK:   ((deployment.tests.network))
-        SHIELD_URL:           ((deployment.tests.shield.core))
-        SHIELD_TOKEN:         ((deployment.tests.shield.token))
-        SHIELD_TENANT:        ((deployment.tests.shield.tenant))
-        SHIELD_STORAGE:       ((deployment.tests.shield.storage))
-        MONGO_PORT:           ((deployment.tests.mongod.port))
-        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
-        VM_TYPE:              ((deployment.tests.mongod.vm-type))
-        ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
+        <<: *deploy-params
         STEMCELL:             ((deployment.bootstrap.stemcell))
         STEMCELL_TYPE:        centos
 
-    - task: check-mongo-version
-      file: mongodb-compilation-bosh-release/ci/deployment/version-upgrade/tasks/check-mongo-version.yml    
-      params:
-        USER: ((deployment.tests.mongod.root-username))
-        PORT: ((deployment.tests.mongod.port))
+    - *check-mongo-version
 
+    - <<: *check-datas
+      task: check-datas-after-version-upgrade
+
+ 
 ########################################################################################################
 #                                      Stemcell Upgrade Test 
 ########################################################################################################
@@ -846,57 +700,31 @@ jobs:
 - name: stemcell-upgrade-centos
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [mongo-version-upgrade-centos]
 
-    - get: mongodb-bosh-release
-    - get: mongodb-compilation-bosh-release
     - get: deployment-specs
+      passed: [mongo-version-upgrade-centos]
 
     - get: versions
       passed: [mongo-version-upgrade-centos]
 
-    - task: create-bosh-config
-      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-      params:
-        CA_CERT:  ((bosh-server.ca))
-        IP:       ((bosh-server.ip))
-        ALIAS:    ((bosh-server.alias)) 
-        USER:     ((bosh-server.user))
-        PASSWORD: ((bosh-server.password))
+    - get: mongodb-bosh-release
+
+    - *create-bosh-config
     
-    - task: get-config-files-mainrelease
-      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files-mainrelease.yml
+    - *get-config-files-mainrelease
+      
+    - <<: *deploy
+      task: upgrade-stemcell
       params:
-        ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
-        SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
-        ENDPOINT_URL:       ((blobstores.release.endpoint-url))
-        BUCKET:             ((blobstores.release.bucket))
-        SIGNATURE_VERSION:  ((blobstores.release.signature-version))
-        SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
-        SSL_CERT:           ((blobstores.release.certificate))
-  
-    - task: upgrade-stemcell
-      file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/deploy-rs.yml
-      params:
-        CA_CERT:              ((bosh-server.ca))
-        IP:                   ((bosh-server.ip))
-        ALIAS:                ((bosh-server.alias)) 
-        USER:                 ((bosh-server.user))
-        PASSWORD:             ((bosh-server.password))
-        RELEASE_NAME:         ((deployment.tests.name))
-        DEPLOYMENT_NAME:      ((deployment.tests.name))
-        DEPLOYMENT_NETWORK:   ((deployment.tests.network))
-        SHIELD_URL:           ((deployment.tests.shield.core))
-        SHIELD_TOKEN:         ((deployment.tests.shield.token))
-        SHIELD_TENANT:        ((deployment.tests.shield.tenant))
-        SHIELD_STORAGE:       ((deployment.tests.shield.storage))
-        MONGO_PORT:           ((deployment.tests.mongod.port))
-        PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
-        VM_TYPE:              ((deployment.tests.mongod.vm-type))
-        ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
+        <<: *deploy-params
+        STEMCELL:             latest
         STEMCELL_TYPE:        centos
+
+    - <<: *check-datas
+      task: check-datas-after-stemcell-upgrade
 
 ########################################################################################################
 #                                      Mongodb Acceptance Tests
@@ -905,31 +733,22 @@ jobs:
 - name: acceptance-tests-centos
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [stemcell-upgrade-centos]
 
-    - get: mongodb-compilation-bosh-release
-    - aggregate:
-      - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-        params:
-          CA_CERT:  ((bosh-server.ca))
-          IP:       ((bosh-server.ip))
-          ALIAS:    ((bosh-server.alias))
-          USER:     ((bosh-server.user))
-          PASSWORD: ((bosh-server.password))
+    - *create-bosh-config
 
-    - put: bosh-errand-lock-centos
+    - &errand-lock-centos
+      put: bosh-errand-lock-centos
       params: {claim: errand-centos}
 
-    - task: run-acceptance-tests
-      file: mongodb-compilation-bosh-release/ci/deployment/acceptance-tests/tasks/run-acceptance-tests.yml
+    - <<: *run-acceptance-tests
       params:
-        ALIAS:            ((bosh-server.alias))
-        DEPLOYMENT_NAME:  ((deployment.tests.name))
+        <<: *run-acceptance-tests-params
         STEMCELL_TYPE:    centos
       ensure:
+        &errand-unlock-centos
         put: bosh-errand-lock-centos
         params: {release: bosh-errand-lock-centos}
 
@@ -940,122 +759,71 @@ jobs:
 - name: backup-restore-test-centos
   serial: true
   plan:
-    - get: filled
+    - get: datas
       trigger: true
       passed: [stemcell-upgrade-centos]
 
     - get: deployment-specs
+      passed: [stemcell-upgrade-centos]
+      
+    - *create-bosh-config
 
-    - get: mongodb-compilation-bosh-release
-    - aggregate:
-      - task: create-bosh-config
-        file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-        params:
-          CA_CERT:  ((bosh-server.ca))
-          IP:       ((bosh-server.ip))
-          ALIAS:    ((bosh-server.alias)) 
-          USER:     ((bosh-server.user))
-          PASSWORD: ((bosh-server.password))
-
-    - task: shield-clean-up
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/shield-clean-up.yml
+    - <<: *shield-clean-up
       params:
-        SHIELD_CA:          ((deployment.tests.shield.ca))
-        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
-        SHIELD_CORE:        ((deployment.tests.shield.core))
-        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
-        SHIELD_TARGET:      ((deployment.tests.name))
+        <<: *shield-clean-up-params
         STEMCELL_TYPE:      centos
 
-    - put: bosh-errand-lock-centos
-      params: {claim: errand-centos}
+    - *errand-lock-centos
 
-    - task: run-shield-import-errand
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/run-shield-errand.yml
+    - <<: *run-shield-import-errand
       params:
-        ALIAS:      ((bosh-server.alias))
-        DEPLOYMENT: ((deployment.tests.name))
+        <<: *run-shield-import-errand-params
         STEMCELL_TYPE: centos
       ensure:
-        put: bosh-errand-lock-centos
-        params: {release: bosh-errand-lock-centos}  
+        *errand-unlock-centos
 
-    - task: update-targets-hosts
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/update-targets-hosts.yml
+    - <<: *update-targets-hosts
       params:
-        SHIELD_CA:          ((deployment.tests.shield.ca))
-        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
-        SHIELD_CORE:        ((deployment.tests.shield.core))
-        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
-        SHIELD_TARGET:      ((deployment.tests.name))
-        MONGO_PORT:         ((deployment.tests.mongod.port))
+        <<: *update-targets-hosts-params
         STEMCELL_TYPE:      centos
 
-    - task: check-content-before-backup
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/test-restoration.yml
-      params:
-        USER: ((deployment.tests.mongod.root-username))
-        PORT: ((deployment.tests.mongod.port))   
+    - <<: *check-datas
+      task: check-content-before-backup
 
-    - task: run-backup
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/run-backup.yml
+    - <<: *run-backup
       params:
-        SHIELD_CA:          ((deployment.tests.shield.ca))
-        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
-        SHIELD_CORE:        ((deployment.tests.shield.core))
-        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
+        <<: *run-backup-params
         STEMCELL_TYPE:      centos
 
-    - task: drop-collection
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/drop-collection.yml
+    - <<: *drop-collection
       params:
-        USER:           ((deployment.tests.mongod.root-username))
-        PORT:           ((deployment.tests.mongod.port))
+        <<: *drop-collection-params
         STEMCELL_TYPE:  centos
 
-    - task: run-restore
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/run-restore.yml
+    - <<: *run-restore
       params:
-        SHIELD_CA:          ((deployment.tests.shield.ca))
-        SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
-        SHIELD_CORE:        ((deployment.tests.shield.core))
-        SHIELD_TENANT:      ((deployment.tests.shield.tenant))
-        SHIELD_TARGET:      ((deployment.tests.name))
+        <<: *run-restore-params
         STEMCELL_TYPE:      centos
 
-    - task: test-restoration
-      file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/test-restoration.yml
-      params:
-        USER:           ((deployment.tests.mongod.root-username))
-        PORT:           ((deployment.tests.mongod.port))
-        STEMCELL_TYPE:  centos
+    - <<: *check-datas
+      task: test-restoration
+      attempts: 3
 
 ########################################################################################################
 #                                      Removing the deployment 
 ########################################################################################################            
  
 - name: delete-deployment-centos
-  serial: false
+  serial: true
   plan:
 
-    - get: mongodb-compilation-bosh-release
-    - task: create-bosh-config
-      file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
-      params:
-        CA_CERT:  ((bosh-server.ca))
-        IP:       ((bosh-server.ip))
-        ALIAS:    ((bosh-server.alias)) 
-        USER:     ((bosh-server.user))
-        PASSWORD: ((bosh-server.password))
+    - get: datas
+      trigger: true
+      passed: [backup-restore-test-centos,acceptance-tests-centos]    
 
-    - get: deployed
-      trigger: false
-      passed: [deploy-bootstrap-centos]
+    - *create-bosh-config
 
-    - task: remove-deployment
-      file: mongodb-compilation-bosh-release/ci/deployment/remove-deployment/tasks/remove-deployment.yml      
+    - <<: *remove-deployment
       params:
-        ALIAS:                ((bosh-server.alias)) 
-        RELEASE_NAME:         ((deployment.tests.name))
-        DEPLOYMENT_NAME:      ((deployment.tests.name))
+        <<: *remove-deployment-params
         STEMCELL_TYPE:        centos

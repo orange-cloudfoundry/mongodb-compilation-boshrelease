@@ -29,6 +29,6 @@ do
 	
 	target=$(shield target ${SHIELD_TARGET}-${ip} --json | jq -r '.uuid') 
 	
-    shield update-target ${target} -d mongo_host="rs0/${ips}" -d mongo_port="${MONGO_PORT}"
+    shield update-target ${target} -d mongo_host="rs0/${ips}" -d mongo_port="${MONGO_PORT}" -d mongo_database="$DB"
 
 done

@@ -9,9 +9,8 @@ image_resource:
 
 inputs:
   - name: mongodb-compilation-bosh-release
-  - name: versions
   - name: deployment-specs
+  - name: datas
   
 run:
-  path: mongodb-compilation-bosh-release/ci/deployment/version-upgrade/scripts/check-mongo-version.sh
-
+  path: mongodb-compilation-bosh-release/ci/common/scripts/check-datas.sh
