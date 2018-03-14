@@ -101,6 +101,12 @@ then
                     -o ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/opsfiles/centos.yml"
 fi
 
+if [ "${ENGINE}" == "rocksdb" ]
+then
+    deployment_ops_files_cmd="${deployment_ops_files_cmd} \
+                    -o ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/opsfiles/rocksdb.yml"
+fi
+
 
 bosh -e ${ALIAS} cr --force
 
