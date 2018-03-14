@@ -108,7 +108,7 @@ bosh -e ${ALIAS} ur
 
 bosh -e ${ALIAS} deploy -n -d ${DEPLOYMENT_NAME} \
         ${deployment_var_init} \
-        ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/manifest-rs-nossl.yml \
+        ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/deployment-manifest.yml \
         ${deployment_ops_files_cmd}
 
 popd
