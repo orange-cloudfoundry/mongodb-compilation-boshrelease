@@ -533,12 +533,15 @@ jobs:
         - &run-backup
           task: run-backup
           file: mongodb-compilation-bosh-release/ci/deployment/backup-restore-test/tasks/run-backup.yml
+          attempts: 3
           params: &run-backup-params
             SHIELD_CA:          ((deployment.tests.shield.ca))
             SHIELD_CORE_TOKEN:  ((deployment.tests.shield.token))
             SHIELD_CORE:        ((deployment.tests.shield.core))
             SHIELD_TENANT:      ((deployment.tests.shield.tenant))
             SHIELD_TARGET:      ((deployment.tests.name))
+            DB:                 ((deployment.tests.mongod.database-name))
+            COLLECTION:         ((deployment.tests.mongod.collection-name))
 
         - &drop-collection
           task: drop-collection
