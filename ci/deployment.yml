@@ -978,7 +978,7 @@ jobs:
       passed: [deploy-bootstrap-ubuntu-MongoRocks]  
     - *create-bosh-config
     - *remove-deployment
-    - *deployment-spec-unlock
+    - *deployment-ubuntu-unlock
 
 # centos
 
@@ -1088,4 +1088,4 @@ jobs:
       passed: [deploy-bootstrap-centos-MongoRocks]  
     - *create-bosh-config
     - *remove-deployment
-    - *deployment-spec-unlock
+    - *deployment-centos-unlock
