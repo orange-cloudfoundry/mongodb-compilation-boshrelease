@@ -190,7 +190,13 @@ jobs:
     - <<: *upload-config-files
       params:
         <<: *upload-config-files-params
-        MONGODB_VERSION:    "" 
+        MONGODB_VERSION:    ""
+
+- name: all-done
+  plan:
+    - get: datas 
+      trigger: true
+      passed: [delete-deployment-ubuntu-WiredTiger,delete-deployment-centos-WiredTiger,delete-deployment-ubuntu-MongoRocks,delete-deployment-centos-MongoRocks]       
 
 ##############################################################################################################
 ##############################################################################################################
@@ -765,20 +771,22 @@ jobs:
       trigger: true
       passed: [stemcell-upgrade-centos-WiredTiger]
 
-    - *create-bosh-config
+    - &acceptance-tests-centos-plan
+      do:  
+        - *create-bosh-config
 
-    - &errand-lock-centos
-      put: bosh-errand-lock-centos
-      params: {claim: errand-centos}
+        - &errand-lock-centos
+          put: bosh-errand-lock-centos
+          params: {claim: errand-centos}
 
-    - <<: *run-acceptance-tests
-      params:
-        <<: *run-acceptance-tests-params
-        STEMCELL_TYPE:    centos
-      ensure:
-        &errand-unlock-centos
-        put: bosh-errand-lock-centos
-        params: {release: bosh-errand-lock-centos}
+        - <<: *run-acceptance-tests
+          params:
+            <<: *run-acceptance-tests-params
+            STEMCELL_TYPE:    centos
+          ensure:
+            &errand-unlock-centos
+            put: bosh-errand-lock-centos
+            params: {release: bosh-errand-lock-centos}
 
 ########################################################################################################
 #                                      Mongodb Shield Test 
@@ -857,7 +865,8 @@ jobs:
 
     - *create-bosh-config
 
-    - <<: *remove-deployment
+    - &remove-deployment-centos
+      <<: *remove-deployment
       params:
         <<: *remove-deployment-params
         STEMCELL_TYPE:        centos
@@ -1066,7 +1075,7 @@ jobs:
     - get: datas
       trigger: true
       passed: [stemcell-upgrade-centos-MongoRocks]
-    - *acceptance-tests-plan
+    - *acceptance-tests-centos-plan
 
 - <<: *backup-restore-test
   name: backup-restore-test-centos-MongoRocks
@@ -1087,5 +1096,5 @@ jobs:
     - get: deployment-centos-lock
       passed: [deploy-bootstrap-centos-MongoRocks]  
     - *create-bosh-config
-    - *remove-deployment
+    - *remove-deployment-centos
     - *deployment-centos-unlock
