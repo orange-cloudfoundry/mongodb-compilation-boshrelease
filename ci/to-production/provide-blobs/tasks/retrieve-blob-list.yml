@@ -1,0 +1,19 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: jraverdyorange/yml-tools
+    tag: latest
+
+inputs:
+  - name: mongodb-compilation-bosh-release
+  - name: mongodb-bosh-release-patched
+
+outputs:
+  - name: blobs-list
+
+run:
+  path: mongodb-compilation-bosh-release/ci/to-production/provide-blobs/scripts/retrieve-blob-list.sh
+
