@@ -41,7 +41,7 @@ instance_groups:
     release: ((mongodb-release))
     properties: 
       node_role: rs
-      require_ssl: 0
+      require_ssl: 1
       replication:
         enable: 1
         key: ((mongo_keyfile_content))
@@ -49,7 +49,6 @@ instance_groups:
       root_password: ((mongo_root_password))
       admin_password: ((mongo_admin_password))
       server_certificate: 
-        ca: ((mongo_ca.ca))
         private_key: ((mongo_ca.private_key))
         certificate: ((mongo_ca.certificate))
   
@@ -122,16 +121,11 @@ variables:
     type: password
     options: 
       length: 200  
-  - name: /internalCA
+  - name: mongo_ca
     type: certificate
     options:
       is_ca: true
       common_name: internalCA
-  - name: mongo_ca
-    type: certificate
-    options:
-      ca: /internalCA
-      common_name: mongo-cert
 #      extended_key_usage:
 #      - server_auth
 #      - client_auth
