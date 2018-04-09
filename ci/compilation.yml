@@ -4,6 +4,17 @@ resource_types:
     type: docker-image
     source:
       repository: swce/keyval-resource
+
+  - name: mongo-src
+    type: docker-image
+    source:
+      repository: jraverdyorange/concourse-mongo-check-resource
+
+  - name: rocks-src
+    type: docker-image
+    source:
+      repository: jraverdyorange/concourse-rocks-check-resource
+    
       
 resources:
 
@@ -36,7 +47,14 @@ resources:
       username:         ((repositories.mongodb-compilation.username))
       password:         ((repositories.mongodb-compilation.password))
       git_user:         "((repositories.mongodb-compilation.git_user)) <((repositories.mongodb-compilation.email))>"
-    
+
+  - name: mongodb-src
+    type: mongo-src
+    source:
+      branch: "3.4"
+
+  - name: rocksdb-src
+    type: rocks-src
 
   - name: versions
     type: keyval
@@ -60,19 +78,6 @@ resources:
       password: ((repositories.locks-pool.password))    
 
 jobs:
-- name: check-versions
-  serial: true
-  plan:
-    - aggregate:
-      - get: mongodb-compilation-bosh-release
-      - get: mongodb-version
-      - get: rocksdb-version
-
-    - task: check-versions
-      file: mongodb-compilation-bosh-release/ci/compilation/check-versions/tasks/check-versions.yml
-
-    - put: versions
-      params: {file: versions/keyval.properties}
 
 ##############################################################################################################
 ##############################################################################################################
@@ -83,6 +88,17 @@ jobs:
 - name: upload-src
   serial: true
   plan:
+
+    - aggregate:
+      - get: mongodb-src
+        trigger: true
+      - get: rocksdb-src
+
+    - task: fill-versions-keyval
+      file: mongodb-compilation-bosh-release/ci/set-versions/tasks/fill-versions.yml
+
+    - put: versions
+      params: {file: output/keyval.properties}  
     
     - get: mongodb-compilation-bosh-release
     - task: create-bosh-config
@@ -93,14 +109,7 @@ jobs:
         ALIAS: ((bosh-server.alias)) 
         USER: ((bosh-server.user))
         PASSWORD: ((bosh-server.password))
-  
-    - get: versions
-      trigger: true
-      passed: [check-versions]
-
-    - task: download-src
-      file: mongodb-compilation-bosh-release/ci/compilation/upload-src/tasks/download-src.yml
-
+ 
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
       params:
@@ -136,8 +145,6 @@ jobs:
 
     - put: uploaded
       params: { file: uploaded/keyval.properties }
-
-  
 
 ##############################################################################################################
 ##############################################################################################################
