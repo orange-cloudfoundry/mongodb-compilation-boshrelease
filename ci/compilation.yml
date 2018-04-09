@@ -96,7 +96,7 @@ jobs:
       - get: rocksdb-src
 
     - task: fill-versions-keyval
-      file: mongodb-compilation-bosh-release/ci/set-versions/tasks/fill-versions.yml
+      file: mongodb-compilation-bosh-release/ci/compilation/set-versions/tasks/fill-versions.yml
 
     - put: versions
       params: {file: output/keyval.properties}  
