@@ -55,6 +55,9 @@ resources:
 
   - name: rocksdb-src
     type: rocks-src
+    source:
+      username: ((repositories.mongodb-compilation.username))
+      password: ((repositories.mongodb-compilation.password))
 
   - name: versions
     type: keyval
@@ -90,17 +93,10 @@ jobs:
   plan:
 
     - aggregate:
-      - get: mongodb-compilation-bosh-release      
+      - get: mongodb-compilation-bosh-release
       - get: mongodb-src
         trigger: true
-      - get: rocksdb-src
-
-    - task: fill-versions-keyval
-      file: mongodb-compilation-bosh-release/ci/compilation/set-versions/tasks/fill-versions.yml
-
-    - put: versions
-      params: { file: output/keyval.properties }  
-    
+      - get: rocksdb-src        
 
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
@@ -109,8 +105,14 @@ jobs:
         IP: ((bosh-server.ip))
         ALIAS: ((bosh-server.alias)) 
         USER: ((bosh-server.user))
-        PASSWORD: ((bosh-server.password))
- 
+        PASSWORD: ((bosh-server.password))         
+
+    - task: fill-versions-keyval
+      file: mongodb-compilation-bosh-release/ci/compilation/set-versions/tasks/fill-versions.yml
+
+    - put: versions
+      params: { file: output/keyval.properties }  
+
     - task: get-config-files
       file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files.yml
       params:
