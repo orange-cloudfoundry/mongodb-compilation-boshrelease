@@ -90,6 +90,7 @@ jobs:
   plan:
 
     - aggregate:
+      - get: mongodb-compilation-bosh-release      
       - get: mongodb-src
         trigger: true
       - get: rocksdb-src
@@ -100,7 +101,7 @@ jobs:
     - put: versions
       params: {file: output/keyval.properties}  
     
-    - get: mongodb-compilation-bosh-release
+
     - task: create-bosh-config
       file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
       params:
