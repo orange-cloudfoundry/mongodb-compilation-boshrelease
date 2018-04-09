@@ -13,7 +13,7 @@ inputs:
   - name: rocksdb-src
 
 outputs:
-  - name: versions
+  - name: output
   
 run:
   path: mongodb-compilation-bosh-release/ci/compilation/set-versions/scripts/fill-versions.sh

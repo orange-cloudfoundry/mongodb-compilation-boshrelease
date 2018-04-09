@@ -99,7 +99,7 @@ jobs:
       file: mongodb-compilation-bosh-release/ci/compilation/set-versions/tasks/fill-versions.yml
 
     - put: versions
-      params: {file: output/keyval.properties}  
+      params: { file: output/keyval.properties }  
     
 
     - task: create-bosh-config
