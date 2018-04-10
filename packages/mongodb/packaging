@@ -36,7 +36,8 @@ do
   CC=/var/vcap/packages/gcc/bin/gcc CXX=/var/vcap/packages/gcc/bin/g++ EXTRA_CFLAGS=-fPIC \
   CFLAGS="-I/var/vcap/packages/compressors/include -I/var/vcap/packages/gcc/include -I/var/vcap/packages/openssl/include/openssl" \
   LDFLAGS="-L/var/vcap/packages/compressors/lib -L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 -L/var/vcap/packages/openssl/lib -lsnappy -llz4 -lzstd -lssl -lcrypto" \
-  EXTRA_CXXFLAGS=-fPIC DISABLE_JEMALLOC=1 PORTABLE=1 make -j $cpun_ static_lib
+  # EXTRA_CXXFLAGS=-fPIC DISABLE_JEMALLOC=1 PORTABLE=1 make -j $cpun_ static_lib \
+  USE_RTTI=1 EXTRA_CXXFLAGS=-fPIC make -j $cpun_ static_lib
   INSTALL_PATH=$BOSH_INSTALL_TARGET make install
   cd ..
 done
@@ -107,7 +108,7 @@ done
   export _mongo_version=`echo $i|sed -e "s/.*[^[0-9]]*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/"`
 
   scons -j $cpun_ --ssl --prefix=$BOSH_INSTALL_TARGET   \
---disable-warnings-as-errors \
+  --disable-warnings-as-errors \
   MONGO_VERSION=$_mongo_version \
   core install
 
@@ -131,3 +132,5 @@ do
   cp -rp bin/* $BOSH_INSTALL_TARGET/bin
   cd ..
 done
+
+
