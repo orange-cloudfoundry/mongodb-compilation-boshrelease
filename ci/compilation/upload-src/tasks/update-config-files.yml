@@ -9,7 +9,8 @@ image_resource:
 
 inputs:
   - name: bosh-director-config
-  - name: downloaded-src
+  - name: mongodb-src
+  - name: rocksdb-src  
   - name: mongodb-compilation-bosh-release
   - name: to-upload-pre
   
