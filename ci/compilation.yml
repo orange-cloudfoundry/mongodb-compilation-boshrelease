@@ -206,11 +206,10 @@ jobs:
     - *create-bosh-config
       
 
-  #  - *get-config-files
-  #    params:
-  #      <<: *get-config-files-params
-  #        SIGNATURE_VERSION: ""
-  #        MONGODB_VERSION:  ""
+    - <<: *get-config-files
+      params:
+        <<: *get-config-files-params
+        MONGODB_VERSION:  ""
 
     - &make-archive
       task: make-archive
@@ -223,16 +222,6 @@ jobs:
     - put: upload-lock
       params: {claim: upload-s3}
 
-    - <<: *get-config-files
-      params:
-        <<: *get-config-files-params
-        MONGODB_VERSION:    "" 
-      on_failure:
-        put: upload-lock
-        params: {release: upload-lock}
-      on_abort:
-        put: upload-lock
-        params: {release: upload-lock}
     
     - &patch-config-files
       task: patch-config-files
@@ -324,11 +313,10 @@ jobs:
 
     - *create-bosh-config
 
-    #- *get-config-files
-    #  params:
-    #    <<: *get-config-files-params
-    #      SIGNATURE_VERSION: ""
-    #      MONGODB_VERSION:  ""
+    - <<: *get-config-files
+      params:
+        <<: *get-config-files-params
+        MONGODB_VERSION:  ""
 
     - task: make-archive
       file: mongodb-compilation-bosh-release/ci/compilation/create-archive/tasks/make-archive.yml
@@ -340,17 +328,6 @@ jobs:
 
     - put: upload-lock
       params: {claim: upload-s3}    
-
-    - <<: *get-config-files
-      params:
-        <<: *get-config-files-params
-        MONGODB_VERSION: ""
-      on_failure:
-        put: upload-lock
-        params: {release: upload-lock}
-      on_abort:
-        put: upload-lock
-        params: {release: upload-lock}
 
     - <<: *patch-config-files
       params:
