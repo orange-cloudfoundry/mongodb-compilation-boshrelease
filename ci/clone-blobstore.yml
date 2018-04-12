@@ -1,10 +1,4 @@
 ---
-resource_types:
-  - name: keyval
-    type: docker-image
-    source:
-      repository: swce/keyval-resource
-      
 resources:
 
   - name: mongodb-compilation-bosh-release
