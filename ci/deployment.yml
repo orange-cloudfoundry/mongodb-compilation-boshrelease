@@ -324,6 +324,9 @@ jobs:
         STEMCELL:             ((deployment.bootstrap.stemcell))
         STEMCELL_TYPE:        ""
         ENGINE:               "wiredtiger"
+        # for ssl deployment
+        REQUIRE_SSL:          ((deployment.tests.mongod.require_ssl))
+        CA_NAME:              ((deployment.tests.mongod.ca_name))
 
 ########################################################################################################
 #                                      Insert some datas
@@ -389,6 +392,8 @@ jobs:
           params:
             USER: ((deployment.tests.mongod.root-username))
             PORT: ((deployment.tests.mongod.port))
+            # for ssl
+            CA_CERT: ((deployment.tests.mongod.ca_cert))
 
         - &insert-collection
           task: insert-collection
@@ -398,6 +403,8 @@ jobs:
             PORT:       ((deployment.tests.mongod.port))
             DB:         ((deployment.tests.mongod.database-name))
             COLLECTION: ((deployment.tests.mongod.collection-name))
+            # for ssl
+            CA_CERT: ((deployment.tests.mongod.ca_cert))
 
         - &list-inserted-values
           put: datas

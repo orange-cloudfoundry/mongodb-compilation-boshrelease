@@ -107,6 +107,11 @@ then
                     -o ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/opsfiles/rocksdb.yml"
 fi
 
+if [ "${REQUIRE_SSL}" == "true" ]
+then
+    deployment_var_init="${deployment_var_init} \
+                    -v ca_name=${CA_NAME}"
+fi    
 
 bosh -e ${ALIAS} cr --force
 
