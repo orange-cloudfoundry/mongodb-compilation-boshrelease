@@ -393,6 +393,7 @@ jobs:
             USER: ((deployment.tests.mongod.root-username))
             PORT: ((deployment.tests.mongod.port))
             # for ssl
+            REQUIRE_SSL: ((deployment.tests.mongod.require_ssl))            
             CA_CERT: ((deployment.tests.mongod.ca_cert))
 
         - &insert-collection
@@ -404,6 +405,7 @@ jobs:
             DB:         ((deployment.tests.mongod.database-name))
             COLLECTION: ((deployment.tests.mongod.collection-name))
             # for ssl
+            REQUIRE_SSL: ((deployment.tests.mongod.require_ssl))
             CA_CERT: ((deployment.tests.mongod.ca_cert))
 
         - &list-inserted-values

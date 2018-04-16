@@ -219,8 +219,21 @@ jobs:
         DEPLOYMENT_NAME: ((deployment.compilation.name))
         INSTANCE_GROUP:  ((deployment.compilation.instance-group))
 
-    - put: upload-lock
+    - &upload-lock
+      put: upload-lock
       params: {claim: upload-s3}
+
+
+    # This second lanch of this get task is needed by the patching task below !!!
+    - <<: *get-config-files
+      params:
+        <<: *get-config-files-params
+        MONGODB_VERSION:  ""
+      on_failure: &upload-unlock
+        put: upload-lock
+        params: {release: upload-lock}
+      on_abort:
+        *upload-unlock        
 
     
     - &patch-config-files
@@ -244,8 +257,7 @@ jobs:
         SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
         SSL_CERT:           ((blobstores.compilation.certificate))
       ensure:
-        put: upload-lock
-        params: {release: upload-lock}
+        *upload-unlock
 
     - &delete-deployment
       task: delete-deployment
@@ -318,16 +330,21 @@ jobs:
         <<: *get-config-files-params
         MONGODB_VERSION:  ""
 
-    - task: make-archive
-      file: mongodb-compilation-bosh-release/ci/compilation/create-archive/tasks/make-archive.yml
+    - <<: *make-archive
       params:
-        ALIAS:           ((bosh-server.alias))
-        DEPLOYMENT_NAME: ((deployment.compilation.name))
-        INSTANCE_GROUP:  ((deployment.compilation.instance-group))
+        <<: *make-archive-params
         STEMCELL_TYPE:   centos
 
-    - put: upload-lock
-      params: {claim: upload-s3}    
+    - *upload-lock
+
+    - <<: *get-config-files
+      params:
+        <<: *get-config-files-params
+        MONGODB_VERSION:  ""
+      on_failure: 
+        *upload-unlock
+      on_abort:
+        *upload-unlock            
 
     - <<: *patch-config-files
       params:
