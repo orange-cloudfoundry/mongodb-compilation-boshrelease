@@ -127,7 +127,7 @@ do
   source /var/vcap/packages/golang-1.8-linux/bosh/compile.env
   export CGO_LDFLAGS="-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 -L/var/vcap/packages/openssl/lib"
   ./set_gopath.sh
-  ./build.sh
+  ./build.sh ssl
   [ ! -d $BOSH_INSTALL_TARGET/bin ] && mkdir -p $BOSH_INSTALL_TARGET/bin
   cp -rp bin/* $BOSH_INSTALL_TARGET/bin
   cd ..
