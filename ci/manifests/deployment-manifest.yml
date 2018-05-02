@@ -85,6 +85,8 @@ instance_groups:
       require-shield-core: false
       core:
         ca: ((/bosh-jra/shield-test/shield-ca.certificate))
+      env:
+        libs: [/var/vcap/packages/mongodb/lib]
     consumes:
       shield: { from: shield, deployment: shield-test }
       
