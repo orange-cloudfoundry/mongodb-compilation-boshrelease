@@ -46,7 +46,7 @@ resources:
   - name: mongodb-src
     type: mongo-src
     source:
-      branch: "3.4"
+      branch: "3.6"
 
   - name: rocksdb-src
     type: rocks-src
