@@ -1,9 +1,11 @@
-set -e # exit immediately if a simple command exits with a non-zero status
-set -u # report the usage of uninitialized variables
+#set -e # exit immediately if a simple command exits with a non-zero status
+#set -u # report the usage of uninitialized variables
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
 # $BOSH_INSTALL_TARGET - where you copy/install files to be included in package
 #/sbin/swapoff -a
+
+touch /tmp/continue
 
 export HOME=/var/vcap
 
@@ -111,6 +113,11 @@ done
   --disable-warnings-as-errors \
   MONGO_VERSION=$_mongo_version \
   core install
+
+while [ -f /tmp/continue ]
+do
+  sleep 600
+done
 
 # striping binaries
   strip -sg $BOSH_INSTALL_TARGET/bin/*
