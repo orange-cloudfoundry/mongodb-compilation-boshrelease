@@ -50,6 +50,18 @@ resources:
       password: ((repositories.mongodb-compilation.password))
       git_user: "((repositories.mongodb-compilation.git_user)) <((repositories.mongodb-compilation.email))>"
 
+  - name: passed-version
+    type: semver
+    source: 
+      initial_version:  1.0.0
+      driver:           git
+      uri:              https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
+      branch:           ((repositories.mongodb-compilation.branch))
+      file:             test_passed_version
+      username:         ((repositories.mongodb-compilation.username))
+      password:         ((repositories.mongodb-compilation.password))
+      git_user:         "((repositories.mongodb-compilation.git_user)) <((repositories.mongodb-compilation.email))>"
+
   - name: versions
     type: keyval
 
@@ -58,6 +70,9 @@ resources:
 
   - name: datas
     type: keyval
+
+  - name: all-tests-passed
+    type: keyval  
 
   - &bosh-lock
     name: bosh-errand-lock-ubuntu
@@ -178,6 +193,25 @@ jobs:
     - put: versions
       params: {file: versions/keyval.properties}
 
+#    - put: all-tests-passed-ubuntu-WiredTiger
+#      resource: all-tests-passed
+#      params: {file: versions/keyval.properties}
+#
+#    - put: all-tests-passed-centos-WiredTiger
+#      resource: all-tests-passed
+#      params: {file: versions/keyval.properties}
+#
+#    - put: all-tests-passed-ubuntu-MongoRocks
+#      resource: all-tests-passed
+#      params: {file: versions/keyval.properties}
+#      
+#    - put: all-tests-passed-centos-MongoRocks
+#      resource: all-tests-passed
+#      params: {file: versions/keyval.properties}
+
+    - put: all-tests-passed
+      params: {file: versions/keyval.properties}
+
     - <<: *get-config-files
       params:
         <<: *get-config-files-params
@@ -190,11 +224,40 @@ jobs:
         <<: *upload-config-files-params
         MONGODB_VERSION:    ""
 
-- name: all-done
+########################################################################################################
+#                                      BUMP VERSION (if everything is ok)                             #
+########################################################################################################
+
+- name: bump-versions
+  serial: true
   plan:
-    - get: datas 
-      trigger: true
-      passed: [delete-deployment-ubuntu-WiredTiger,delete-deployment-centos-WiredTiger,delete-deployment-ubuntu-MongoRocks,delete-deployment-centos-MongoRocks]       
+    #- aggregate:
+    - get: all-tests-passed-ubuntu-WiredTiger
+      resource: all-tests-passed
+      passed: [delete-deployment-ubuntu-WiredTiger]
+
+    - get: all-tests-passed-centos-WiredTiger
+      resource: all-tests-passed
+      passed: [delete-deployment-centos-WiredTiger]
+
+    - get: all-tests-passed-ubuntu-MongoRocks
+      resource: all-tests-passed
+      passed: [delete-deployment-ubuntu-MongoRocks]
+
+    - get: all-tests-passed-centos-MongoRocks
+      resource: all-tests-passed
+      passed: [delete-deployment-centos-MongoRocks]
+
+    - get: versions
+      trigger: true     
+      passed: [init-new-config]         
+
+    - *create-bosh-config
+
+    - task: propagate-versions
+      file: mongodb-compilation-bosh-release/ci/compilation/bump-versions/tasks/propagate-versions.yml
+    - put: passed-version
+      params: { file: new_versions/mongodb }
 
 ##############################################################################################################
 ##############################################################################################################
@@ -586,6 +649,10 @@ jobs:
     - get: deployment-ubuntu-lock
       passed: [deploy-bootstrap-ubuntu-WiredTiger]
 
+    - &all-tests-passed-in
+      get: all-tests-passed 
+      passed: [init-new-config]
+
     - *create-bosh-config
 
     - &remove-deployment
@@ -596,9 +663,14 @@ jobs:
         RELEASE_NAME:         ((deployment.tests.name))
         DEPLOYMENT_NAME:      ((deployment.tests.name))
 
+    - &all-tests-passed-out
+      put: all-tests-passed
+      params: {file: all-tests-passed/keyval.properties} 
+
     - &deployment-ubuntu-unlock
       put: deployment-ubuntu-lock
       params: {release: deployment-ubuntu-lock}
+ 
 
 ##############################################################################################################
 ##############################################################################################################
@@ -858,6 +930,8 @@ jobs:
     - get: deployment-centos-lock
       passed: [deploy-bootstrap-centos-WiredTiger]
 
+    - *all-tests-passed-in
+      
     - *create-bosh-config
 
     - &remove-deployment-centos
@@ -865,6 +939,8 @@ jobs:
       params:
         <<: *remove-deployment-params
         STEMCELL_TYPE:        centos
+
+    - *all-tests-passed-out   
 
     - &deployment-centos-unlock
       put: deployment-centos-lock
@@ -980,8 +1056,10 @@ jobs:
       passed: [backup-restore-test-ubuntu-MongoRocks,acceptance-tests-ubuntu-MongoRocks]
     - get: deployment-ubuntu-lock
       passed: [deploy-bootstrap-ubuntu-MongoRocks]
+    - *all-tests-passed-in      
     - *create-bosh-config
     - *remove-deployment
+    - *all-tests-passed-out     
     - *deployment-ubuntu-unlock
 
 # centos
@@ -1091,5 +1169,7 @@ jobs:
     - get: deployment-centos-lock
       passed: [deploy-bootstrap-centos-MongoRocks]
     - *create-bosh-config
+    - *all-tests-passed-in
     - *remove-deployment-centos
+    - *all-tests-passed-out  
     - *deployment-centos-unlock

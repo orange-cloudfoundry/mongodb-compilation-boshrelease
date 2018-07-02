@@ -1,0 +1,124 @@
+---
+resource_types:
+  - name: keyval
+    type: docker-image
+    source:
+      repository: swce/keyval-resource
+
+  - name: email
+    type: docker-image
+    source:
+      repository: pcfseceng/email-resource      
+      
+resources:
+
+  - name: mongodb-compilation-bosh-release
+    type: git
+    source:
+      uri: https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
+      branch: ((repositories.mongodb-compilation.branch))
+
+  - name: mongodb-bosh-release
+    type: git
+    source:
+      uri:    ((repositories.mongodb.uri))
+      branch: ((repositories.mongodb.branch))    
+
+  - name: mongodb-version
+    type: semver
+    source: 
+      initial_version:  1.0.0
+      driver:           git
+      uri:              https://github.com/orange-cloudfoundry/mongodb-compilation-boshrelease.git
+      branch:           ((repositories.mongodb-compilation.branch))
+      file:             test_passed_version
+      username:         ((repositories.mongodb-compilation.username))
+      password:         ((repositories.mongodb-compilation.password))
+      git_user:         "((repositories.mongodb-compilation.git_user)) <((repositories.mongodb-compilation.email))>"
+
+  - name: versions
+    type: keyval
+
+  - name: send-email
+    type: email
+    source:
+      smtp:
+        host: ((communication.mail.host))
+        port: ((communication.mail.port)) # this must be a string
+        anonymous: true
+        skip_ssl_validation: true
+      from: concourse@dbsp.dw
+      to: ((communication.mail.to))
+
+
+jobs:
+- name: check-versions
+  serial: true
+  plan:
+    - aggregate:
+      - get: mongodb-compilation-bosh-release
+      - get: mongodb-version
+        trigger: true
+ 
+    - task: set-version
+      file: mongodb-compilation-bosh-release/ci/to-production/set-versions/tasks/set-versions.yml
+
+    - put: versions
+      params: {file: versions/keyval.properties}
+
+- &send-blobs-to-preprod
+  name: send-blobs-to-preprod
+  serial: true
+  plan:
+    - get: mongodb-bosh-release
+    - get: versions
+      trigger: true
+      passed: [check-versions]
+
+    - &create-bosh-config
+      do:
+        - get: mongodb-compilation-bosh-release 
+        - task: create-bosh-config
+          file: mongodb-compilation-bosh-release/ci/common/tasks/create-bosh-config.yml
+          params:
+            CA_CERT:  ((bosh-server.ca))
+            IP:       ((bosh-server.ip))
+            ALIAS:    ((bosh-server.alias)) 
+            USER:     ((bosh-server.user))
+            PASSWORD: ((bosh-server.password))  
+
+    - &get-config-files-mainrelease
+      task: get-config-files-mainrelease
+      file: mongodb-compilation-bosh-release/ci/common/tasks/get-config-files-mainrelease.yml
+      params:
+        ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.release.endpoint-url))
+        BUCKET:             ((blobstores.release.bucket))
+        SIGNATURE_VERSION:  ((blobstores.release.signature-version))
+        SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.release.certificate))
+
+    - &provide-blobs
+      task: retrieve-blob-list
+      file: mongodb-compilation-bosh-release/ci/to-production/provide-blobs/tasks/retrieve-blob-list.yml
+
+    - &copy-blobs-to-http-server
+      task: copy-blobs-to-http-server
+      file: mongodb-compilation-bosh-release/ci/to-production/provide-blobs/tasks/copy-blobs-to-http-server.yml
+      params:
+        ACCESS_KEY_ID:      ((blobstores.release.access_key_id))
+        SECRET_ACCESS_KEY:  ((blobstores.release.secret_access_key))
+        ENDPOINT_URL:       ((blobstores.release.endpoint-url))
+        BUCKET:             ((blobstores.release.bucket))
+        SIGNATURE_VERSION:  ((blobstores.release.signature-version))
+        SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
+        SSL_CERT:           ((blobstores.release.certificate))
+        HTTP_BUCKET:        ((blobstores.release.http-bucket))
+        HTTP_PORT:          ((communication.http.port))
+        HTTP_IP:            ((communication.http.ip))
+      on_success:  
+        put: send-email
+        params:
+          subject_text: "[MongoDB] New blobs available"
+          body: output/mail.body
