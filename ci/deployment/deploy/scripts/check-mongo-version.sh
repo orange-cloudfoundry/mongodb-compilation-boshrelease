@@ -20,10 +20,26 @@ fi
 CI_IP=`echo ${ips} \
 	| sed -e "s/,/:${PORT},/g" -e "s/$/:${PORT}/"`
 
-# get mongodb server version
+# testing if we are using ssl
+mongo_cmd="mongo \"mongodb://${CI_IP}/?replicaSet=rs0\" -u ${USER} -p \"${password}\" --authenticationDatabase admin"
 
-installed_version=$(mongo "mongodb://${CI_IP}/?replicaSet=rs0" -u ${USER} -p "${password}" --authenticationDatabase admin \
-  --eval "db.version()"|tail -1)
+if [ "${REQUIRE_SSL}" == "true" ]
+then
+    if [ "${CA_CERT}" != "" ] 
+    then 
+    	cat > /tmp/CA.crt <<-EOF
+			${CA_CERT}
+		EOF
+	else
+		echo "SSL certificate not set" && exit 666
+	fi  
+	mongo_cmd="${mongo_cmd} --ssl --sslCAFile /tmp/CA.crt"
+fi
+
+# get mongodb server version
+mongo_cmd="${mongo_cmd} --eval \"db.version()\""
+
+installed_version=$(eval ${mongo_cmd} |tail -1)
 
 needed_version=$(grep "^mongodb" ${ROOT_FOLDER}/versions/keyval.properties|cut -d"=" -f2)
 
