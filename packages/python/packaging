@@ -13,6 +13,6 @@ do
   ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]|cut -d" " -f6 |cut -d"/" -f1`
   tar xzf $i
   cd $ext_dir
-  ./configure --prefix=$BOSH_INSTALL_TARGET
+  ./configure --prefix=$BOSH_INSTALL_TARGET --with-ensurepip=install
   make && make install
 done
