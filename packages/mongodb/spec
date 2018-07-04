@@ -15,4 +15,5 @@ files:
 -  mongodb/mongo-tools-*.tar.gz
 -  mongodb/rocksdb-*.tar.gz
 -  mongodb/mongo-rocks-*.tar.gz
+-  mongodb/mongodb-python-deps-*.tar.gz
 
