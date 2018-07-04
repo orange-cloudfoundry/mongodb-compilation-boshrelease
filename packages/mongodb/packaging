@@ -50,6 +50,15 @@ do
   tar xf $i
 done
 
+
+# extracting and installing mongodb python dependencies
+for i in `find mongodb/ -type f -name 'mongodb-python-deps-*.tar.gz' -print`
+do
+  mongodb_python_deps_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+done
+
+
 for i in `find mongodb/ -type f -name 'mongodb-src*.tar.gz' -print`
 do 
   ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`

@@ -8,4 +8,8 @@ files:
 -  gcc/mpc-*.tar.gz
 -  gcc/libpcap-*.tar.gz
 -  gcc/gcc-*.tar.gz
+-  gcc/libffi-*.tar.gz
+-  gcc/automake-*.tar.gz
+-  gcc/autoconf-*.tar.gz
+-  gcc/libtool-*.tar.gz
 

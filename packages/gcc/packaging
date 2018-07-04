@@ -1,9 +1,12 @@
-set -e # exit immediately if a simple command exits with a non-zero status
-set -u # report the usage of uninitialized variables
+#set -e # exit immediately if a simple command exits with a non-zero status
+#set -u # report the usage of uninitialized variables
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
 # $BOSH_INSTALL_TARGET - where you copy/install files to be included in package
 #/sbin/swapoff -a
+
+
+touch /tmp/continue
 
 export HOME=/var/vcap
 
@@ -81,23 +84,19 @@ do
   --with-gmp=$BOSH_INSTALL_TARGET --with-mpfr=$BOSH_INSTALL_TARGET \
   --with-mpc=$BOSH_INSTALL_TARGET --disable-multilib
 
-  #LDFLAGS="-L$BOSH_INSTALL_TARGET/lib" CPPFLAGS="-I$BOSH_INSTALL_TARGET/include" ../configure -v \
-  #--prefix=$BOSH_INSTALL_TARGET --enable-shared --enable-linker-build-id --without-included-gettext #--enable-threads=posix  \
-  #--enable-nls --with-sysroot=/ --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes \
-  #--enable-gnu-unique-object --disable-libmudflap --enable-plugin --with-system-zlib --disable-browser-plugin \
-  #--enable-gtk-cairo --with-arch-directory=amd64 --enable-objc-gc --with-tune=generic \
-  #--enable-checking=release --build=x86_64-linux-gnu \
-  #--with-gmp=$BOSH_INSTALL_TARGET --with-mpfr=$BOSH_INSTALL_TARGET \
-  #--with-mpc=$BOSH_INSTALL_TARGET --disable-multilib
-
   make -j $cpun_ 
   make install
   cd ../..
 done
 
-# adding libpcap 
+# adding automake, autoconf and libtools (needed by libffi)
 
-for i in `find gcc/  -type f -name 'libpcap*.tar.*' -print`
+while [ -f /tmp/continue ]
+do
+  sleep 6000
+done
+
+for i in `find gcc/  -type f -name 'libpcap*.tar.*' -o -name 'libffi-*.tar.*' -print`
 do
   ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
@@ -108,3 +107,19 @@ do
   make && make install
   cd ../..
 done
+
+# adding libpcap and libffi (needed by python cryptography module)
+
+for i in `find gcc/  -type f -name 'libpcap*.tar.*' -o -name 'libffi-*.tar.*' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  mkdir build
+  cd build
+  ../configure --prefix=$BOSH_INSTALL_TARGET CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
+  make && make install
+  cd ../..
+done
+
+
