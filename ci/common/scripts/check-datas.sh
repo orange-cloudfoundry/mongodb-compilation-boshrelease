@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -ex
+set -e
 
 export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 

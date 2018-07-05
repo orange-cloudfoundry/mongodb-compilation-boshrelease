@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -ex
+set -e
 
 export ROOT_FOLDER=${PWD}
 
@@ -68,7 +68,7 @@ bosh -e ${ALIAS} -n upload-blobs
 # the go vendor package case ...
 
 # which version of golang is used on git ?
-go_git_fingerprint=$(cat packages/golang-1.8-linux/spec.lock \
+go_git_fingerprint=$(cat packages/golang-${GOLANG_VERSION}-linux/spec.lock \
 					| sed -e s/:[[:space:]]*/:/g 			 \
 					| grep fingerprint 						 \
 					| cut -d":" -f2 )
@@ -84,7 +84,7 @@ git checkout ${fingerprint_tag}
 cd -
 
 dest_id=$(python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < \
-	.final_builds/packages/golang-1.8-linux/index.yml \
+	.final_builds/packages/golang-${GOLANG_VERSION}-linux/index.yml \
 	| jq -r '.builds|map(select(.version|contains("'${go_git_fingerprint}'")))[0].blobstore_id')
 
 [ -d .final_builds/packages/golang* ] && rm -rf .final_builds/packages/golang*
@@ -92,11 +92,11 @@ dest_id=$(python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys
 
 # reuploading golang
 
-bosh vendor-package golang-1.8-linux ${ROOT_FOLDER}/golang-release
+bosh vendor-package golang-${GOLANG_VERSION}-linux ${ROOT_FOLDER}/golang-release
 
 # and now the id is ....
 id=$(python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < \
-	.final_builds/packages/golang-1.8-linux/index.yml \
+	.final_builds/packages/golang-${GOLANG_VERSION}-linux/index.yml \
 	| jq -r '.builds|map(select(.version|contains("'${go_git_fingerprint}'")))[0].blobstore_id')
 
 # appending to the list

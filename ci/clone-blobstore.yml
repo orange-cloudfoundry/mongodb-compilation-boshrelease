@@ -38,6 +38,8 @@ jobs:
         ENDPOINT_URL:       ((blobstores.release.endpoint-url))
         BUCKET:             ((blobstores.release.bucket))     
         SIGNATURE_VERSION:  ((blobstores.release.signature-version))
+        GOLANG_VERSION:     ((deployment.compilation.golang-version))
+
 
     - task: blobs-rename
       file: mongodb-compilation-bosh-release/ci/clone-blobstore/clone-blobstore/tasks/blobs-rename.yml

@@ -3,7 +3,7 @@ name: mongodb
 dependencies: 
 -  python
 -  scons
--  golang-1.8-linux
+-  golang-1.9-linux
 -  gcc
 -  compressors
 -  openssl

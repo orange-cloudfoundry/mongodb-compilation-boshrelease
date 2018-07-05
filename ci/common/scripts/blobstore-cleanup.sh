@@ -2,8 +2,7 @@
 
 # Remove every blobs that are not referenced in one of the blobs.yml files
 
-
-set -ex
+set -e
 
 ROOT_FOLDER=${PWD}
 

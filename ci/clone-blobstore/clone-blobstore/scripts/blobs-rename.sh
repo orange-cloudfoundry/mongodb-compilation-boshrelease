@@ -1,6 +1,6 @@
 #!/usr/bin/env sh 
 
-set -ex
+set -e
 
 ROOT_FOLDER=${PWD}
 
@@ -18,10 +18,13 @@ cd mongodb-bosh-release-patched || exit 666
 # Renamming
 cat  blob_mv_list.lst | while read src dst
 do
-	echo renamming ${src} to ${dst}
-	aws --endpoint-url ${ENDPOINT_URL} \
-	--no-verify-ssl s3 mv s3://${BUCKET}/${src} s3://${BUCKET}/${dst} \
-	2>/dev/null 
+	if [ "$src" != "$dst" ]
+	then
+		echo renamming ${src} to ${dst}
+		aws --endpoint-url ${ENDPOINT_URL} \
+		--no-verify-ssl s3 mv s3://${BUCKET}/${src} s3://${BUCKET}/${dst} \
+		2>/dev/null
+	fi
 done
 
 # exporting config files ()

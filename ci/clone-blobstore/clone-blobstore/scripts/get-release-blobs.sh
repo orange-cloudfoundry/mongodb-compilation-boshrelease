@@ -75,7 +75,7 @@ done
 # the go vendor package case ...
 
 # which version of golang is used on git ?
-go_git_fingerprint=$(cat packages/golang-1.8-linux/spec.lock \
+go_git_fingerprint=$(cat packages/golang-${GOLANG_VERSION}-linux/spec.lock \
 					| sed -e s/:[[:space:]]*/:/g 			 \
 					| grep fingerprint 						 \
 					| cut -d":" -f2 )
@@ -84,27 +84,30 @@ git clone https://github.com/bosh-packages/golang-release ${ROOT_FOLDER}/golang-
 
 cd ${ROOT_FOLDER}/golang-release
 
-fingerprint_tag="$(grep -l -r -F ${go_git_fingerprint} releases/ | sed -e 's/^.*\([[0-9]]*\.[[0-9]]*\.[[0-9]]*\).*$/v\1/')"
+fingerprint_tag="$(grep -l -r -F ${go_git_fingerprint} releases/ \
+					| sort \
+					|tail -1 \
+					| sed -e 's/^.*\([[0-9]]*\.[[0-9]]*\.[[0-9]]*\).*$/v\1/')"
 
 git checkout ${fingerprint_tag}
 
 cd -
 
 dest_id=$(python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < \
-	${ROOT_FOLDER}/mongodb-bosh-release/.final_builds/packages/golang-1.8-linux/index.yml \
-	| jq -r '.builds|map(select(.version|contains("1509998fbf5c66cb8fc361a479beafb41ef8cc14")))[0].blobstore_id')
+	${ROOT_FOLDER}/mongodb-bosh-release/.final_builds/packages/golang-${GOLANG_VERSION}-linux/index.yml \
+	| jq -r '.builds|map(select(.version|contains("'${go_git_fingerprint}'")))[0].blobstore_id')
 
-[ -d .final_builds/packages/golang* ] && rm -rf .final_builds/packages/golang*
-[ -d packages/golang* ] && rm -rf packages/golang*  
+[ -z "$(find .final_builds/packages -type d -name 'golang*')" ] && rm -rf .final_builds/packages/golang*
+[ -z "$(find packages -type d -name 'golang*')" ] && rm -rf packages/golang*  
 
 # reuploading golang
 
-bosh vendor-package golang-1.8-linux ${ROOT_FOLDER}/golang-release
+bosh vendor-package golang-${GOLANG_VERSION}-linux ${ROOT_FOLDER}/golang-release
 
 # and now the id is ....
 id=$(python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < \
-	.final_builds/packages/golang-1.8-linux/index.yml \
-	| jq -r '.builds|map(select(.version|contains("1509998fbf5c66cb8fc361a479beafb41ef8cc14")))[0].blobstore_id')
+	.final_builds/packages/golang-${GOLANG_VERSION}-linux/index.yml \
+	| jq -r '.builds|map(select(.version|contains("'${go_git_fingerprint}'")))[0].blobstore_id')
 
 # appending to the list
 echo "$id $dest_id" >> blob_mv_list.lst

@@ -62,7 +62,8 @@ jobs:
         ENDPOINT_URL:       ((blobstores.compilation.endpoint-url))
         BUCKET:             ((blobstores.compilation.bucket))
         SIGNATURE_VERSION:  ((blobstores.compilation.signature-version))   
- 
+        GOLANG_VERSION:     ((deployment.compilation.golang-version))
+         
     - task: upload-config-files
       file: mongodb-compilation-bosh-release/ci/initialize-compilation-blobstore/get-dependencies/tasks/upload-config-files.yml
       params:
