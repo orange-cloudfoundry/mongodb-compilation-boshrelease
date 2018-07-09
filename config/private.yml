@@ -1,7 +1,7 @@
 ---
 blobstore:
   options:
-    access_key_id: 'default'
-    secret_access_key: 'mi3qgF9WTf7p7wkPY7VHY39HaKkFsC'
+    access_key_id: 'K1V9KHNLHCQVIXRD4SXM'
+    secret_access_key: 'K785mpJ9TtS4n5j+18RIOnaTHZYVWmFA7VEtc4Ca'
     ssl_verify_peer: false
     signature_version: '2'
