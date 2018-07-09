@@ -22,8 +22,16 @@ cd ${ROOT_FOLDER}
 #upload all config yml files
 aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 cp --recursive ci s3://${BUCKET}/ci/
 
-#renaming needed blobs (golang)
-cat ${ROOT_FOLDER}/to_rename/blob_mv_list.lst | while read src dest
-do
-	aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 mv s3://${BUCKET}/${src} s3://${BUCKET}/${dest} 2>/dev/null
-done
+#renaming needed blobs (golang) if needed
+if [ -f ${ROOT_FOLDER}/to_rename/blob_mv_list.lst ]
+then
+	cat ${ROOT_FOLDER}/to_rename/blob_mv_list.lst | while read src dest
+	do
+		if [ "${src}" != "${dest}" ]
+		then
+			aws --endpoint-url ${ENDPOINT_URL} --no-verify-ssl s3 mv s3://${BUCKET}/${src} s3://${BUCKET}/${dest} 2>/dev/null
+		fi
+	done
+fi
+
+exit 0

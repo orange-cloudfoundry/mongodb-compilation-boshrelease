@@ -77,18 +77,25 @@ git clone https://github.com/bosh-packages/golang-release ${ROOT_FOLDER}/golang-
 
 cd ${ROOT_FOLDER}/golang-release
 
-fingerprint_tag="$(grep -l -r -F ${go_git_fingerprint} releases/ | sed -e 's/^.*\([[0-9]]*\.[[0-9]]*\.[[0-9]]*\).*$/v\1/')"
+fingerprint_tag="$(grep -l -r -F ${go_git_fingerprint} releases/ \
+					| sort \
+					|tail -1 \
+					| sed -e 's/^.*\([[0-9]]*\.[[0-9]]*\.[[0-9]]*\).*$/v\1/')"
 
 git checkout ${fingerprint_tag}
 
 cd -
 
+dest_id=""
+if [ -f ${ROOT_FOLDER}/mongodb-compilation-bosh-release/.final_builds/packages/golang-${GOLANG_VERSION}-linux/index.yml ]
+then
 dest_id=$(python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < \
-	.final_builds/packages/golang-${GOLANG_VERSION}-linux/index.yml \
+	${ROOT_FOLDER}/mongodb-compilation-bosh-release/.final_builds/packages/golang-${GOLANG_VERSION}-linux/index.yml \
 	| jq -r '.builds|map(select(.version|contains("'${go_git_fingerprint}'")))[0].blobstore_id')
+fi
 
-[ -d .final_builds/packages/golang* ] && rm -rf .final_builds/packages/golang*
-[ -d packages/golang* ] && rm -rf packages/golang*  
+[ -n "$(find .final_builds/packages -type d -name 'golang*')" ] && rm -rf .final_builds/packages/golang*
+[ -n "$(find packages -type d -name 'golang*')" ] && rm -rf packages/golang*  
 
 # reuploading golang
 
@@ -100,6 +107,9 @@ id=$(python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdo
 	| jq -r '.builds|map(select(.version|contains("'${go_git_fingerprint}'")))[0].blobstore_id')
 
 # appending to the list
-echo "$id $dest_id" >> ${ROOT_FOLDER}/to_rename/blob_mv_list.lst || exit 666
+if [ "${dest_id}" != "" ]
+then
+	echo "$id $dest_id" >> ${ROOT_FOLDER}/to_rename/blob_mv_list.lst || exit 666
+fi	
 
 cp -rp config/*.yml ${ROOT_FOLDER}/ci || exit 666

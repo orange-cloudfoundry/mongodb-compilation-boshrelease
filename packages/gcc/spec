@@ -12,4 +12,4 @@ files:
 -  gcc/automake-*.tar.gz
 -  gcc/autoconf-*.tar.gz
 -  gcc/libtool-*.tar.gz
-
+-  gcc/texinfo*.tar.gz

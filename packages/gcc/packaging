@@ -65,6 +65,7 @@ done
 # Filling PATHs
 export LD_LIBRARY_PATH=`echo $BOSH_INSTALL_TARGET/lib:${LD_LIBRARY_PATH:-''}|sed -e 's/^://' -e 's/:$//'`
 export C_INCLUDE_PATH=`echo $BOSH_INSTALL_TARGET/include:${C_INCLUDE_PATH:-''}|sed -e 's/^://' -e 's/:$//'`
+export PATH=`echo $BOSH_INSTALL_TARGET/bin:${PATH:-''}|sed -e 's/^://' -e 's/:$//'`
 
 # Compiling GCC
 
@@ -89,14 +90,25 @@ do
   cd ../..
 done
 
-# adding automake, autoconf and libtools (needed by libffi)
-
-while [ -f /tmp/continue ]
+# libffi needs texinfo (makeinfo) ... bc , compiled in binutils package needs it too
+for i in `find gcc/ -type f -name 'texinfo*tar.*' -print`
 do
-  sleep 6000
+  ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]|cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  mkdir build
+  cd build
+  LDFLAGS='-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64' \
+  CPPFLAGS="-I/var/vcap/packages/gcc/include" \
+  ../configure --prefix=$BOSH_INSTALL_TARGET
+  make && make install
+  cd ../..
 done
 
-for i in `find gcc/  -type f -name 'libpcap*.tar.*' -o -name 'libffi-*.tar.*' -print`
+# adding automake, autoconf and libtools (needed by libffi) - they have to be  compiled in this order
+
+# autoconf
+for i in `find gcc/  -type f -name 'autoconf*.tar.*' -print`
 do
   ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
@@ -108,9 +120,8 @@ do
   cd ../..
 done
 
-# adding libpcap and libffi (needed by python cryptography module)
-
-for i in `find gcc/  -type f -name 'libpcap*.tar.*' -o -name 'libffi-*.tar.*' -print`
+# automake
+for i in `find gcc/  -type f -name 'automake*.tar.*' -print`
 do
   ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
@@ -118,6 +129,46 @@ do
   mkdir build
   cd build
   ../configure --prefix=$BOSH_INSTALL_TARGET CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
+  make && make install
+  cd ../..
+done  
+
+# libtool
+for i in `find gcc/  -type f -name 'libtool*.tar.*' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  mkdir build
+  cd build
+  ../configure --prefix=$BOSH_INSTALL_TARGET CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
+  make && make install
+  cd ../..
+done
+
+for i in `find gcc/  -type f -name 'libpcap*.tar.*' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  mkdir build
+  cd build
+  ../configure --prefix=$BOSH_INSTALL_TARGET CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
+  make && make install
+  cd ../..
+done
+
+# adding libffi (needed by python cryptography module)
+for i in `find gcc/  -type f -name 'libffi-*.tar.*' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  # running autogen.sh to generate configure file
+  ./autogen.sh
+  mkdir build
+  cd build
+  ../configure --prefix=$BOSH_INSTALL_TARGET CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib --enable-portable-binary
   make && make install
   cd ../..
 done

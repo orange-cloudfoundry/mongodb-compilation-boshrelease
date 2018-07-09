@@ -1,6 +1,6 @@
 #!/usr/bin/env bash 
 
-set -ex
+set -e
 
 apt install -y jq python python-yaml
 
@@ -97,8 +97,8 @@ dest_id=$(python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys
 	${ROOT_FOLDER}/mongodb-bosh-release/.final_builds/packages/golang-${GOLANG_VERSION}-linux/index.yml \
 	| jq -r '.builds|map(select(.version|contains("'${go_git_fingerprint}'")))[0].blobstore_id')
 
-[ -z "$(find .final_builds/packages -type d -name 'golang*')" ] && rm -rf .final_builds/packages/golang*
-[ -z "$(find packages -type d -name 'golang*')" ] && rm -rf packages/golang*  
+[ -n "$(find .final_builds/packages -type d -name 'golang*')" ] && rm -rf .final_builds/packages/golang*
+[ -n "$(find packages -type d -name 'golang*')" ] && rm -rf packages/golang*  
 
 # reuploading golang
 
