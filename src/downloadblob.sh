@@ -12,7 +12,7 @@ curl --connect-timeout 10 -w 200 --retry 5 -o mpc-1.0.3.tar.gz -L https://ftp.gn
 curl --connect-timeout 10 -w 200 --retry 5 -o mpfr-3.1.6.tar.bz2 -L https://ftp.gnu.org/gnu/mpfr/mpfr-3.1.6.tar.bz2
 curl --connect-timeout 10 -w 200 --retry 5 -o isl-0.18.tar.gz -L http://isl.gforge.inria.fr/isl-0.18.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o Python-2.7.15.tgz -L https://www.python.org/ftp/python/2.7.15/Python-2.7.15.tgz
-curl --connect-timeout 10 -w 200 --retry 5 -o scons-3.0.1.tar.gz -L https://github.com/SCons/scons/archive/3.0.1.tar.gz
+curl --connect-timeout 10 -w 200 --retry 5 -o scons-3.0.1.tar.gz -L https://sourceforge.net/projects/scons/files/scons/3.0.1/scons-3.0.1.tar.gz/download
 curl --connect-timeout 10 -w 200 --retry 5 -o openssl-1.0.2o.tar.gz -L https://www.openssl.org/source/openssl-1.0.2o.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o lzip-1.19.tar.gz -L http://download.savannah.gnu.org/releases/lzip/lzip-1.19.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o ed-1.14.2.tar.lz -L https://ftp.gnu.org/gnu/ed/ed-1.14.2.tar.lz
