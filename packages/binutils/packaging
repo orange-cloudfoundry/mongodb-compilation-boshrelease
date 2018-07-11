@@ -41,19 +41,6 @@ do
   cd ..
 done
 
-# bc needs texinfo (makeinfo)
-for i in `find binutils/ -type f -name 'texinfo*tar.*' -print`
-do
-  ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]|cut -d" " -f6 |cut -d"/" -f1`
-  tar xf $i
-  cd $ext_dir
-  LDFLAGS='-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64' \
-  CPPFLAGS="-I/var/vcap/packages/gcc/include" \
-  ./configure --prefix=$BOSH_INSTALL_TARGET
-  make && make install
-  cd ..
-done
-
 # binutils needs bc
 for i in `find binutils/ -type f -name 'bc*tar.*' -print`
 do
