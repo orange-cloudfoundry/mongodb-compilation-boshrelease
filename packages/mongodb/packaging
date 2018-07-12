@@ -69,53 +69,52 @@ do
   ln -sf $(readlink -f ../$mongo_rocks_dir) src/mongo/db/modules/rocks
 
 
-# compiling mongodb
+  # compiling mongodb
 
-export CC="/var/vcap/packages/gcc/bin/gcc" 
-export CXX="/var/vcap/packages/gcc/bin/g++" 
-export CPPPATH="$BOSH_INSTALL_TARGET/include /var/vcap/packages/compressors/include /var/vcap/packages/gcc/include /var/vcap/packages/openssl/include/openssl" 
-export LIBPATH="$BOSH_INSTALL_TARGET/lib /var/vcap/packages/compressors/lib /var/vcap/packages/gcc/lib /var/vcap/packages/gcc/lib64 /var/vcap/packages/openssl/lib"
-export LDFLAGS="-L/var/vcap/packages/compressors/lib -L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 -L/var/vcap/packages/openssl/lib -lsnappy -llz4 -lzstd -lssl -lcrypto"
-export LIBS="lz4 zstd snappy ssl crypto"
-export CPPFLAGS="-I/var/vcap/packages/gcc/include -I/var/vcap/packages/compressors/include -I/var/vcap/packages/openssl/include/openssl -I$BOSH_INSTALL_TARGET/include"
-export AR="/var/vcap/packages/binutils/bin/ar" 
-export RANLIB="/var/vcap/packages/binutils/bin/ranlib" 
-export LD="/var/vcap/packages/binutils/bin/ld" # not working ?
-export NM="/var/vcap/packages/binutils/bin/nm"
+  export CC="/var/vcap/packages/gcc/bin/gcc" 
+  export CXX="/var/vcap/packages/gcc/bin/g++" 
+  export CPPPATH="$BOSH_INSTALL_TARGET/include /var/vcap/packages/compressors/include /var/vcap/packages/gcc/include /var/vcap/packages/openssl/include/openssl" 
+  export LIBPATH="$BOSH_INSTALL_TARGET/lib /var/vcap/packages/compressors/lib /var/vcap/packages/gcc/lib /var/vcap/packages/gcc/lib64 /var/vcap/packages/openssl/lib"
+  export LDFLAGS="-L/var/vcap/packages/compressors/lib -L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 -L/var/vcap/packages/openssl/lib -lsnappy -llz4 -lzstd -lssl -lcrypto"
+  export LIBS="lz4 zstd snappy ssl crypto"
+  export CPPFLAGS="-I/var/vcap/packages/gcc/include -I/var/vcap/packages/compressors/include -I/var/vcap/packages/openssl/include/openssl -I$BOSH_INSTALL_TARGET/include"
+  export AR="/var/vcap/packages/binutils/bin/ar" 
+  export RANLIB="/var/vcap/packages/binutils/bin/ranlib" 
+  export LD="/var/vcap/packages/binutils/bin/ld" # not working ?
+  export NM="/var/vcap/packages/binutils/bin/nm"
 
-# Patching SConstruct to retrieve environment non standard variables
+  # Patching SConstruct to retrieve environment non standard variables
 
-sed -i "$(grep -n "\-\-\- other build setup" SConstruct|cut -d":" -f1)ifor key in Split('CC CXX AR RANLIB LD NM CFLAGS CXXFLAGS CCFLAGS LIBPATH'):\n  \
-value = os.environ.get(key)\n  if value != None:\n    env[key] = Split(value)\nif os.environ.has_key('CPPFLAGS'):\n  \
-env['CCFLAGS'] += SCons.Util.CLVar(os.environ['CPPFLAGS'])\nif os.environ.has_key('LDFLAGS'):\n  \
-env['LINKFLAGS'] += SCons.Util.CLVar(os.environ['LDFLAGS'])\n" SConstruct
+  sed -i "$(grep -n "\-\-\- other build setup" SConstruct|cut -d":" -f1)ifor key in Split('CC CXX AR RANLIB LD NM CFLAGS CXXFLAGS CCFLAGS LIBPATH'):\n  \
+  value = os.environ.get(key)\n  if value != None:\n    env[key] = Split(value)\nif os.environ.has_key('CPPFLAGS'):\n  \
+  env['CCFLAGS'] += SCons.Util.CLVar(os.environ['CPPFLAGS'])\nif os.environ.has_key('LDFLAGS'):\n  \
+  env['LINKFLAGS'] += SCons.Util.CLVar(os.environ['LDFLAGS'])\n" SConstruct
 
-#here is the text appended:
-#for key in Split('CC CXX AR RANLIB LD NM CFLAGS CXXFLAGS CCFLAGS LIBPATH'):
-#  value = os.environ.get(key)
-#  if value != None:
-#    env[key] = Split(value)
-#if os.environ.has_key('CPPFLAGS'):
-#  env['CCFLAGS'] += SCons.Util.CLVar(os.environ['CPPFLAGS'])
-#if os.environ.has_key('LDFLAGS'):
-#  env['LINKFLAGS'] += SCons.Util.CLVar(os.environ['LDFLAGS'])
+  #here is the text appended:
+  #for key in Split('CC CXX AR RANLIB LD NM CFLAGS CXXFLAGS CCFLAGS LIBPATH'):
+  #  value = os.environ.get(key)
+  #  if value != None:
+  #    env[key] = Split(value)
+  #if os.environ.has_key('CPPFLAGS'):
+  #  env['CCFLAGS'] += SCons.Util.CLVar(os.environ['CPPFLAGS'])
+  #if os.environ.has_key('LDFLAGS'):
+  #  env['LINKFLAGS'] += SCons.Util.CLVar(os.environ['LDFLAGS'])
 
-# create symbolics links to linker -- dirty solution !! didn t find how to pass linker path to scons
+  # create symbolics links to linker -- dirty solution !! didn t find how to pass linker path to scons
 
-for _bin in `find /var/vcap/packages/binutils/bin -type f -print`
-do
-  if [ -x $_bin ]
-  then
-    fexec=`basename $_bin`
-    [ -x /usr/bin/$fexec ] && mv /usr/bin/$fexec /usr/bin/${fexec}.old && ln -s $_bin /usr/bin/$fexec
-  fi
-done
+  for _bin in `find /var/vcap/packages/binutils/bin -type f -print`
+  do
+    if [ -x $_bin ]
+    then
+      fexec=`basename $_bin`
+      [ -x /usr/bin/$fexec ] && mv /usr/bin/$fexec /usr/bin/${fexec}.old && ln -s $_bin /usr/bin/$fexec
+    fi
+  done
 
-# Patching necessary files (gcc 6.3)
-#  patch -p0 src/third_party/boost-1.60.0/boost/function/function_base.hpp <../mongodb/function_base.hpp.patch
-#  patch -p0 src/mongo/base/parse_number_test.cpp <../mongodb/parse_number_test.cpp.patch
+  # installing python dependencies
+  python -mpip install --user -r buildscripts/requirements.txt --no-index --find-links $(readlink -f ../${mongodb_python_deps_dir})
 
-# retrieve mongodb version from package name
+  # retrieve mongodb version from package name
   export _mongo_version=`echo $i|sed -e "s/.*[^[0-9]]*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/"`
 
   scons -j $cpun_ --ssl --prefix=$BOSH_INSTALL_TARGET   \
@@ -123,10 +122,10 @@ done
   MONGO_VERSION=$_mongo_version \
   core install
 
-while [ -f /tmp/continue ]
-do
-  sleep 600
-done
+  while [ -f /tmp/continue ]
+  do
+    sleep 600
+  done
 
 # striping binaries
   strip -sg $BOSH_INSTALL_TARGET/bin/*

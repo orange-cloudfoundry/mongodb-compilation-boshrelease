@@ -163,11 +163,13 @@ do
   cd $ext_dir
   # running autogen.sh to generate configure file
   ./autogen.sh
-  mkdir build
-  cd build
-  ../configure --prefix=$BOSH_INSTALL_TARGET CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib --enable-portable-binary
+  
+  # libffi install include in bad directory (under $prefix/lib/.../include) instead of $prefix/include
+
+  perl -pe 's#^AM_CFLAGS = .*#AM_CFLAGS = -g#' -i Makefile.in
+  perl -pe 's#^includesdir = .*#includesdir = \@includedir\@#' -i include/Makefile.in
+
+  ./configure --prefix=$BOSH_INSTALL_TARGET CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
   make && make install
-  cd ../..
+  cd ..
 done
-
-
