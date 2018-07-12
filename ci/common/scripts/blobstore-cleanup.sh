@@ -53,7 +53,7 @@ cat blobs*.yml \
 
 # Adding golang bosh vendor package to protected blobs
 
-cat ${ROOT_FOLDER}/mongodb-compilation-bosh-release/.final_builds/packages/golang-1.8-linux/index.yml \
+cat ${ROOT_FOLDER}/mongodb-compilation-bosh-release/.final_builds/packages/golang-*-linux/index.yml \
 	| sed -e 's/^[[:space:]]*//g' \
 	| grep "blobstore_id:" \
 	| awk '{print $2}' >> used_blobs.lst
