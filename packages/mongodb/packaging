@@ -23,6 +23,12 @@ done
 
 export PATH=/var/vcap/packages/gcc/bin:/var/vcap/packages/binutils/bin:/var/vcap/packages/python/bin/:/var/vcap/packages/scons/bin:/var/vcap/packages/openssl/bin:$PATH
 
+# processing python virtualenv
+mkdir -p /var/vcap/data/tmp/python_venv
+virtualenv /var/vcap/data/tmp/python_venv
+source /var/vcap/data/tmp/python_venv/bin/activate
+
+
 # Retrieving number of cpus on compilation server
 export cpun_=`lscpu | grep '^CPU('|tr -d [:space:]|cut -d":" -f2`
 
@@ -33,8 +39,15 @@ do
   tar xf $i
   cd $ext_dir
   CC=/var/vcap/packages/gcc/bin/gcc CXX=/var/vcap/packages/gcc/bin/g++ EXTRA_CFLAGS=-fPIC \
-  CFLAGS="-I/var/vcap/packages/compressors/include -I/var/vcap/packages/gcc/include -I/var/vcap/packages/openssl/include/openssl" \
-  LDFLAGS="-L/var/vcap/packages/compressors/lib -L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 -L/var/vcap/packages/openssl/lib -lsnappy -llz4 -lzstd -lssl -lcrypto" \
+  CFLAGS="-I/var/vcap/packages/compressors/include \
+          -I/var/vcap/packages/gcc/include \
+          -I/var/vcap/packages/openssl/include/openssl" \
+  LDFLAGS="-L/var/vcap/packages/compressors/lib \
+           -L/var/vcap/packages/compressors/lib64 \
+           -L/var/vcap/packages/gcc/lib \
+           -L/var/vcap/packages/gcc/lib64 \
+           -L/var/vcap/packages/openssl/lib \
+           -lsnappy -llz4 -lzstd -lssl -lcrypto" \
   DISABLE_JEMALLOC=1 USE_RTTI=1 EXTRA_CXXFLAGS=-fPIC make -j $cpun_ static_lib
   INSTALL_PATH=$BOSH_INSTALL_TARGET make install
   cd ..
@@ -48,7 +61,7 @@ do
 done
 
 
-# extracting and installing mongodb python dependencies
+# extracting  mongodb python dependencies
 for i in `find mongodb/ -type f -name 'mongodb-python-deps-*.tar.gz' -print`
 do
   mongodb_python_deps_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`
@@ -65,39 +78,68 @@ do
   mkdir -p src/mongo/db/modules/
   ln -sf $(readlink -f ../$mongo_rocks_dir) src/mongo/db/modules/rocks
 
+  # installing python dependencies
+  # processing subprocess32 which fall in error with pip
+  mkdir -p /var/vcap/data/tmp/sub32
+  find $(readlink -f ../${mongodb_python_deps_dir}) -type f -name 'subprocess*.tar.gz' -exec sh -c 'tar xf $1 -C /var/vcap/data/tmp/sub32 --strip 1' {} {} \;
+  cd /var/vcap/data/tmp/sub32
+  ./configure
+  python setup.py install
+  cd -
+
+
+  python -mpip install -r buildscripts/requirements.txt --no-index --find-links $(readlink -f ../${mongodb_python_deps_dir})
+
 
   # compiling mongodb
 
   export CC="/var/vcap/packages/gcc/bin/gcc" 
   export CXX="/var/vcap/packages/gcc/bin/g++" 
-  export CPPPATH="$BOSH_INSTALL_TARGET/include /var/vcap/packages/compressors/include /var/vcap/packages/gcc/include /var/vcap/packages/openssl/include/openssl" 
-  export LIBPATH="$BOSH_INSTALL_TARGET/lib /var/vcap/packages/compressors/lib /var/vcap/packages/gcc/lib /var/vcap/packages/gcc/lib64 /var/vcap/packages/openssl/lib"
-  export LDFLAGS="-L/var/vcap/packages/compressors/lib -L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 -L/var/vcap/packages/openssl/lib -lsnappy -llz4 -lzstd -lssl -lcrypto"
+  export CPPPATH="$BOSH_INSTALL_TARGET/include \
+           /var/vcap/packages/compressors/include \
+           /var/vcap/packages/gcc/include \
+           /var/vcap/packages/openssl/include/openssl" 
+  export LIBPATH="$BOSH_INSTALL_TARGET/lib \
+           /var/vcap/packages/compressors/lib \
+           /var/vcap/packages/compressors/lib64 \
+           /var/vcap/packages/gcc/lib \
+           /var/vcap/packages/gcc/lib64 \
+           /var/vcap/packages/openssl/lib"
+  export LDFLAGS="-L/var/vcap/packages/compressors/lib \
+           -L/var/vcap/packages/compressors/lib64 \
+           -L/var/vcap/packages/gcc/lib \
+           -L/var/vcap/packages/gcc/lib64 \
+           -L/var/vcap/packages/openssl/lib \
+           -lsnappy -llz4 -lzstd -lssl -lcrypto"
   export LIBS="lz4 zstd snappy ssl crypto"
-  export CPPFLAGS="-I/var/vcap/packages/gcc/include -I/var/vcap/packages/compressors/include -I/var/vcap/packages/openssl/include/openssl -I$BOSH_INSTALL_TARGET/include"
+  export CPPFLAGS="-I/var/vcap/packages/gcc/include \
+            -I/var/vcap/packages/compressors/include \
+            -I/var/vcap/packages/openssl/include/openssl \
+            -I$BOSH_INSTALL_TARGET/include"
   export AR="/var/vcap/packages/binutils/bin/ar" 
   export RANLIB="/var/vcap/packages/binutils/bin/ranlib" 
   export LD="/var/vcap/packages/binutils/bin/ld" # not working ?
   export NM="/var/vcap/packages/binutils/bin/nm"
 
   # Patching SConstruct to retrieve environment non standard variables
-
+  # Be careful this is python code so do not change indentation or it will affect the 
   sed -i "$(grep -n "\-\-\- other build setup" SConstruct|cut -d":" -f1)ifor key in Split('CC CXX AR RANLIB LD NM CFLAGS CXXFLAGS CCFLAGS LIBPATH'):\n  \
-  value = os.environ.get(key)\n  if value != None:\n    env[key] = Split(value)\nif os.environ.has_key('CPPFLAGS'):\n  \
-  env['CCFLAGS'] += SCons.Util.CLVar(os.environ['CPPFLAGS'])\nif os.environ.has_key('LDFLAGS'):\n  \
-  env['LINKFLAGS'] += SCons.Util.CLVar(os.environ['LDFLAGS'])\n" SConstruct
+value = os.environ.get(key)\n  if value != None:\n    env[key] = Split(value)\nif os.environ.has_key('CPPFLAGS'):\n  \
+env['CCFLAGS'] += SCons.Util.CLVar(os.environ['CPPFLAGS'])\nif os.environ.has_key('LDFLAGS'):\n  \
+env['LINKFLAGS'] += SCons.Util.CLVar(os.environ['LDFLAGS'])\n" SConstruct
 
   #here is the text appended:
+  #
   #for key in Split('CC CXX AR RANLIB LD NM CFLAGS CXXFLAGS CCFLAGS LIBPATH'):
   #  value = os.environ.get(key)
-  #if value != None:
+  #  if value != None:
   #    env[key] = Split(value)
   #if os.environ.has_key('CPPFLAGS'):
   #  env['CCFLAGS'] += SCons.Util.CLVar(os.environ['CPPFLAGS'])
   #if os.environ.has_key('LDFLAGS'):
   #  env['LINKFLAGS'] += SCons.Util.CLVar(os.environ['LDFLAGS'])
 
-  # create symbolics links to linker -- dirty solution !! didn t find how to pass linker path to scons
+  # create symbolics links to linker -- dirty solution !! I didn t find how to pass linker path to scons
 
   for _bin in `find /var/vcap/packages/binutils/bin -type f -print`
   do
@@ -108,15 +150,10 @@ do
     fi
   done
 
-  # installing python dependencies
-  python -mpip install --user -r buildscripts/requirements.txt --no-index --find-links $(readlink -f ../${mongodb_python_deps_dir})
-
   # retrieve mongodb version from package name
   export _mongo_version=`echo $i|sed -e "s/.*[^[0-9]]*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/"`
 
-  scons CC=/var/vcap/packages/gcc/bin/gcc CXX=/var/vcap/packages/gcc/bin/g++ \
-  CFLAGS="-I/var/vcap/packages/compressors/include -I/var/vcap/packages/gcc/include -I/var/vcap/packages/openssl/include/openssl" \
-  -j $cpun_ --ssl --prefix=$BOSH_INSTALL_TARGET   \
+  scons -j $cpun_ --ssl --prefix=$BOSH_INSTALL_TARGET   \
   --disable-warnings-as-errors \
   MONGO_VERSION=$_mongo_version \
   core install

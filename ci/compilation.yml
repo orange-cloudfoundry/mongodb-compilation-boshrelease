@@ -46,7 +46,10 @@ resources:
   - name: mongodb-src
     type: mongo-src
     source:
-      branch: "3.6"
+      #branch: "3.6"
+      # force version to 3.6.4 because of mongorocks problem on 3.6.5
+      # https://github.com/mongodb-partners/mongo-rocks/issues/146
+      version: "3.6.4"
 
   - name: rocksdb-src
     type: rocks-src

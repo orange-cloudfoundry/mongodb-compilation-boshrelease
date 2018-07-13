@@ -4,3 +4,4 @@ dependencies:
 -  gcc
 files:
 -  python/Python-*.tgz
+-  python/virtualenv-*.tar.gz
