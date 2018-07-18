@@ -158,8 +158,12 @@ env['LINKFLAGS'] += SCons.Util.CLVar(os.environ['LDFLAGS'])\n" SConstruct
   MONGO_VERSION=$_mongo_version \
   core install
 
-# striping binaries
-  strip -sg $BOSH_INSTALL_TARGET/bin/*
+  # striping binaries
+  # mongo 3.6 introduce python script install_compass which should not be stripped
+  file /var/vcap/packages/mongodb/bin/* \
+  | grep -v "Python script" \
+  | cut -d":" -f1 \
+  | xargs -i strip -sg {}
   cd ..
 done
 
