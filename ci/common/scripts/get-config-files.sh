@@ -59,3 +59,20 @@ aws ${aws_opt} s3 \
 
 #get the list of availables blobs ids on blobsore
 aws ${aws_opt} s3 ls s3://${BUCKET}/ > blobstore_ids.list
+
+# keeping only needed version of golang package
+if [ ! -z ${GOLANG_VERSION} ]
+then
+	for d in $(find .final_builds/packages -type d \
+								-name 'golang*' \
+								! -name '*-'${GOLANG_VERSION}'-*')
+	do
+		[ -d ${d} ] && rm -rf ${d}
+	done
+	for d in $(find ./packages -type d \
+				  -name 'golang*' \
+				  ! -name '*-'${GOLANG_VERSION}'-*')
+	do
+		[ -d ${d} ] && rm -rf ${d}
+	done
+fi

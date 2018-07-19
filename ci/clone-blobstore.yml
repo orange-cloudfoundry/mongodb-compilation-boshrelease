@@ -38,7 +38,7 @@ jobs:
         ENDPOINT_URL:       ((blobstores.release.endpoint-url))
         BUCKET:             ((blobstores.release.bucket))     
         SIGNATURE_VERSION:  ((blobstores.release.signature-version))
-        GOLANG_VERSION:     ((deployment.compilation.golang-version))
+        GOLANG_VERSION:     ((deployment.golang-version))
 
 
     - task: blobs-rename

@@ -144,6 +144,7 @@ jobs:
         SKIP_SSL:           ((blobstores.compilation.skip-ssl-validation))
         SSL_CERT:           ((blobstores.compilation.certificate))
         MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
+        GOLANG_VERSION:     ((deployment.golang-version))
 
     - &upload-compiled-blobs
       task: upload-compiled-blobs
@@ -299,7 +300,8 @@ jobs:
         SKIP_SSL:           ((blobstores.release.skip-ssl-validation))
         SSL_CERT:           ((blobstores.release.certificate))
         MONGODB_VERSION:    ((deployment.bootstrap.mongodb-version))
-
+        GOLANG_VERSION:     ((deployment.golang-version))
+        
     - &deploy
       task: deploy-rs
       file: mongodb-compilation-bosh-release/ci/deployment/deploy/tasks/deploy-rs.yml

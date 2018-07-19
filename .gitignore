@@ -8,3 +8,4 @@ ci/compile-mongo/settings.yml
 ci/settings.yml
 mongodb_compiled_version
 rocksdb_compiled_version
+ci/Makefile
