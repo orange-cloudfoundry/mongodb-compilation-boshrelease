@@ -1,5 +1,5 @@
 - type: replace
-  path: /stemcells/alias=trusty/alias
+  path: /stemcells/alias=xenial/alias
   value: centos
 
 - type: replace

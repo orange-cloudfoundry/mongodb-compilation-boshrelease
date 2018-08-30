@@ -13,8 +13,8 @@ update:
   serial: false
 
 stemcells:
-- alias: trusty
-  os: ubuntu-trusty
+- alias: xenial
+  os: ubuntu-xenial
   version: latest
 
 instance_groups:
@@ -27,7 +27,7 @@ instance_groups:
   env:
     bosh:
       swap_size: 0
-  stemcell: trusty
+  stemcell: xenial
   networks:
   - name: ((network))
   jobs:

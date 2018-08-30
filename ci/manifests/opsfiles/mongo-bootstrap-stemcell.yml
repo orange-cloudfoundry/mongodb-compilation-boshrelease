@@ -1,3 +1,3 @@
 - type: replace
-  path: /stemcells/alias=trusty/version
+  path: /stemcells/alias=xenial/version
   value: ((stemcell))

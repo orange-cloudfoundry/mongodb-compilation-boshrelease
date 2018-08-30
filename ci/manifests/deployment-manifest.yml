@@ -17,8 +17,8 @@ update:
   serial: false
 
 stemcells:
-- alias: trusty
-  os: ubuntu-trusty
+- alias: xenial
+  os: ubuntu-xenial
   version: latest
 
 instance_groups:
@@ -30,7 +30,7 @@ instance_groups:
   env:
     bosh:
       swap_size: 0
-  stemcell: trusty
+  stemcell: xenial
   networks:
   - name: ((deployments-network))
   persistent_disk_type: ((persistent-disk-type))
@@ -110,7 +110,7 @@ instance_groups:
     - name: mongodb-acceptance-tests
       release: ((mongodb-release))
   vm_type: ((vm-type))
-  stemcell: trusty
+  stemcell: xenial
   networks:
     - name: ((deployments-network))
 
