@@ -15,3 +15,10 @@ outputs:
 
 run:
   path: mongodb-compilation-bosh-release/ci/common/scripts/create-bosh-config.sh
+
+params:
+  ALIAS: ""
+  CA_CERT: ""
+  IP: ""
+  PASSWORD: ""
+  USER: ""  

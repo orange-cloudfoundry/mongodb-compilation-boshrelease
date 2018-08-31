@@ -28,7 +28,6 @@ mkdir -p /var/vcap/data/tmp/python_venv
 virtualenv /var/vcap/data/tmp/python_venv
 source /var/vcap/data/tmp/python_venv/bin/activate
 
-
 # Retrieving number of cpus on compilation server
 export cpun_=`lscpu | grep '^CPU('|tr -d [:space:]|cut -d":" -f2`
 
@@ -60,7 +59,6 @@ do
   tar xf $i
 done
 
-
 # extracting  mongodb python dependencies
 for i in `find mongodb/ -type f -name 'mongodb-python-deps-*.tar.gz' -print`
 do
@@ -79,17 +77,22 @@ do
   ln -sf $(readlink -f ../$mongo_rocks_dir) src/mongo/db/modules/rocks
 
   # installing python dependencies
-  # processing subprocess32 which fall in error with pip
-  mkdir -p /var/vcap/data/tmp/sub32
-  find $(readlink -f ../${mongodb_python_deps_dir}) -type f -name 'subprocess*.tar.gz' -exec sh -c 'tar xf $1 -C /var/vcap/data/tmp/sub32 --strip 1' {} {} \;
-  cd /var/vcap/data/tmp/sub32
-  ./configure
-  python setup.py install
-  cd -
+  if [ -f buildscripts/requirements.txt ]
+  then
+    # processing subprocess32 which fall in error with pip
+    ls ../${mongodb_python_deps_dir}/subprocess32*.tar.gz 1>/dev/null 2>&1
+    if [ $? -eq 0 ]
+    then
+      mkdir -p /var/vcap/data/tmp/sub32
+      find $(readlink -f ../${mongodb_python_deps_dir}) -type f -name 'subprocess32*.tar.gz' -exec sh -c 'tar xf $1 -C /var/vcap/data/tmp/sub32 --strip 1' {} {} \;
+      cd /var/vcap/data/tmp/sub32
+      ./configure
+      python setup.py install
+      cd -
+    fi
 
-
-  python -mpip install -r buildscripts/requirements.txt --no-index --find-links $(readlink -f ../${mongodb_python_deps_dir})
-
+    python -mpip install -r buildscripts/requirements.txt --no-index --find-links $(readlink -f ../${mongodb_python_deps_dir})
+  fi
 
   # compiling mongodb
 
@@ -157,6 +160,12 @@ env['LINKFLAGS'] += SCons.Util.CLVar(os.environ['LDFLAGS'])\n" SConstruct
   --disable-warnings-as-errors \
   MONGO_VERSION=$_mongo_version \
   core install
+
+  touch /tmp/continue
+  while [ -f /tmp/continue ]
+  do
+    sleep 6000
+  done
 
   # striping binaries
   # mongo 3.6 introduce python script install_compass which should not be stripped
