@@ -18,3 +18,12 @@ outputs:
 
 run:
   path: mongodb-compilation-bosh-release/ci/compilation/create-release/scripts/create-release.sh
+
+params:
+  BOSH_RELEASE: ""
+  DEPLOYMENT_NAME: ""
+  INSTANCE_GROUP: ""
+  NETWORK: ""
+  STEMCELL_TYPE: ""
+  UUID: ""
+  ALIAS: ""  

@@ -16,4 +16,12 @@ outputs:
 
 run:
   path: mongodb-compilation-bosh-release/ci/initialize-compilation-blobstore/get-dependencies/scripts/get-dependencies.sh
-  
+
+params:
+  ALIAS: ""
+  ACCESS_KEY_ID: ""
+  SECRET_ACCESS_KEY: ""
+  ENDPOINT_URL: ""
+  BUCKET: ""
+  SIGNATURE_VERSION: ""
+  GOLANG_VERSION: ""

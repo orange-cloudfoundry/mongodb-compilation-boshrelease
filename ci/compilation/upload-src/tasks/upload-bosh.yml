@@ -19,3 +19,6 @@ outputs:
 
 run:
   path: mongodb-compilation-bosh-release/ci/compilation/upload-src/scripts/upload-bosh.sh
+
+params:
+  ALIAS: ""  

@@ -15,3 +15,10 @@ outputs:
 
 run:
   path: mongodb-compilation-bosh-release/ci/initialize-compilation-blobstore/clean-blobstore/scripts/clean-blobstore.sh
+
+params:
+  ENDPOINT_URL: ""
+  SECRET_ACCESS_KEY: ""
+  SIGNATURE_VERSION: ""
+  ACCESS_KEY_ID: ""
+  BUCKET: ""

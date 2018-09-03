@@ -19,3 +19,7 @@ outputs:
 
 run:
   path: mongodb-compilation-bosh-release/ci/compilation/upload-src/scripts/update-config-files.sh
+
+params:
+  ALIAS: ""
+  BOSH_RELEASE: "" 

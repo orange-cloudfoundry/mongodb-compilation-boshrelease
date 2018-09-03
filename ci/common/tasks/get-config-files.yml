@@ -17,3 +17,12 @@ outputs:
 run:
   path: mongodb-compilation-bosh-release/ci/common/scripts/get-config-files.sh
 
+params:
+  ACCESS_KEY_ID: ""
+  BUCKET: ""
+  ENDPOINT_URL: ""
+  MONGODB_VERSION: ""
+  SECRET_ACCESS_KEY: ""
+  SIGNATURE_VERSION: ""
+  SKIP_SSL: ""
+  SSL_CERT: ""

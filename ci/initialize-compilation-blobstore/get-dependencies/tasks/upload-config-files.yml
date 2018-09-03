@@ -14,3 +14,10 @@ inputs:
 
 run:
   path: mongodb-compilation-bosh-release/ci/initialize-compilation-blobstore/get-dependencies/scripts/upload-config-files.sh
+
+params:
+  ENDPOINT_URL: ""
+  SECRET_ACCESS_KEY: ""
+  SIGNATURE_VERSION: ""
+  ACCESS_KEY_ID: ""
+  BUCKET: ""  

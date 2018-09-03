@@ -18,3 +18,12 @@ outputs:
 run:
   path: mongodb-compilation-bosh-release/ci/clone-blobstore/clone-blobstore/scripts/get-release-blobs.sh
 
+params:
+  SECRET_ACCESS_KEY: ""
+  SIGNATURE_VERSION: ""
+  ACCESS_KEY_ID: ""
+  ALIAS: ""
+  BUCKET: ""
+  ENDPOINT_URL: ""
+  GOLANG_VERSION: ""  
+
