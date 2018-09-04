@@ -1,5 +1,5 @@
 curl --connect-timeout 10 -w 200 --retry 5 -o cmake-3.11.4.tar.gz -L https://github.com/Kitware/CMake/archive/v3.11.4.tar.gz
-curl --connect-timeout 10 -w 200 --retry 5 -o bzip2-1.0.6.tar.gz -L http://www.bzip.org/1.0.6/bzip2-1.0.6.tar.gz
+curl --connect-timeout 10 -w 200 --retry 5 -o bzip2-1.0.6.tar.gz -L https://fossies.org/linux/misc/bzip2-1.0.6.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o lz4-1.8.2.tar.gz -L https://github.com/lz4/lz4/archive/v1.8.2.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o snappy-1.1.7.tar.gz -L https://github.com/google/snappy/archive/1.1.7.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o zlib-1.2.11.tar.gz -L https://zlib.net/zlib-1.2.11.tar.gz

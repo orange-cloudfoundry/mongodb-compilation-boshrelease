@@ -48,6 +48,14 @@ touch config/blobs.yml
 # proceed download
 cd src
 [ -x downloadblob.sh ] && . ./downloadblob.sh || exit 666
+# checking all files are tarballs
+for file in $(ls | grep -Ew "tgz|tar")
+do
+	tar tf $file 1>/dev/null 2>&1
+	[ $? -ne 0 ] && \
+		echo "$file do not seems to be a valid tarball\ncheck your src/dowloadblob.sh file" && \
+		exit 1
+done	
 cd -
 
 # adding all blobs except mongodb ones
