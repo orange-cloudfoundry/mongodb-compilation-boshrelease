@@ -178,17 +178,13 @@ do
   tar xf $i
   cd $ext_dir
   # need libpcap for mongoreplay
-  source /var/vcap/packages/golang-1.8-linux/bosh/compile.env
+  go_compile_env=$(find /var/vcap/packages/golang-*-linux/bosh -name 'compile.env')
+  [ "$go_compile_env" == "" ] && echo "Go compilation environment not found" && exit 1
+  source $go_compile_env
   export CGO_LDFLAGS="-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 -L/var/vcap/packages/openssl/lib"
   ./set_gopath.sh
   ./build.sh ssl
   [ ! -d $BOSH_INSTALL_TARGET/bin ] && mkdir -p $BOSH_INSTALL_TARGET/bin
   cp -rp bin/* $BOSH_INSTALL_TARGET/bin
   cd ..
-done
-
-touch /tmp/continue
-while [ -f /tmp/continue ]
-do
-  sleep 120
 done
