@@ -8,7 +8,7 @@ export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 
 # installing needed packages
 apt update
-apt install -y curl jq python python-yaml
+apt install -y curl jq python python-yaml lzip xz-utils bzip2
 
 mkdir -p ci to_rename
 
@@ -49,13 +49,17 @@ touch config/blobs.yml
 cd src
 [ -x downloadblob.sh ] && . ./downloadblob.sh || exit 666
 # checking all files are tarballs
+RC=0
 for file in $(ls | grep -Ew "tgz|tar")
 do
 	tar tf $file 1>/dev/null 2>&1
-	[ $? -ne 0 ] && \
-		echo "$file do not seems to be a valid tarball\ncheck your src/dowloadblob.sh file" && \
-		exit 1
-done	
+	if [ $? -ne 0 ]
+	then
+		echo "$file do not seems to be a valid tarball\ncheck your src/dowloadblob.sh file"
+		RC=1
+	fi
+done
+[ $RC -eq 1 ] && exit 666
 cd -
 
 # adding all blobs except mongodb ones
