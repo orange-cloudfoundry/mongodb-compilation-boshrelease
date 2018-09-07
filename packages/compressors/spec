@@ -2,7 +2,7 @@
 name: compressors
 dependencies: 
 -  gcc
--  cmake
+-  compilation-tools
 files:
 -  compressors/lz4-*.tar.gz
 -  compressors/bzip2-*.tar.gz

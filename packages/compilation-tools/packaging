@@ -1,4 +1,4 @@
-#set -e # exit immediately if a simple command exits with a non-zero status
+set -e # exit immediately if a simple command exits with a non-zero status
 #set -u # report the usage of uninitialized variables
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
@@ -12,15 +12,28 @@ export C_INCLUDE_PATH=`echo /var/vcap/packages/gcc/include:${C_INCLUDE_PATH:-''}
 export CC=/var/vcap/packages/gcc/bin/gcc
 export CXX=/var/vcap/packages/gcc/bin/g++
 
-# compiling 
+# compiling cmake
 
-for i in `find cmake/ -type f -name 'cmake*.tar.gz' -print`
+for i in `find compilation-tools/ -type f -name 'cmake*.tar.gz' -print`
 do
   ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
   cd $ext_dir
   CC=/var/vcap/packages/gcc/bin/gcc CPPFLAGS="-I/var/vcap/packages/gcc/include" \
   LDFLAGS="-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64" ./configure --prefix=$BOSH_INSTALL_TARGET
+  make && make install
+  cd ..
+done
+
+# compiling pkg-config
+
+for i in `find compilation-tools/ -type f -name 'pkg-config*.tar.gz' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  CC=/var/vcap/packages/gcc/bin/gcc CPPFLAGS="-I/var/vcap/packages/gcc/include" \
+  LDFLAGS="-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64" ./configure --prefix=$BOSH_INSTALL_TARGET --with-internal-glib
   make && make install
   cd ..
 done

@@ -9,7 +9,7 @@ dependencies:
 -  openssl
 -  binutils
 -  coreutils
--  cmake
+-  compilation-tools
 files:
 -  mongodb/mongodb-src-*.tar.gz
 -  mongodb/mongo-tools-*.tar.gz

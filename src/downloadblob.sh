@@ -25,3 +25,4 @@ curl --connect-timeout 10 -w 200 --retry 5 -o libffi-3.2.1.tar.xz -L https://git
 curl --connect-timeout 10 -w 200 --retry 5 -o autoconf-2.69.tar.gz -L https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o automake-1.16.1.tar.gz -L https://ftp.gnu.org/gnu/automake/automake-1.16.1.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o libtool-2.4.tar.gz -L https://ftp.gnu.org/gnu/libtool/libtool-2.4.tar.gz
+curl --connect-timeout 10 -w 200 --retry 5 -o pkg-config-0.29.2.tar.gz -L https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz

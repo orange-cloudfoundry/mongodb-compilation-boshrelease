@@ -21,7 +21,7 @@ do
   export C_INCLUDE_PATH=${package_inc_dir}:$C_INCLUDE_PATH
 done
 
-export PATH=/var/vcap/packages/gcc/bin:/var/vcap/packages/binutils/bin:/var/vcap/packages/python/bin/:/var/vcap/packages/scons/bin:/var/vcap/packages/openssl/bin:$PATH
+export PATH=/var/vcap/packages/gcc/bin:/var/vcap/packages/binutils/bin:/var/vcap/packages/python/bin/:/var/vcap/packages/scons/bin:/var/vcap/packages/openssl/bin:/var/vcap/packages/compilation-tools/bin:$PATH
 
 # processing python virtualenv
 mkdir -p /var/vcap/data/tmp/python_venv
@@ -92,6 +92,7 @@ do
     fi
 
     python -mpip install -r buildscripts/requirements.txt --no-index --find-links $(readlink -f ../${mongodb_python_deps_dir})
+
   fi
 
   # compiling mongodb
@@ -169,6 +170,12 @@ env['LINKFLAGS'] += SCons.Util.CLVar(os.environ['LDFLAGS'])\n" SConstruct
   | cut -d":" -f1 \
   | xargs -i strip -sg {}
   cd ..
+done
+
+touch /tmp/continue
+while [ -f /tmp/continue ]
+do
+  sleep 600
 done
 
 # processing mongo-tools

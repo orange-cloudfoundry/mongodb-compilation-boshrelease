@@ -11,7 +11,7 @@ export HOME=/var/vcap
 
 export LD_LIBRARY_PATH=`echo /var/vcap/packages/gcc/lib:/var/vcap/packages/gcc/lib64:${LD_LIBRARY_PATH:-''}|sed -e 's/^://' -e 's/:$//'`
 export C_INCLUDE_PATH=`echo /var/vcap/packages/gcc/include:${C_INCLUDE_PATH:-''}|sed -e 's/^://' -e 's/:$//'`
-export PATH=`echo /var/vcap/packages/cmake/bin:${PATH:-''}|sed -e 's/^://' -e 's/:$//'`
+export PATH=`echo /var/vcap/packages/compilation-tools/bin:${PATH:-''}|sed -e 's/^://' -e 's/:$//'`
 export CC=/var/vcap/packages/gcc/bin/gcc
 export CXX=/var/vcap/packages/gcc/bin/g++
 
