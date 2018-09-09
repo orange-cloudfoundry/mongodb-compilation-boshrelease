@@ -26,3 +26,5 @@ curl --connect-timeout 10 -w 200 --retry 5 -o autoconf-2.69.tar.gz -L https://ft
 curl --connect-timeout 10 -w 200 --retry 5 -o automake-1.16.1.tar.gz -L https://ftp.gnu.org/gnu/automake/automake-1.16.1.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o libtool-2.4.tar.gz -L https://ftp.gnu.org/gnu/libtool/libtool-2.4.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o pkg-config-0.29.2.tar.gz -L https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
+curl --connect-timeout 10 -w 200 --retry 5 -o git-2.18.0.tar.gz -L https://github.com/git/git/archive/v2.18.0.tar.gz
+curl --connect-timeout 10 -w 200 --retry 5 -o expat-2.2.6.tar.gz -L https://github.com/libexpat/libexpat/archive/R_2_2_6.tar.gz

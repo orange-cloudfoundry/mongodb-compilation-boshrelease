@@ -172,13 +172,8 @@ env['LINKFLAGS'] += SCons.Util.CLVar(os.environ['LDFLAGS'])\n" SConstruct
   cd ..
 done
 
-touch /tmp/continue
-while [ -f /tmp/continue ]
-do
-  sleep 600
-done
-
 # processing mongo-tools
+
 for i in `find mongodb/ -type f -name 'mongo-tools-*.tar.gz' -print`
 do
   ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`
@@ -189,7 +184,11 @@ do
   [ "$go_compile_env" == "" ] && echo "Go compilation environment not found" && exit 1
   source $go_compile_env
   export CGO_LDFLAGS="-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 -L/var/vcap/packages/openssl/lib"
+  # initializing PKG_CONFIG_PATH
+  export PKG_CONFIG_PATH="/var/vcap/packages/openssl/lib/pkgconfig:$PKG_CONFIG_PATH"
   ./set_gopath.sh
+  # patching shebang which have to be set to #!/bin/bash 
+  sed -ie "1s/^#\!.*$/#\!\/bin\/bash/" build.sh
   ./build.sh ssl
   [ ! -d $BOSH_INSTALL_TARGET/bin ] && mkdir -p $BOSH_INSTALL_TARGET/bin
   cp -rp bin/* $BOSH_INSTALL_TARGET/bin
