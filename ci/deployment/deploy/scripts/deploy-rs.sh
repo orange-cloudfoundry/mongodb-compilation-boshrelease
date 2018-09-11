@@ -90,7 +90,7 @@ deployment_ops_files_cmd=""
 if [ "${STEMCELL}" != "" ]
 then
     deployment_var_init="${deployment_var_init} \
-                    -v stemcell=${STEMCELL}"
+                    -v stemcell-version=${STEMCELL} -v stemcell-alias=${STEMCELL_ALIAS} -v stemcell-os=${STEMCELL_OS}"
     deployment_ops_files_cmd="${deployment_ops_files_cmd} \
                     -o ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/opsfiles/mongo-bootstrap-stemcell.yml"
 fi

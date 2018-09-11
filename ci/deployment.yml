@@ -323,7 +323,9 @@ jobs:
         PERSISTENT_DISK_TYPE: ((deployment.tests.mongod.persistent-disk-type))
         VM_TYPE:              ((deployment.tests.mongod.vm-type))
         ROOT_USERNAME:        ((deployment.tests.mongod.root-username))
-        STEMCELL:             ((deployment.bootstrap.stemcell))
+        STEMCELL:             ((deployment.bootstrap.stemcell.version))
+        STEMCELL_OS:          ((deployment.bootstrap.stemcell.os))
+        STEMCELL_ALIAS:       ((deployment.bootstrap.stemcell.type))
         STEMCELL_TYPE:        ""
         ENGINE:               "wiredtiger"
         # for ssl deployment
