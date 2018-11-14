@@ -12,11 +12,6 @@ cat ${ROOT_FOLDER}/deployment-specs/keyval.properties \
 
 source ${ROOT_FOLDER}/deployment-specs/sourced.properties 
 
-if [ "${STEMCELL_TYPE}" != "centos" ]
-then
-  STEMCELL_TYPE="ubuntu"   
-fi
-
 CI_IP=`echo ${ips} \
 	 | sed -e "s/,/:${PORT},/g" -e "s/$/:${PORT}/"`
 

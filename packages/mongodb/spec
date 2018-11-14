@@ -3,17 +3,13 @@ name: mongodb
 dependencies: 
 -  python
 -  scons
--  golang-1.9-linux
--  gcc
 -  compressors
--  openssl
--  binutils
--  coreutils
--  compilation-tools
+-  git
+-  extra
+-  golang-1.9-linux
 files:
 -  mongodb/mongodb-src-*.tar.gz
 -  mongodb/mongo-tools-*.tar.gz
 -  mongodb/rocksdb-*.tar.gz
 -  mongodb/mongo-rocks-*.tar.gz
 -  mongodb/mongodb-python-deps-*.tar.gz
-

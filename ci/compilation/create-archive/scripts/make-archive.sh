@@ -8,20 +8,12 @@ cp -rp mongodb-compilation-bosh-release-patched/. mongodb-compilation-bosh-relea
 
 export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 
-
-if [ "${STEMCELL_TYPE}" == "centos" ]
-then
-    DEPLOYMENT_NAME="${DEPLOYMENT_NAME}-centos"
-else
-	STEMCELL_TYPE="ubuntu"
-fi
-
-bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n run-errand make-tar --keep-alive
+bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} -n run-errand create-mongodb-archive --keep-alive
 
 src_vm=$(bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} vms --column="instance"|tr -d [:space:])
 
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} scp \
-${src_vm}:/var/vcap/store/make-tar/archive/mongodb-${STEMCELL_TYPE}-x86_64-*.tar.gz ${ROOT_FOLDER}/mongodb-compilation-bosh-release-archive
+${src_vm}:/var/vcap/store/create-mongodb-archive/archive/mongodb-ubuntu-x86_64-*.tar.gz ${ROOT_FOLDER}/mongodb-compilation-bosh-release-archive
 
 # killing the vm
 bosh -e ${ALIAS} -d ${DEPLOYMENT_NAME} vms \

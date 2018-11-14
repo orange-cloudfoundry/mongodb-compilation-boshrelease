@@ -1,7 +1,7 @@
 ---
 name: python
-dependencies: 
--  gcc
+dependencies:
+-  extra
 files:
 -  python/Python-*.tgz
 -  python/virtualenv-*.tar.gz

@@ -1,9 +1,0 @@
----
-name: compilation-tools
-dependencies: 
--  gcc
-files:
--  compilation-tools/cmake-*.tar.gz
--  compilation-tools/pkg-config*.tar.gz
--  compilation-tools/expat-*.tar.gz
--  compilation-tools/git-*.tar.gz

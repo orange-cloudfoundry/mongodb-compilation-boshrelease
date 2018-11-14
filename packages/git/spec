@@ -1,0 +1,7 @@
+---
+name: git
+dependencies: 
+-  python
+-  extra
+files:
+-  git/git-*.tar.gz

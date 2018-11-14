@@ -10,17 +10,6 @@ pushd mongodb-compilation-bosh-release-patched|| exit 666
 
 deployment_ops_files=""
 
-if [ "${STEMCELL_TYPE}" == "centos" ]
-then
-    DEPLOYMENT_NAME="${DEPLOYMENT_NAME}-centos"
-    BOSH_RELEASE="${BOSH_RELEASE}-centos"
-    deployment_ops_files="${deployment_ops_files} \
-                -o ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/opsfiles/compilation-centos.yml"
-else 
-	STEMCELL_TYPE="ubuntu"
-fi
-
-
 # Updating final.yml with release name specified in settings
 sed -i -e "s/^\(final_name:\).*/\1 ${BOSH_RELEASE}/" config/final.yml
 

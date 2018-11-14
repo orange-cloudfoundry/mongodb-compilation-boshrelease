@@ -1,6 +1,6 @@
 #!/usr/bin/env sh 
 
-set -ex
+set -e
 
 ROOT_FOLDER=${PWD}
 
@@ -9,12 +9,6 @@ credhub api ${IP}:${PORT} --skip-tls-validation
 ( echo ${USER} ; echo ${PASSWORD} ) \
     | credhub login
 set -x
-
-if [ "${STEMCELL_TYPE}" == "centos" ]
-then
-    # If we are on a centos deployment, deloyment name will be suffixed
-    DEPLOYMENT_NAME="${DEPLOYMENT_NAME}-centos"
-fi
 
 mkdir -p output
 cd output || exit 666

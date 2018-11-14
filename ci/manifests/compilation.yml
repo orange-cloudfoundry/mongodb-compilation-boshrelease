@@ -31,7 +31,7 @@ instance_groups:
   networks:
   - name: ((network))
   jobs:
-  - name: make-tar
+  - name: create-mongodb-archive
     release: ((release))
     properties: 
       mongodb-version: ((version))

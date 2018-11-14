@@ -1,8 +1,6 @@
 ---
 name: compressors
-dependencies: 
--  gcc
--  compilation-tools
+dependencies: []
 files:
 -  compressors/lz4-*.tar.gz
 -  compressors/bzip2-*.tar.gz

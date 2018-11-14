@@ -7,9 +7,6 @@ set -u # report the usage of uninitialized variables
 
 export HOME=/var/vcap
 
-export CC=/var/vcap/packages/gcc/bin/gcc
-export CXX=/var/vcap/packages/gcc/bin/g++
-
 #cp -a brokers $BOSH_INSTALL_TARGET/brokers
 for i in `find scons/  -type f -name '*.tar.gz' -print`
 do

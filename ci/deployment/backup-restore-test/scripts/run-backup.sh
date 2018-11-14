@@ -19,12 +19,6 @@ export SHIELD_CORE=shield-tests
 
 shield login
 
-if [ "${STEMCELL_TYPE}" == "centos" ]
-then
-    # If we are on a centos deployment, deloyment name will be suffixed
-    SHIELD_TARGET="${SHIELD_TARGET}-centos"
-fi
-
 # removing previous archives
 
 for target_name in $(shield targets --json \

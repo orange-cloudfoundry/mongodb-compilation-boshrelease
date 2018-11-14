@@ -81,7 +81,7 @@ aws ${aws_opt} s3 \
 # Removing previous mongodb references from blob.yml
 sed -i "/^mongodb\/mongodb-.*-x86_64.*/,/sha:.*/d" ${ROOT_FOLDER}/to-upload/config/blobs.yml
 
-for dist in ubuntu centos
+for dist in ubuntu
 do
 
   # Retrieving last compiled blob informations

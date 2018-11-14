@@ -122,7 +122,7 @@ jobs:
 ##                                          UBUNTU BRANCH                                                   ##
 ##############################################################################################################
 ##############################################################################################################
-- name: create-release-ubuntu
+- name: create-release
   serial: true
   plan:
     - aggregate:
@@ -150,14 +150,14 @@ jobs:
         INSTANCE_GROUP:   ((deployment.compilation.instance-group))
         NETWORK:          ((deployment.compilation.network))
  
-- name: deployment-ubuntu
+- name: deployment
   serial: true
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
       - get: versions
         trigger: true
-        passed: [create-release-ubuntu]
+        passed: [create-release]
     
     - *create-bosh-config
     
@@ -177,14 +177,14 @@ jobs:
         INSTANCE_GROUP:   ((deployment.compilation.instance-group))
         NETWORK:          ((deployment.compilation.network))
      
-- name: create-archive-ubuntu
+- name: create-archive
   serial: true
   plan:
     - aggregate:
       - get: mongodb-compilation-bosh-release
       - get: versions
         trigger: true
-        passed: [deployment-ubuntu]
+        passed: [deployment]
 
     - *create-bosh-config
       
@@ -245,96 +245,6 @@ jobs:
         ALIAS:           ((bosh-server.alias))
         DEPLOYMENT_NAME: ((deployment.compilation.name))
 
-##############################################################################################################
-##############################################################################################################
-##                                          CENTOS BRANCH                                                   ##
-##############################################################################################################
-##############################################################################################################
-
-- name: create-release-centos
-  serial: true
-  plan:
-    - aggregate:
-      - get: mongodb-compilation-bosh-release
-      - get: versions
-        trigger: true
-        passed: [upload-src]
-
-    - *create-bosh-config
-
-    - <<: *get-config-files
-      params:
-        <<: *get-config-files-params
-        MONGODB_VERSION:    ""
-
-    - <<: *create-release
-      params:
-        <<: *create-release-params
-        STEMCELL_TYPE:    centos
-
-- name: deployment-centos
-  serial: true
-  plan:
-    - aggregate:
-      - get: mongodb-compilation-bosh-release
-      - get: versions
-        trigger: true
-        passed: [create-release-centos]
-
-    - *create-bosh-config
-    
-    - <<: *get-config-files
-      params:
-        <<: *get-config-files-params
-        MONGODB_VERSION: ""
-
-    - <<: *deploy
-      params:
-        <<: *deploy-params
-        STEMCELL_TYPE:    centos
-
-- name: create-archive-centos
-  serial: true
-  plan:
-    - aggregate:
-      - get: mongodb-compilation-bosh-release
-      - get: versions
-        trigger: true
-        passed: [deployment-centos]
-
-    - *create-bosh-config
-
-    - <<: *get-config-files
-      params:
-        <<: *get-config-files-params
-        MONGODB_VERSION:  ""
-
-    - <<: *make-archive
-      params:
-        <<: *make-archive-params
-        STEMCELL_TYPE:   centos
-
-    - *upload-lock    
-
-    - <<: *get-config-files
-      params:
-        <<: *get-config-files-params
-        MONGODB_VERSION:  ""
-      on_failure:
-        *upload-unlock
-      on_abort:
-        *upload-unlock       
-
-    - <<: *patch-config-files
-      params:
-        STEMCELL_TYPE: centos
-
-    - *upload-config-files
-
-    - <<: *delete-deployment
-      params:
-        <<: *delete-deployment-params
-        STEMCELL_TYPE:   centos
 
 ##############################################################################################################
 ##############################################################################################################
@@ -346,7 +256,7 @@ jobs:
   plan:
     - aggregate:
       - get: versions
-        passed: [create-archive-centos, create-archive-ubuntu]
+        passed: [create-archive]
         trigger: true
 
       - get: mongodb-compilation-bosh-release

@@ -9,11 +9,7 @@ export HOME=/var/vcap
 
 #cp -a brokers $BOSH_INSTALL_TARGET/brokers
 
-export LD_LIBRARY_PATH=`echo /var/vcap/packages/gcc/lib:/var/vcap/packages/gcc/lib64:${LD_LIBRARY_PATH:-''}|sed -e 's/^://' -e 's/:$//'`
-export C_INCLUDE_PATH=`echo /var/vcap/packages/gcc/include:${C_INCLUDE_PATH:-''}|sed -e 's/^://' -e 's/:$//'`
-export PATH=`echo /var/vcap/packages/compilation-tools/bin:${PATH:-''}|sed -e 's/^://' -e 's/:$//'`
-export CC=/var/vcap/packages/gcc/bin/gcc
-export CXX=/var/vcap/packages/gcc/bin/g++
+## export PATH=`echo /var/vcap/packages/compilation-tools/bin:${PATH:-''}|sed -e 's/^://' -e 's/:$//'`
 
 # compiling 
 #zlib
@@ -22,7 +18,7 @@ do
   ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
   cd $ext_dir
-  CC=/var/vcap/packages/gcc/bin/gcc CPPFLAGS="-I/var/vcap/packages/gcc/include" LDFLAGS="-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64" ./configure --prefix=$BOSH_INSTALL_TARGET
+  ./configure --prefix=$BOSH_INSTALL_TARGET
   make && make install
   cd ..
 done
@@ -37,7 +33,7 @@ do
   sed -i -e "s/^CFLAGS=\(.*\)$/CFLAGS=\1 -fPIC/" Makefile
 #  make -f Makefile-libbz2_so CC=/var/vcap/packages/gcc/bin/gcc LDFLAGS="-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64"
 #  make clean
-  CC=/var/vcap/packages/gcc/bin/gcc LDFLAGS="-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64" make
+  make
   make install PREFIX=$BOSH_INSTALL_TARGET
   cd ..
 done
@@ -48,8 +44,8 @@ do
   ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
   cd $ext_dir
-  CC=/var/vcap/packages/gcc/bin/gcc LDFLAGS="-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 -L./lib"  \
-  CPPFLAGS="-I/var/vcap/packages/gcc/include -I./lib" make
+  LDFLAGS="-L./lib"  \
+  CPPFLAGS="-I./lib" make
   make install PREFIX=$BOSH_INSTALL_TARGET
   cd ..
 done
@@ -63,8 +59,6 @@ do
   mkdir build 
   cd build
   cmake ../ -DCMAKE_INSTALL_PREFIX=$BOSH_INSTALL_TARGET
-  CC=/var/vcap/packages/gcc/bin/gcc CXX=/var/vcap/packages/gcc/bin/g++ CPPFLAGS="-I/var/vcap/packages/gcc/include" \
-  LDFLAGS="-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64" \
   PREFIX=$BOSH_INSTALL_TARGET make 
   make install 
   cd ../..
@@ -76,8 +70,7 @@ do
   ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
   cd $ext_dir
-  CC=/var/vcap/packages/gcc/bin/gcc CXX=/var/vcap/packages/gcc/bin/g++ CPPFLAGS="-I/var/vcap/packages/gcc/include" \
-  LDFLAGS="-L/var/vcap/packages/gcc/lib  -L/var/vcap/packages/gcc/lib64" make
+  make
   PREFIX=$BOSH_INSTALL_TARGET make install 
   cd ..
 done

@@ -8,14 +8,6 @@ export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 
 pushd mongodb-compilation-bosh-release-patched|| exit 666
 
-if [ "${STEMCELL_TYPE}" == "centos" ]
-then
-    DEPLOYMENT_NAME="${DEPLOYMENT_NAME}-centos"
-    BOSH_RELEASE="${BOSH_RELEASE}-centos"
-else 
-	STEMCELL_TYPE="ubuntu"
-fi
-
 if [ "${MONGODB_VERSION}" == "" ]
 then
   MONGODB_VERSION=`grep "^mongodb" ${ROOT_FOLDER}/versions/keyval.properties|cut -d"=" -f2`

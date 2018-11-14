@@ -1,0 +1,12 @@
+---
+name: create-mongodb-archive
+packages:
+  - mongodb
+
+templates:
+  bin/errand.sh.erb: bin/run
+
+properties: 
+  mongodb-version:
+      description: |
+        The version of mongodb which will be archived - Is only used in archive name

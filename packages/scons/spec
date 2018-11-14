@@ -2,6 +2,5 @@
 name: scons
 dependencies: 
 -  python
--  gcc
 files:
 -  scons/scons-*.tar.gz

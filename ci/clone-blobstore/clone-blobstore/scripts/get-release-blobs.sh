@@ -2,6 +2,7 @@
 
 set -e
 
+apt update
 apt install -y jq python python-yaml
 
 export ROOT_FOLDER=${PWD}

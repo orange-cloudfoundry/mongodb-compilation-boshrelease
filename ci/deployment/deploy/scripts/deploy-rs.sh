@@ -51,14 +51,6 @@ export BOSH_CONFIG=$PWD/bosh-director-config/bosh_config.yml
 
 pushd mongodb-bosh-release-patched || exit 666
 
-
-if [ "${STEMCELL_TYPE}" == "centos" ]
-then
-    # If we are on a centos deployment, deloyment name and release name will be suffixed
-    DEPLOYMENT_NAME="${DEPLOYMENT_NAME}-centos"
-    RELEASE_NAME="${RELEASE_NAME}-centos"
-fi
-
 create_fake_files
 
 # renaming final_name in final.yml
@@ -93,12 +85,6 @@ then
                     -v stemcell-version=${STEMCELL} -v stemcell-alias=${STEMCELL_ALIAS} -v stemcell-os=${STEMCELL_OS}"
     deployment_ops_files_cmd="${deployment_ops_files_cmd} \
                     -o ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/opsfiles/mongo-bootstrap-stemcell.yml"
-fi
-
-if [ "${STEMCELL_TYPE}" == "centos" ]
-then
-    deployment_ops_files_cmd="${deployment_ops_files_cmd} \
-                    -o ${ROOT_FOLDER}/mongodb-compilation-bosh-release/ci/manifests/opsfiles/centos.yml"
 fi
 
 if [ "${ENGINE}" == "rocksdb" ]

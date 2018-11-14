@@ -1,0 +1,136 @@
+set -e # exit immediately if a simple command exits with a non-zero status
+set -u # report the usage of uninitialized variables
+
+# $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
+# $BOSH_INSTALL_TARGET - where you copy/install files to be included in package
+#/sbin/swapoff -a
+
+export HOME=/var/vcap
+
+for package_bin_dir in $(find  /var/vcap/packages -follow -maxdepth 2 -mindepth 2 -type d -name 'bin' ) $BOSH_INSTALL_TARGET/bin
+do
+  export PATH=${package_bin_dir}:$PATH
+done
+
+# adding automake, autoconf and libtools (needed by libffi) - they have to be  compiled in this order
+
+# autoconf
+for i in `find extra/  -type f -name 'autoconf*.tar.*' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  mkdir build
+  cd build
+  ../configure --prefix=$BOSH_INSTALL_TARGET
+  make && make install
+  cd ../..
+done
+
+# automake
+for i in `find extra/  -type f -name 'automake*.tar.*' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  mkdir build
+  cd build
+  ../configure --prefix=$BOSH_INSTALL_TARGET CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
+  make && make install
+  cd ../..
+done  
+
+# libtool
+for i in `find extra/  -type f -name 'libtool*.tar.*' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  mkdir build
+  cd build
+  ../configure --prefix=$BOSH_INSTALL_TARGET CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
+  make && make install
+  cd ../..
+done
+
+# texinfo (needed by libffi)
+for i in `find extra/ -type f -name 'texinfo*tar.*' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]|cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  mkdir build
+  cd build
+  ../configure --prefix=$BOSH_INSTALL_TARGET
+  make && make install
+  cd ../..
+done
+
+                                                                      
+# libffi (needed by git)
+for i in `find extra/  -type f -name 'libffi-*.tar.*' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  # running autogen.sh to generate configure file
+  ./autogen.sh
+  
+  # libffi install include in bad directory (under $prefix/lib/.../include) instead of $prefix/include
+
+  perl -pe 's#^AM_CFLAGS = .*#AM_CFLAGS = -g#' -i Makefile.in
+  perl -pe 's#^includesdir = .*#includesdir = \@includedir\@#' -i include/Makefile.in
+
+  ./configure --prefix=$BOSH_INSTALL_TARGET CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
+  make && make install
+  cd ..
+done
+
+
+# compiling pkg-config
+
+for i in `find extra/ -type f -name 'pkg-config*.tar.gz' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  ./configure --prefix=$BOSH_INSTALL_TARGET --with-internal-glib
+  make && make install
+  cd ..
+done
+
+# compiling expat (needed by git)
+for i in `find extra/ -type f -name 'expat-*.tar.gz' -print`
+do
+  ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir/expat
+  ./buildconf.sh
+  ./configure --prefix=$BOSH_INSTALL_TARGET --without-docbook --without-xmlwf
+  make && make install
+  cd ../..
+done
+
+# compiling libpcap (needed by mongotools)
+for i in `find extra/  -type f -name 'libpcap*.tar.*' -print`
+do
+  _cppflags=""
+  for package_inc_dir in $(find  /var/vcap/packages -follow -mindepth 2 -path '*include' -o -path '*include/*' -type d)
+  do
+    _cppflags="-I${package_inc_dir} ${_cppflags}"
+  done
+  _ldflags=""
+  for package_lib_dir in $(find  /var/vcap/packages -follow -maxdepth 2 -mindepth 2 -type d -name 'lib' -o -name 'lib64')
+  do
+    _ldflags="-L${package_lib_dir} ${_ldflags}"
+  done
+
+  ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
+  tar xf $i
+  cd $ext_dir
+  mkdir build
+  cd build
+  ../configure --prefix=$BOSH_INSTALL_TARGET CPPFLAGS="${_cppflags}" LDFLAGS="${_ldflags}"
+  make && make install
+  cd ../..
+done
