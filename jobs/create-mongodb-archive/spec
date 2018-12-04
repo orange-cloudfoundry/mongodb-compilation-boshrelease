@@ -2,6 +2,7 @@
 name: create-mongodb-archive
 packages:
   - mongodb
+  - compressors
 
 templates:
   bin/errand.sh.erb: bin/run
