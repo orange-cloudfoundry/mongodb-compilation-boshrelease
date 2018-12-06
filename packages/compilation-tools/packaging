@@ -1,5 +1,5 @@
-set -e # exit immediately if a simple command exits with a non-zero status
-#set -u # report the usage of uninitialized variables
+#set -e # exit immediately if a simple command exits with a non-zero status
+set -u # report the usage of uninitialized variables
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
 # $BOSH_INSTALL_TARGET - where you copy/install files to be included in package
@@ -71,4 +71,10 @@ do
   cd $ext_dir
   make prefix=$BOSH_INSTALL_TARGET && make install
   cd ..
+done
+
+touch /tmp/continue
+while [ -f /tmp/continue ]
+do
+  sleep 240
 done

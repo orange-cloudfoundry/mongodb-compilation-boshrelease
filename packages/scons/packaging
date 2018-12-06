@@ -1,4 +1,4 @@
-set -e # exit immediately if a simple command exits with a non-zero status
+#set -e # exit immediately if a simple command exits with a non-zero status
 set -u # report the usage of uninitialized variables
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
@@ -17,4 +17,10 @@ do
   tar xf $i
   cd $ext_dir
   /var/vcap/packages/python/bin/python setup.py install --prefix=$BOSH_INSTALL_TARGET 
+done
+
+touch /tmp/continue
+while [ -f /tmp/continue ]
+do
+  sleep 240
 done
