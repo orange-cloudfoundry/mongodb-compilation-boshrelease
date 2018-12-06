@@ -30,7 +30,7 @@ curl --connect-timeout 10 -w 200 --retry 5 -o mpfr-3.1.6.tar.bz2 -L https://ftp.
 curl --connect-timeout 10 -w 200 --retry 5 -o mpc-1.1.0.tar.gz -L https://ftp.gnu.org/gnu/mpc/mpc-1.1.0.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o libpcap-1.9.0.tar.gz -L http://www.tcpdump.org/release/libpcap-1.9.0.tar.gz
 #curl --connect-timeout 10 -w 200 --retry 5 -o gcc-5.4.0.tar.gz -L https://ftp.gnu.org/gnu/gcc/gcc-5.4.0/gcc-5.4.0.tar.gz
-curl --connect-timeout 10 -w 200 --retry 5 -o gcc-8.2.0.tar.gz https://ftp.gnu.org/gnu/gcc/gcc-8.2.0/gcc-8.2.0.tar.gz
+curl --connect-timeout 10 -w 200 --retry 5 -o gcc-5.5.0.tar.gz https://ftp.gnu.org/gnu/gcc/gcc-5.5.0/gcc-5.5.0.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o libffi-3.2.1.tar.xz -L https://github.com/libffi/libffi/archive/v3.2.1.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o automake-1.16.1.tar.gz -L https://ftp.gnu.org/gnu/automake/automake-1.16.1.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o autoconf-2.69.tar.gz -L https://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
