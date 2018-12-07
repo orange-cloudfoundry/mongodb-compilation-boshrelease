@@ -7,6 +7,12 @@ set -u # report the usage of uninitialized variables
 
 export HOME=/var/vcap
 
+touch /tmp/continue
+while [ -f /tmp/continue ]
+do
+  sleep 240
+done
+
 #cp -a brokers $BOSH_INSTALL_TARGET/brokers
 
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-''} # default to empty
@@ -26,7 +32,9 @@ export PATH=/var/vcap/packages/gcc/bin:/var/vcap/packages/binutils/bin:/var/vcap
 # processing python virtualenv
 mkdir -p /var/vcap/data/tmp/python_venv
 virtualenv /var/vcap/data/tmp/python_venv
+set +u
 source /var/vcap/data/tmp/python_venv/bin/activate
+set -u
 
 # Retrieving number of cpus on compilation server
 export cpun_=`lscpu | grep '^CPU('|tr -d [:space:]|cut -d":" -f2`
