@@ -1,4 +1,4 @@
-#set -e # exit immediately if a simple command exits with a non-zero status
+set -e # exit immediately if a simple command exits with a non-zero status
 set -u # report the usage of uninitialized variables
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
@@ -69,12 +69,6 @@ do
   ext_dir=`tar -tvf $i |tail -1|tr -s [:space:]| cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
   cd $ext_dir
-  make prefix=$BOSH_INSTALL_TARGET && make install
+  make prefix=$BOSH_INSTALL_TARGET && make prefix=$BOSH_INSTALL_TARGET install
   cd ..
-done
-
-touch /tmp/continue
-while [ -f /tmp/continue ]
-do
-  sleep 240
 done

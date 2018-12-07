@@ -1,4 +1,4 @@
-#set -e # exit immediately if a simple command exits with a non-zero status
+set -e # exit immediately if a simple command exits with a non-zero status
 set -u # report the usage of uninitialized variables
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
@@ -25,10 +25,4 @@ do
   RANLIB=/var/vcap/packages/binutils/bin/ranlib ./Configure -fPIC shared --prefix=$BOSH_INSTALL_TARGET linux-x86_64 -I/var/vcap/packages/gcc/include -L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 
   make -j $cpun_
   make install
-done
-
-touch /tmp/continue
-while [ -f /tmp/continue ]
-do
-  sleep 240
 done

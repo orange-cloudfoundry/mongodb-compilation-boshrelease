@@ -1,4 +1,4 @@
-#set -e # exit immediately if a simple command exits with a non-zero status
+set -e # exit immediately if a simple command exits with a non-zero status
 set -u # report the usage of uninitialized variables
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
@@ -31,7 +31,7 @@ do
   ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
   cd $ext_dir
-  ./configure --prefix=$BOSH_INSTALL_TARGET M4=$BOSH_INSTALL_TARGET/bin/m4
+   M4=$BOSH_INSTALL_TARGET/bin/m4 ./configure --prefix=$BOSH_INSTALL_TARGET 
   make && make install
   cd ..
 done
@@ -112,7 +112,7 @@ do
   cd $ext_dir
   mkdir build
   cd build
-  ../configure --prefix=$BOSH_INSTALL_TARGET CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
+  CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib ../configure --prefix=$BOSH_INSTALL_TARGET 
   make && make install
   cd ../..
 done
@@ -125,7 +125,7 @@ do
   cd $ext_dir
   mkdir build
   cd build
-  ../configure --prefix=$BOSH_INSTALL_TARGET CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
+  CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib ../configure --prefix=$BOSH_INSTALL_TARGET 
   make && make install
   cd ../..
 done  
@@ -138,7 +138,7 @@ do
   cd $ext_dir
   mkdir build
   cd build
-  ../configure --prefix=$BOSH_INSTALL_TARGET CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
+  CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib ../configure --prefix=$BOSH_INSTALL_TARGET 
   make && make install
   cd ../..
 done
@@ -169,13 +169,7 @@ do
   perl -pe 's#^AM_CFLAGS = .*#AM_CFLAGS = -g#' -i Makefile.in
   perl -pe 's#^includesdir = .*#includesdir = \@includedir\@#' -i include/Makefile.in
 
-  ./configure --prefix=$BOSH_INSTALL_TARGET CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib
+  CC=$BOSH_INSTALL_TARGET/bin/gcc CPPFLAGS=-I$BOSH_INSTALL_TARGET/include LDFLAGS=-L$BOSH_INSTALL_TARGET/lib ./configure --prefix=$BOSH_INSTALL_TARGET 
   make && make install
   cd ..
-done
-
-touch /tmp/continue
-while [ -f /tmp/continue ]
-do
-  sleep 240
 done

@@ -1,4 +1,4 @@
-#set -e # exit immediately if a simple command exits with a non-zero status
+set -e # exit immediately if a simple command exits with a non-zero status
 set -u # report the usage of uninitialized variables
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
@@ -44,10 +44,4 @@ do
   cd $ext_dir
   python setup.py install
   cd ..
-done
-
-touch /tmp/continue
-while [ -f /tmp/continue ]
-do
-  sleep 240
 done
