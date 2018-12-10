@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
 
 export ROOT_FOLDER=${PWD}
 
@@ -48,6 +48,7 @@ touch config/blobs.yml
 # proceed download
 cd src
 [ -x downloadblob.sh ] && . ./downloadblob.sh || exit 666
+
 # checking all files are tarballs
 RC=0
 for file in $(ls | grep -Ew "tgz|tar")

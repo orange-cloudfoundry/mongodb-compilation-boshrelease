@@ -45,9 +45,4 @@ curl --connect-timeout 10 -w 200 --retry 5 -o Python-2.7.15.tgz -L https://www.p
 curl --connect-timeout 10 -w 200 --retry 5 -o virtualenv-16.1.0.tar.gz -L https://github.com/pypa/virtualenv/archive/16.1.0.tar.gz
 
 #scons
-curl --connect-timeout 10 -w 200 --retry 5 -o scons-3.0.1.tar.gz -L https://sourceforge.net/projects/scons/files/scons/3.0.1/scons-3.0.1.tar.gz/download
-
-
-
-
-
+curl --connect-timeout 10 -w 200 --retry 5 -o scons-3.0.1.tar.gz -L https://github.com/SCons/scons/archive/3.0.1.tar.gz
