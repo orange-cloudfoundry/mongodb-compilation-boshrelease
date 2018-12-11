@@ -10,17 +10,12 @@ export HOME=/var/vcap
 export CC=/var/vcap/packages/gcc/bin/gcc
 export CXX=/var/vcap/packages/gcc/bin/g++
 
-touch /tmp/continue
-while [ -f /tmp/continue ]
-do
-	sleep 240
-done
-
-#cp -a brokers $BOSH_INSTALL_TARGET/brokers
 for i in `find scons/  -type f -name '*.tar.gz' -print`
 do
   ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
   cd $ext_dir
+  /var/vcap/packages/python/bin/python bootstrap.py build/scons
+  cd build/scons
   /var/vcap/packages/python/bin/python setup.py install --prefix=$BOSH_INSTALL_TARGET 
 done

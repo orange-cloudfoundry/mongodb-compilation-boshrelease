@@ -13,8 +13,6 @@ do
   sleep 240
 done
 
-#cp -a brokers $BOSH_INSTALL_TARGET/brokers
-
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-''} # default to empty
 for package_lib_dir in $(find  /var/vcap/packages -follow -maxdepth 2 -mindepth 2 -type d -name 'lib' -o -name 'lib64')
 do
