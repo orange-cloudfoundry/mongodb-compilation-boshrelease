@@ -26,7 +26,7 @@ curl --connect-timeout 10 -w 200 --retry 5 -o coreutils-8.30.tar.xz -L https://f
 #gcc
 curl --connect-timeout 10 -w 200 --retry 5 -o m4-1.4.18.tar.bz2 -L https://ftp.gnu.org/gnu/m4/m4-1.4.18.tar.bz2
 curl --connect-timeout 10 -w 200 --retry 5 -o gmp-6.1.2.tar.bz2 -L https://ftp.gnu.org/gnu/gmp/gmp-6.1.2.tar.bz2
-curl --connect-timeout 10 -w 200 --retry 5 -o mpfr-3.1.6.tar.bz2 -L https://ftp.gnu.org/gnu/mpfr/mpfr-3.1.6.zip
+curl --connect-timeout 10 -w 200 --retry 5 -o mpfr-3.1.6.tar.bz2 -L https://ftp.gnu.org/gnu/mpfr/mpfr-3.1.6.tar.bz2
 curl --connect-timeout 10 -w 200 --retry 5 -o mpc-1.1.0.tar.gz -L https://ftp.gnu.org/gnu/mpc/mpc-1.1.0.tar.gz
 curl --connect-timeout 10 -w 200 --retry 5 -o libpcap-1.9.0.tar.gz -L http://www.tcpdump.org/release/libpcap-1.9.0.tar.gz
 #curl --connect-timeout 10 -w 200 --retry 5 -o gcc-5.4.0.tar.gz -L https://ftp.gnu.org/gnu/gcc/gcc-5.4.0/gcc-5.4.0.tar.gz
