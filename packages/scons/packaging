@@ -10,12 +10,27 @@ export HOME=/var/vcap
 export CC=/var/vcap/packages/gcc/bin/gcc
 export CXX=/var/vcap/packages/gcc/bin/g++
 
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-''} # default to empty
+for package_lib_dir in $(find  /var/vcap/packages -follow -maxdepth 2 -mindepth 2 -type d -name 'lib' -o -name 'lib64')
+do
+  export LD_LIBRARY_PATH=${package_lib_dir}:$LD_LIBRARY_PATH
+done
+
+export C_INCLUDE_PATH=${C_INCLUDE_PATH:-''}
+for package_inc_dir in $(find  /var/vcap/packages -follow -mindepth 2 -path '*include' -o -path '*include/*' -type d )
+do
+  export C_INCLUDE_PATH=${package_inc_dir}:$C_INCLUDE_PATH
+done
+
+for package_bin_dir in $(find  /var/vcap/packages -follow -mindepth 2 -path '*bin' -type d)
+do
+  export PATH=${package_bin_dir}:$PATH
+done
+
 for i in `find scons/  -type f -name '*.tar.gz' -print`
 do
   ext_dir=`tar -tvf $i |tail -1| tr -s [:space:] | cut -d" " -f6 |cut -d"/" -f1`
   tar xf $i
   cd $ext_dir
-  /var/vcap/packages/python/bin/python bootstrap.py build/scons
-  cd build/scons
   /var/vcap/packages/python/bin/python setup.py install --prefix=$BOSH_INSTALL_TARGET 
 done
