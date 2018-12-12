@@ -7,12 +7,6 @@ set -u # report the usage of uninitialized variables
 
 export HOME=/var/vcap
 
-touch /tmp/continue
-while [ -f /tmp/continue ]
-do
-  sleep 240
-done
-
 export LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-''} # default to empty
 for package_lib_dir in $(find  /var/vcap/packages -follow -maxdepth 2 -mindepth 2 -type d -name 'lib' -o -name 'lib64')
 do
@@ -105,6 +99,14 @@ do
   fi
 
   # compiling mongodb
+
+
+  touch /tmp/continue
+  while [ -f /tmp/continue ]
+  do
+    sleep 240
+  done
+
 
   export CC="/var/vcap/packages/gcc/bin/gcc" 
   export CXX="/var/vcap/packages/gcc/bin/g++" 

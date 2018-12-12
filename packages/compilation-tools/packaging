@@ -1,4 +1,4 @@
-set -e # exit immediately if a simple command exits with a non-zero status
+#set -e # exit immediately if a simple command exits with a non-zero status
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
 # $BOSH_INSTALL_TARGET - where you copy/install files to be included in package
@@ -11,9 +11,15 @@ export CC=/var/vcap/packages/gcc/bin/gcc
 export CXX=/var/vcap/packages/gcc/bin/g++
 
 
-for package_bin_dir in $(ls -d /var/vcap/packages/*/bin )
+for package_bin_dir in $(find  /var/vcap/packages -follow -mindepth 2 -path '*bin' -type d)
 do
   export PATH=${package_bin_dir}:$PATH
+done
+
+touch /tmp/continue
+while -f [ /tmp/continue ]
+do
+  sleep 240
 done
 
 # compiling cmake
