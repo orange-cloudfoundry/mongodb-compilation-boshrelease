@@ -14,12 +14,12 @@ do
 done
 
 export C_INCLUDE_PATH=${C_INCLUDE_PATH:-''}
-for package_inc_dir in $(find  /var/vcap/packages -follow -mindepth 2 -path '*include' -o -path '*include/*' -type d )
+for package_inc_dir in $(find  /var/vcap/packages -follow -mindepth 2 -maxdepth 2 -path '*/include' -type d )
 do
   export C_INCLUDE_PATH=${package_inc_dir}:$C_INCLUDE_PATH
 done
 
-for package_bin_dir in $(find  /var/vcap/packages -follow -mindepth 2 -path '*bin' -type d)
+for package_bin_dir in $(find  /var/vcap/packages -follow -mindepth 2 -path '*/bin' -type d)
 do
   export PATH=${package_bin_dir}:$PATH
 done
