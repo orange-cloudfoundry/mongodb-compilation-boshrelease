@@ -1,4 +1,4 @@
-#set -e # exit immediately if a simple command exits with a non-zero status
+set -e # exit immediately if a simple command exits with a non-zero status
 set -u # report the usage of uninitialized variables
 
 # $BOSH_COMPILE_TARGET - where this package & spec'd source files are available
@@ -100,14 +100,6 @@ do
 
   # compiling mongodb
 
-
-  touch /tmp/continue
-  while [ -f /tmp/continue ]
-  do
-    sleep 240
-  done
-
-
   export CC="/var/vcap/packages/gcc/bin/gcc" 
   export CXX="/var/vcap/packages/gcc/bin/g++" 
   export CPPPATH="$BOSH_INSTALL_TARGET/include \
@@ -199,7 +191,7 @@ do
   source $go_compile_env
   export CGO_LDFLAGS="-L/var/vcap/packages/gcc/lib -L/var/vcap/packages/gcc/lib64 -L/var/vcap/packages/openssl/lib"
   # initializing PKG_CONFIG_PATH
-  export PKG_CONFIG_PATH="/var/vcap/packages/openssl/lib/pkgconfig:$PKG_CONFIG_PATH"
+  export PKG_CONFIG_PATH=/var/vcap/packages/openssl/lib/pkgconfig:${PKG_CONFIG_PATH:-''}
   ./set_gopath.sh
   # patching shebang which have to be set to #!/bin/bash 
   sed -ie "1s/^#\!.*$/#\!\/bin\/bash/" build.sh
@@ -207,10 +199,4 @@ do
   [ ! -d $BOSH_INSTALL_TARGET/bin ] && mkdir -p $BOSH_INSTALL_TARGET/bin
   cp -rp bin/* $BOSH_INSTALL_TARGET/bin
   cd ..
-done
-
-touch /tmp/continue
-while [ -f /tmp/continue ]
-do
-  sleep 240
 done
