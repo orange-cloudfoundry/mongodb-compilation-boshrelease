@@ -50,7 +50,7 @@ do
            -L/var/vcap/packages/gcc/lib64 \
            -L/var/vcap/packages/openssl/lib \
            -lsnappy -llz4 -lzstd -lssl -lcrypto" \
-  DISABLE_JEMALLOC=1 USE_RTTI=1 EXTRA_CXXFLAGS=-fPIC make -j $cpun_ static_lib
+  DISABLE_JEMALLOC=1 USE_RTTI=1 PORTABLE=1 EXTRA_CXXFLAGS=-fPIC make -j $cpun_ static_lib
   INSTALL_PATH=$BOSH_INSTALL_TARGET make install
   cd ..
 done
