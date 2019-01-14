@@ -3,7 +3,15 @@
 set -e
 
 apt update
-apt install -y jq python python-yaml
+
+#avoiding error 407 with cntlm proxy
+RET=1
+while [ $RET -ne 0 ]
+do
+  >/tmp/apt.log
+  apt install -y jq python python-yaml | tee -a /tmp/apt.log
+  RET=$(grep -w 407 /tmp/apt.log|grep "Proxy Authentication Required"|wc -l)
+done
 
 export ROOT_FOLDER=${PWD}
 
